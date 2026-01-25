@@ -46,8 +46,8 @@ jobs:
         run: |
           pnpm -r exec sed -i 's/"workspace:\*"/"*"/g' "package.json"
 
-      - name: Semantic Release (models)
-        working-directory: packages/models
+      - name: Semantic Release (cli)
+        working-directory: packages/llmgateway-cli
         run: pnpm semantic-release
         env:
           GITHUB_TOKEN: ${{ github.token }}
