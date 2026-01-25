@@ -33,6 +33,7 @@ program
 // list command
 program
   .command("list")
+  .alias("ls")
   .description("List available templates")
   .option("--json", "Output as JSON")
   .action(list);
