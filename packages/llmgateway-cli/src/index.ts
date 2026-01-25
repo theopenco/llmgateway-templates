@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
+import { createRequire } from "module";
 import { init } from "./commands/init.js";
 import { list } from "./commands/list.js";
 import { listModels } from "./commands/models.js";
@@ -10,13 +11,16 @@ import { upgrade } from "./commands/upgrade.js";
 import { docs } from "./commands/docs.js";
 import { add } from "./commands/add.js";
 
+const require = createRequire(import.meta.url);
+const pkg = require("../package.json");
+
 const program = new Command();
 
 program
   .name("llmgateway")
   .alias("lg")
   .description("CLI tool for scaffolding LLM Gateway templates and managing AI projects")
-  .version("0.1.0");
+  .version(pkg.version);
 
 // init command
 program
