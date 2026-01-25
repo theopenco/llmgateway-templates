@@ -6,7 +6,7 @@ A collection of open-source templates for building AI-powered applications using
 
 ### Image Generation App
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftheopenco%2Fopenllm-templates&env=LLMGATEWAY_API_KEY&envDescription=Get%20your%20API%20key%20from%20llmgateway.io&envLink=https%3A%2F%2Fllmgateway.io&project-name=llm-image-generation&repository-name=llm-image-generation&root-directory=templates/image-generation)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftheopenco%2Fllmgateway-templates&env=LLMGATEWAY_API_KEY&envDescription=Get%20your%20API%20key%20from%20llmgateway.io&envLink=https%3A%2F%2Fllmgateway.io&project-name=llm-image-generation&repository-name=llm-image-generation&root-directory=templates/image-generation)
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/llm-image-generation?referralCode=llmgateway)
 
@@ -29,8 +29,8 @@ A collection of open-source templates for building AI-powered applications using
 
 ```bash
 # Clone the repository
-git clone https://github.com/theopenco/openllm-templates.git
-cd openllm-templates
+git clone https://github.com/theopenco/llmgateway-templates.git
+cd llmgateway-templates
 
 # Install dependencies
 pnpm install
@@ -63,7 +63,7 @@ pnpm build
 ## Project Structure
 
 ```
-openllm-templates/
+llmgateway-templates/
 ├── templates/
 │   └── image-generation/    # Next.js image generation app
 ├── agents/
@@ -101,5 +101,5 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 
 ## Support
 
-- [GitHub Issues](https://github.com/theopenco/openllm-templates/issues)
+- [GitHub Issues](https://github.com/theopenco/llmgateway-templates/issues)
 - [LLM Gateway Discord](https://discord.gg/llmgateway)

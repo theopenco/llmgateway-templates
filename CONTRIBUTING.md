@@ -10,7 +10,7 @@ By participating in this project, you agree to maintain a respectful and inclusi
 
 ### Reporting Bugs
 
-1. Check if the issue already exists in [GitHub Issues](https://github.com/theopenco/openllm-templates/issues)
+1. Check if the issue already exists in [GitHub Issues](https://github.com/theopenco/llmgateway-templates/issues)
 2. If not, create a new issue with:
    - Clear, descriptive title
    - Steps to reproduce
@@ -19,7 +19,7 @@ By participating in this project, you agree to maintain a respectful and inclusi
 
 ### Suggesting Features
 
-1. Open a [GitHub Issue](https://github.com/theopenco/openllm-templates/issues/new)
+1. Open a [GitHub Issue](https://github.com/theopenco/llmgateway-templates/issues/new)
 2. Describe the feature and its use case
 3. Explain why it would benefit the community
 
@@ -29,8 +29,8 @@ By participating in this project, you agree to maintain a respectful and inclusi
 
 2. **Clone your fork**
    ```bash
-   git clone https://github.com/your-username/openllm-templates.git
-   cd openllm-templates
+   git clone https://github.com/your-username/llmgateway-templates.git
+   cd llmgateway-templates
    ```
 
 3. **Install dependencies**
@@ -137,7 +137,7 @@ Use clear, descriptive commit messages:
 
 ## Questions?
 
-- Open a [GitHub Discussion](https://github.com/theopenco/openllm-templates/discussions)
+- Open a [GitHub Discussion](https://github.com/theopenco/llmgateway-templates/discussions)
 - Join our [Discord](https://discord.gg/llmgateway)
 
 Thank you for contributing!
