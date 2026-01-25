@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -30,10 +30,11 @@ jobs:
         with:
           version: ${{ env.pnpm_version }}
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.nodejs_version }}
           cache: pnpm
+          registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -43,10 +44,10 @@ jobs:
 
       - name: Fix workspace dependencies
         run: |
-          pnpm -r exec sed -i 's/"workspace:\*/"*/g' "package.json"
+          pnpm -r exec sed -i 's/"workspace:\*"/"*"/g' "package.json"
 
-      - name: Semantic Release (cli)
-        working-directory: packages/llmgateway-cli
+      - name: Semantic Release (models)
+        working-directory: packages/models
         run: pnpm semantic-release
         env:
           GITHUB_TOKEN: ${{ github.token }}
