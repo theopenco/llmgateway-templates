@@ -17,7 +17,35 @@ A collection of open-source templates for building AI-powered applications using
 | [Image Generation](./templates/image-generation) | Full-stack web app for AI image generation | Next.js 16, React 19, Tailwind CSS |
 | [Weather Agent](./agents/weather-agent) | CLI agent that answers weather queries using tools | Node.js, TypeScript, Vercel AI SDK |
 
-## Getting Started
+## Quick Start
+
+The easiest way to get started is with the CLI:
+
+```bash
+# Create a new project (interactive)
+npx @llmgateway/cli init
+
+# Or specify a template directly
+npx @llmgateway/cli init --template image-generation
+npx @llmgateway/cli init --template weather-agent
+```
+
+## CLI
+
+The `@llmgateway/cli` provides tools for scaffolding templates and managing AI projects:
+
+```bash
+npx @llmgateway/cli init              # Create a new project from a template
+npx @llmgateway/cli list              # List available templates
+npx @llmgateway/cli models            # Browse available AI models
+npx @llmgateway/cli add tool weather  # Add tools to your project
+npx @llmgateway/cli auth login        # Manage your API key
+npx @llmgateway/cli docs              # Open documentation
+```
+
+See the [CLI documentation](./packages/llmgateway-cli/README.md) for all available commands.
+
+## Getting Started (Manual)
 
 ### Prerequisites
 
@@ -64,6 +92,8 @@ pnpm build
 
 ```
 llmgateway-templates/
+├── packages/
+│   └── llmgateway-cli/      # @llmgateway/cli package
 ├── templates/
 │   └── image-generation/    # Next.js image generation app
 ├── agents/
