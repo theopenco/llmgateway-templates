@@ -14,6 +14,7 @@ const program = new Command();
 
 program
   .name("llmgateway")
+  .alias("lg")
   .description("CLI tool for scaffolding LLM Gateway templates and managing AI projects")
   .version("0.1.0");
 
