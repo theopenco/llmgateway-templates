@@ -1,6 +1,6 @@
 {
   "name": "@llmgateway/cli",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "CLI tool for scaffolding LLM Gateway templates and managing AI projects",
   "type": "module",
   "bin": {
