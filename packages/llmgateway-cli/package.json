@@ -1,0 +1,54 @@
+{
+  "name": "@llmgateway/cli",
+  "version": "0.1.0",
+  "description": "CLI tool for scaffolding LLM Gateway templates and managing AI projects",
+  "type": "module",
+  "bin": {
+    "llmgateway": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint src/"
+  },
+  "keywords": [
+    "llm",
+    "ai",
+    "cli",
+    "template",
+    "scaffold",
+    "llmgateway"
+  ],
+  "author": "LLM Gateway",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theopenco/llmgateway-templates.git",
+    "directory": "packages/llmgateway-cli"
+  },
+  "dependencies": {
+    "@llmgateway/models": "^1.1.1",
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "degit": "^2.8.4",
+    "fs-extra": "^11.3.0",
+    "open": "^10.1.0",
+    "ora": "^8.2.0",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/degit": "^2.8.6",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^22.10.10",
+    "@types/prompts": "^2.4.9",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
