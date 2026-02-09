@@ -1,4 +1,4 @@
 packages:
-  - "templates/*"
-  - "agents/*"
-  - "packages/*"
+  - templates/*
+  - agents/*
+  - packages/*
