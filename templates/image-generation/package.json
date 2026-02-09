@@ -9,7 +9,7 @@
     "lint": "eslint --cache --cache-location .next/cache/eslint/ ."
   },
   "dependencies": {
-    "@llmgateway/ai-sdk-provider": "^2.0.0",
+    "@llmgateway/ai-sdk-provider": "^3.2.1",
     "@llmgateway/models": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",

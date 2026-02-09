@@ -2,6 +2,3 @@ packages:
   - templates/*
   - agents/*
   - packages/*
-
-patchedDependencies:
-  '@llmgateway/ai-sdk-provider@2.5.1': patches/@llmgateway__ai-sdk-provider@2.5.1.patch
