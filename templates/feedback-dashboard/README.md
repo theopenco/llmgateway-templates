@@ -4,6 +4,8 @@ A full-stack Next.js app for AI-powered customer feedback sentiment analysis usi
 
 ![Feedback Dashboard Template](feedback.png)
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftheopenco%2Fllmgateway-templates&env=LLMGATEWAY_API_KEY&envDescription=Get%20your%20API%20key%20from%20llmgateway.io&envLink=https%3A%2F%2Fllmgateway.io&project-name=llm-feedback-dashboard&repository-name=llm-feedback-dashboard&root-directory=templates/feedback-dashboard)
+
 ## Features
 
 - Paste customer reviews (one per line) for analysis

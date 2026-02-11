@@ -4,6 +4,8 @@ A full-stack Next.js app that generates Open Graph images with AI-powered copy v
 
 ![OG Image Generator Template](og-image.png)
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftheopenco%2Fllmgateway-templates&env=LLMGATEWAY_API_KEY&envDescription=Get%20your%20API%20key%20from%20llmgateway.io&envLink=https%3A%2F%2Fllmgateway.io&project-name=llm-og-image-generator&repository-name=llm-og-image-generator&root-directory=templates/og-image-generator)
+
 ## Features
 
 - AI-generated title, subtitle, and call-to-action copy

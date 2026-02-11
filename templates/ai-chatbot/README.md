@@ -4,6 +4,8 @@ A full-stack Next.js chatbot with streaming responses using LLM Gateway.
 
 ![AI Chatbot Template](chatbot.png)
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftheopenco%2Fllmgateway-templates&env=LLMGATEWAY_API_KEY&envDescription=Get%20your%20API%20key%20from%20llmgateway.io&envLink=https%3A%2F%2Fllmgateway.io&project-name=llm-ai-chatbot&repository-name=llm-ai-chatbot&root-directory=templates/ai-chatbot)
+
 ## Features
 
 - Streaming chat with real-time token delivery
