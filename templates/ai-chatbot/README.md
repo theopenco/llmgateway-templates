@@ -2,6 +2,8 @@
 
 A full-stack Next.js chatbot with streaming responses using LLM Gateway.
 
+![AI Chatbot Template](chatbot.png)
+
 ## Features
 
 - Streaming chat with real-time token delivery

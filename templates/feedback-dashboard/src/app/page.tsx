@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { BarChart3, Loader2, MessageSquare, RotateCcw } from "lucide-react";
+import { BarChart3, KeyRound, Loader2, MessageSquare, RotateCcw } from "lucide-react";
+import { useApiKey } from "@/components/api-key-provider";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -60,6 +61,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
+  const { apiKey, setOpen: setApiKeyOpen } = useApiKey();
 
   async function handleAnalyze(e: React.FormEvent) {
     e.preventDefault();
@@ -71,7 +73,10 @@ export default function Home() {
     try {
       const response = await fetch("/api/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(apiKey ? { "x-api-key": apiKey } : {}),
+        },
         body: JSON.stringify({ reviews }),
       });
 
@@ -106,10 +111,20 @@ export default function Home() {
                 {analysis.reviews.length} reviews analyzed
               </p>
             </div>
-            <Button variant="outline" onClick={handleReset}>
-              <RotateCcw className="size-4" />
-              Analyze New
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setApiKeyOpen(true)}
+                title="API Key"
+              >
+                <KeyRound className="size-4" />
+              </Button>
+              <Button variant="outline" onClick={handleReset}>
+                <RotateCcw className="size-4" />
+                Analyze New
+              </Button>
+            </div>
           </header>
 
           <div className="mb-6 grid gap-4 sm:grid-cols-2">
@@ -208,6 +223,16 @@ export default function Home() {
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-2xl">
         <header className="mb-8 text-center">
+          <div className="flex justify-end">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => setApiKeyOpen(true)}
+              title="API Key"
+            >
+              <KeyRound className="size-4" />
+            </Button>
+          </div>
           <h1 className="mb-2 text-4xl font-bold">Feedback Dashboard</h1>
           <p className="text-lg text-muted-foreground">
             Analyze customer feedback with AI-powered sentiment analysis

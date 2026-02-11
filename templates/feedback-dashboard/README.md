@@ -2,6 +2,8 @@
 
 A full-stack Next.js app for AI-powered customer feedback sentiment analysis using LLM Gateway.
 
+![Feedback Dashboard Template](feedback.png)
+
 ## Features
 
 - Paste customer reviews (one per line) for analysis

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ApiKeyProvider } from "@/components/api-key-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,7 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ApiKeyProvider>{children}</ApiKeyProvider>
+      </body>
     </html>
   );
 }

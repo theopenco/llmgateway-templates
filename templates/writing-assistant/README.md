@@ -2,6 +2,8 @@
 
 A full-stack Next.js app for AI-powered text transformation using LLM Gateway.
 
+![Writing Assistant Template](writing-assistant.png)
+
 ## Features
 
 - Multiple text actions: rewrite, summarize, expand, fix grammar, change tone

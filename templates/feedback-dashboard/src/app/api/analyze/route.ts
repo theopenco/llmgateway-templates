@@ -2,10 +2,6 @@ import { createLLMGateway } from "@llmgateway/ai-sdk-provider";
 import { generateObject } from "ai";
 import { z } from "zod";
 
-const llmgateway = createLLMGateway({
-  apiKey: process.env.LLMGATEWAY_API_KEY,
-});
-
 const analysisSchema = z.object({
   overallSentiment: z
     .enum(["positive", "negative", "neutral", "mixed"])
@@ -45,6 +41,11 @@ const analysisSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const apiKey =
+      request.headers.get("x-api-key") || process.env.LLMGATEWAY_API_KEY;
+
+    const llmgateway = createLLMGateway({ apiKey });
+
     const { reviews } = await request.json();
 
     if (!reviews || typeof reviews !== "string" || !reviews.trim()) {

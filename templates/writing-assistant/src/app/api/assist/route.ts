@@ -1,10 +1,6 @@
 import { createLLMGateway } from "@llmgateway/ai-sdk-provider";
 import { generateText } from "ai";
 
-const llmgateway = createLLMGateway({
-  apiKey: process.env.LLMGATEWAY_API_KEY,
-});
-
 const ACTION_PROMPTS: Record<string, (text: string, tone?: string) => string> = {
   rewrite: (text) =>
     `Rewrite the following text to improve clarity and flow while preserving the original meaning. Return only the rewritten text.\n\n${text}`,
@@ -20,6 +16,11 @@ const ACTION_PROMPTS: Record<string, (text: string, tone?: string) => string> = 
 
 export async function POST(request: Request) {
   try {
+    const apiKey =
+      request.headers.get("x-api-key") || process.env.LLMGATEWAY_API_KEY;
+
+    const llmgateway = createLLMGateway({ apiKey });
+
     const { text, action, tone } = await request.json();
 
     if (!text || typeof text !== "string" || !text.trim()) {
