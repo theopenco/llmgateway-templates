@@ -2,6 +2,8 @@
 
 A full-stack Next.js app that generates Open Graph images with AI-powered copy via LLM Gateway.
 
+![OG Image Generator Template](og-image.png)
+
 ## Features
 
 - AI-generated title, subtitle, and call-to-action copy

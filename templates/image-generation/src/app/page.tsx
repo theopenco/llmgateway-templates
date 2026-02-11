@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { AlertCircle, KeyRound } from "lucide-react";
 import { models } from "@llmgateway/models";
+import { useApiKey } from "@/components/api-key-provider";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -17,7 +20,6 @@ import {
   PromptInputSelectValue,
   type PromptInputMessage,
 } from "@/components/ai-elements/prompt-input";
-import { AlertCircle } from "lucide-react";
 
 // Filter models that support image generation and extract needed fields
 const IMAGE_MODELS = models
@@ -40,6 +42,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [images, setImages] = useState<GeneratedImage[]>([]);
+  const { apiKey, setOpen: setApiKeyOpen } = useApiKey();
 
   async function handleSubmit(message: PromptInputMessage) {
     const prompt = message.text;
@@ -51,7 +54,10 @@ export default function Home() {
     try {
       const response = await fetch("/api/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(apiKey ? { "x-api-key": apiKey } : {}),
+        },
         body: JSON.stringify({ prompt, model }),
       });
 
@@ -79,6 +85,16 @@ export default function Home() {
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-4xl">
         <header className="mb-8 text-center">
+          <div className="flex justify-end">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => setApiKeyOpen(true)}
+              title="API Key"
+            >
+              <KeyRound className="size-4" />
+            </Button>
+          </div>
           <h1 className="mb-2 text-4xl font-bold">Image Generation</h1>
           <p className="text-lg text-muted-foreground">
             Generate images using AI models via LLM Gateway

@@ -1,8 +1,9 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { useEffect, useRef, useState } from "react";
-import { Bot, Send, Trash2, User } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Bot, KeyRound, Send, Trash2, User } from "lucide-react";
+import { useApiKey } from "@/components/api-key-provider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -16,11 +17,19 @@ const MODELS = [
 export default function Home() {
   const [model, setModel] = useState(MODELS[0].id);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { apiKey, setOpen: setApiKeyOpen } = useApiKey();
+
+  const headers = useMemo(
+    () => (apiKey ? { "x-api-key": apiKey } : undefined),
+    [apiKey]
+  );
 
   const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } =
     useChat({
       api: "/api/chat",
       body: { model },
+      headers,
+      streamProtocol: "text",
     });
 
   useEffect(() => {
@@ -43,6 +52,14 @@ export default function Home() {
               </option>
             ))}
           </select>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => setApiKeyOpen(true)}
+            title="API Key"
+          >
+            <KeyRound className="size-4" />
+          </Button>
           {messages.length > 0 && (
             <Button
               variant="ghost"
@@ -92,7 +109,11 @@ export default function Home() {
                 }`}
               >
                 <CardContent className="whitespace-pre-wrap text-sm">
-                  {message.content}
+                  {message.parts
+                    .filter((part) => part.type === "text")
+                    .map((part, i) => (
+                      <span key={i}>{part.text}</span>
+                    ))}
                 </CardContent>
               </Card>
               {message.role === "user" && (

@@ -1,12 +1,13 @@
 import { createLLMGateway } from "@llmgateway/ai-sdk-provider";
 import { generateText } from "ai";
 
-const llmgateway = createLLMGateway({
-  apiKey: process.env.LLMGATEWAY_API_KEY,
-});
-
 export async function POST(request: Request) {
   try {
+    const apiKey =
+      request.headers.get("x-api-key") || process.env.LLMGATEWAY_API_KEY;
+
+    const llmgateway = createLLMGateway({ apiKey });
+
     const { prompt, model } = await request.json();
 
     if (!prompt || typeof prompt !== "string") {

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Download, Loader2, Sparkles } from "lucide-react";
+import { Copy, Download, KeyRound, Loader2, Sparkles } from "lucide-react";
+import { useApiKey } from "@/components/api-key-provider";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -28,6 +29,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [ogData, setOgData] = useState<OgData | null>(null);
   const [copied, setCopied] = useState(false);
+  const { apiKey, setOpen: setApiKeyOpen } = useApiKey();
 
   async function handleGenerate(e: React.FormEvent) {
     e.preventDefault();
@@ -39,7 +41,10 @@ export default function Home() {
     try {
       const response = await fetch("/api/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(apiKey ? { "x-api-key": apiKey } : {}),
+        },
         body: JSON.stringify({ productName, description, style }),
       });
 
@@ -102,6 +107,16 @@ export default function Home() {
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-5xl">
         <header className="mb-8 text-center">
+          <div className="flex justify-end">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => setApiKeyOpen(true)}
+              title="API Key"
+            >
+              <KeyRound className="size-4" />
+            </Button>
+          </div>
           <h1 className="mb-2 text-4xl font-bold">OG Image Generator</h1>
           <p className="text-lg text-muted-foreground">
             Generate Open Graph images with AI-powered copy via LLM Gateway

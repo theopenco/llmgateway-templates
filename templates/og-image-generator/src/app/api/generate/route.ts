@@ -2,10 +2,6 @@ import { createLLMGateway } from "@llmgateway/ai-sdk-provider";
 import { generateObject } from "ai";
 import { z } from "zod";
 
-const llmgateway = createLLMGateway({
-  apiKey: process.env.LLMGATEWAY_API_KEY,
-});
-
 const ogSchema = z.object({
   title: z.string().describe("A compelling title for the OG image (max 60 chars)"),
   subtitle: z
@@ -25,6 +21,11 @@ const ogSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const apiKey =
+      request.headers.get("x-api-key") || process.env.LLMGATEWAY_API_KEY;
+
+    const llmgateway = createLLMGateway({ apiKey });
+
     const { productName, description, style } = await request.json();
 
     if (!productName || typeof productName !== "string") {

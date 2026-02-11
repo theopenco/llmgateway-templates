@@ -1,11 +1,12 @@
 import { createLLMGateway } from "@llmgateway/ai-sdk-provider";
 import { streamText } from "ai";
 
-const llmgateway = createLLMGateway({
-  apiKey: process.env.LLMGATEWAY_API_KEY,
-});
-
 export async function POST(request: Request) {
+  const apiKey =
+    request.headers.get("x-api-key") || process.env.LLMGATEWAY_API_KEY;
+
+  const llmgateway = createLLMGateway({ apiKey });
+
   const { messages, model } = await request.json();
 
   const result = streamText({
