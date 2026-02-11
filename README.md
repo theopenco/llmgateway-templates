@@ -15,7 +15,16 @@ A collection of open-source templates for building AI-powered applications using
 | Template | Description | Stack |
 |----------|-------------|-------|
 | [Image Generation](./templates/image-generation) | Full-stack web app for AI image generation | Next.js 16, React 19, Tailwind CSS |
+| [AI Chatbot](./templates/ai-chatbot) | Streaming chat with conversation history and model selector | Next.js 16, React 19, Tailwind CSS |
+| [OG Image Generator](./templates/og-image-generator) | AI-powered Open Graph image generator with preview and download | Next.js 16, React 19, Tailwind CSS |
+| [Feedback Dashboard](./templates/feedback-dashboard) | Customer feedback sentiment analysis dashboard | Next.js 16, React 19, Tailwind CSS |
+| [Writing Assistant](./templates/writing-assistant) | AI writing assistant with text actions (rewrite, summarize, expand) | Next.js 16, React 19, Tailwind CSS |
 | [Weather Agent](./agents/weather-agent) | CLI agent that answers weather queries using tools | Node.js, TypeScript, Vercel AI SDK |
+| [Lead Agent](./agents/lead-agent) | CLI agent that researches people and posts to Discord | Node.js, TypeScript, Vercel AI SDK |
+| [Changelog Generator](./agents/changelog-generator-agent) | CLI agent that generates changelogs from git history | Node.js, TypeScript, Vercel AI SDK |
+| [Email Drafter](./agents/email-drafter-agent) | CLI agent that drafts polished emails from notes | Node.js, TypeScript, Vercel AI SDK |
+| [Sentiment Analyzer](./agents/sentiment-analyzer-agent) | CLI agent that analyzes text sentiment | Node.js, TypeScript, Vercel AI SDK |
+| [Data Extractor](./agents/data-extractor-agent) | CLI agent that extracts structured entities from text | Node.js, TypeScript, Vercel AI SDK |
 
 ## Quick Start
 
@@ -95,9 +104,18 @@ llmgateway-templates/
 ├── packages/
 │   └── llmgateway-cli/      # @llmgateway/cli package
 ├── templates/
-│   └── image-generation/    # Next.js image generation app
+│   ├── image-generation/    # Next.js image generation app
+│   ├── ai-chatbot/          # Next.js streaming chatbot
+│   ├── og-image-generator/  # Next.js OG image generator
+│   ├── feedback-dashboard/  # Next.js sentiment dashboard
+│   └── writing-assistant/   # Next.js writing assistant
 ├── agents/
-│   └── weather-agent/       # CLI weather agent
+│   ├── weather-agent/              # CLI weather agent
+│   ├── lead-agent/                 # CLI lead research agent
+│   ├── changelog-generator-agent/  # CLI changelog generator
+│   ├── email-drafter-agent/        # CLI email drafter
+│   ├── sentiment-analyzer-agent/   # CLI sentiment analyzer
+│   └── data-extractor-agent/       # CLI data extractor
 ├── package.json             # Root workspace config
 ├── pnpm-workspace.yaml      # pnpm workspace config
 └── turbo.json               # Turbo build config
