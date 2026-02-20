@@ -1,6 +1,6 @@
 # QA Agent Template
 
-An AI-powered QA testing agent that uses Playwright to interact with your running web app. Give it natural language test instructions and watch it execute step-by-step with a real-time action timeline and live browser preview.
+An AI-powered QA testing agent that uses Agent Browser to interact with your running web app. Give it natural language test instructions and watch it execute step-by-step with a real-time action timeline and live browser preview.
 
 ## Demo
 
@@ -9,7 +9,7 @@ An AI-powered QA testing agent that uses Playwright to interact with your runnin
 ## Features
 
 - Natural language test instructions — describe what to test in plain English
-- Playwright MCP integration — the agent controls a headless browser to navigate, click, type, and screenshot
+- Agent Browser — the agent controls a headless browser to navigate, click, type, and screenshot
 - Real-time action timeline — see each step as the agent executes it
 - Live iframe preview of the target application
 - Model selector to switch between LLM providers
@@ -20,7 +20,7 @@ An AI-powered QA testing agent that uses Playwright to interact with your runnin
 - **Framework**: Next.js 16 (App Router)
 - **UI**: React 19, Tailwind CSS 4, shadcn/ui
 - **AI**: Vercel AI SDK (`generateText` + MCP tools), LLM Gateway Provider
-- **Browser Automation**: Playwright MCP (headless)
+- **Browser Automation**: Agent browser (headless)
 - **Icons**: Lucide React
 
 ## Getting Started
