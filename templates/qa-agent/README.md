@@ -4,7 +4,7 @@ An AI-powered QA testing agent that uses Playwright to interact with your runnin
 
 ## Demo
 
-<video src="demo.mp4" />
+<iframe width="560" height="315" src="[https://www.youtube.com/embed/video-id](https://www.youtube.com/embed/-ai9eVvXvZE?si=lFIULxRqUpi_ZLrI)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Features
 
