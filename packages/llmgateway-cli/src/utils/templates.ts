@@ -37,6 +37,12 @@ export const templates: Template[] = [
     path: "templates/writing-assistant",
   },
   {
+    name: "qa-agent",
+    description: "AI QA testing agent with live browser preview",
+    category: "web",
+    path: "templates/qa-agent",
+  },
+  {
     name: "weather-agent",
     description: "CLI agent that answers weather queries using tools",
     category: "agent",
