@@ -1,5 +1,5 @@
 import { createLLMGateway } from "@llmgateway/ai-sdk-provider";
-import { generateText } from "ai";
+import { generateImage } from "ai";
 
 export async function POST(request: Request) {
   try {
@@ -14,43 +14,25 @@ export async function POST(request: Request) {
       return Response.json({ error: "Prompt is required" }, { status: 400 });
     }
 
-    const result = await generateText({
-      model: llmgateway(model || "google/gemini-2.0-flash-exp-image-generation"),
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
+    const result = await generateImage({
+      model: llmgateway.image(model || "gemini-3-pro-image-preview"),
+      prompt,
+      n: 1,
     });
 
-    const images: string[] = [];
-
-    for (const message of result.response.messages) {
-      if (message.role === "assistant" && Array.isArray(message.content)) {
-        for (const part of message.content) {
-          if (part.type === "file") {
-            const filePart = part as {
-              type: "file";
-              data: string | Uint8Array | ArrayBuffer | URL;
-              mediaType?: string;
-            };
-
-            if (filePart.mediaType?.startsWith("image/")) {
-              if (typeof filePart.data === "string") {
-                images.push(`data:${filePart.mediaType};base64,${filePart.data}`);
-              }
-            }
-          }
-        }
-      }
-    }
+    const images = result.images.map(
+      (image) =>
+        `data:${image.mediaType || "image/png"};base64,${image.base64}`
+    );
 
     return Response.json({ images });
   } catch (error) {
     console.error("Image generation error:", error);
     return Response.json(
-      { error: error instanceof Error ? error.message : "Failed to generate image" },
+      {
+        error:
+          error instanceof Error ? error.message : "Failed to generate image",
+      },
       { status: 500 }
     );
   }

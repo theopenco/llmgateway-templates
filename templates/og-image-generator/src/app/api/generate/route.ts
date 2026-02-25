@@ -1,23 +1,5 @@
 import { createLLMGateway } from "@llmgateway/ai-sdk-provider";
-import { generateObject } from "ai";
-import { z } from "zod";
-
-const ogSchema = z.object({
-  title: z.string().describe("A compelling title for the OG image (max 60 chars)"),
-  subtitle: z
-    .string()
-    .describe("A supporting subtitle or tagline (max 100 chars)"),
-  callToAction: z.string().describe("A short call-to-action text (max 30 chars)"),
-  theme: z
-    .enum(["gradient", "minimal", "bold"])
-    .describe("Visual theme for the OG image"),
-  gradientFrom: z
-    .string()
-    .describe("Starting hex color for gradient background (e.g. #6366f1)"),
-  gradientTo: z
-    .string()
-    .describe("Ending hex color for gradient background (e.g. #8b5cf6)"),
-});
+import { generateImage } from "ai";
 
 export async function POST(request: Request) {
   try {
@@ -35,19 +17,24 @@ export async function POST(request: Request) {
       );
     }
 
-    const result = await generateObject({
-      model: llmgateway("openai/gpt-4o-mini"),
-      schema: ogSchema,
-      prompt: `Generate compelling OG image copy for a product/page.
+    const styleDescriptions: Record<string, string> = {
+      gradient: "a vibrant gradient background with modern typography",
+      minimal: "a clean, minimalist white background with elegant typography",
+      bold: "a bold, high-contrast design with strong colors",
+    };
 
-Product name: ${productName}
-Description: ${description || "N/A"}
-Preferred style: ${style || "gradient"}
+    const styleDesc = styleDescriptions[style] || styleDescriptions.gradient;
 
-Create a title, subtitle, and call-to-action that would look great on a 1200x630 Open Graph image. Choose colors that match the product's vibe. The theme should be "${style || "gradient"}".`,
+    const result = await generateImage({
+      model: llmgateway.image("gemini-3-pro-image-preview"),
+      prompt: `Create a professional Open Graph social media preview image in landscape orientation (wider than tall, roughly 1200x630 aspect ratio) for a product called "${productName}".${description ? ` The product: ${description}.` : ""} The design should feature ${styleDesc}. Include the product name "${productName}" as prominent heading text on the image. Make it look polished and suitable for social media sharing.`,
+      n: 1,
     });
 
-    return Response.json(result.object);
+    const image = result.images[0];
+    const dataUrl = `data:${image.mediaType || "image/png"};base64,${image.base64}`;
+
+    return Response.json({ image: dataUrl });
   } catch (error) {
     console.error("OG generation error:", error);
     return Response.json(
@@ -55,7 +42,7 @@ Create a title, subtitle, and call-to-action that would look great on a 1200x630
         error:
           error instanceof Error
             ? error.message
-            : "Failed to generate OG copy",
+            : "Failed to generate OG image",
       },
       { status: 500 }
     );

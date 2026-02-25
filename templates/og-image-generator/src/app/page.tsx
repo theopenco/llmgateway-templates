@@ -12,22 +12,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-type OgData = {
-  title: string;
-  subtitle: string;
-  callToAction: string;
-  theme: string;
-  gradientFrom: string;
-  gradientTo: string;
-};
-
 export default function Home() {
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
   const [style, setStyle] = useState("gradient");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [ogData, setOgData] = useState<OgData | null>(null);
+  const [image, setImage] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const { apiKey, setOpen: setApiKeyOpen } = useApiKey();
 
@@ -54,7 +45,7 @@ export default function Home() {
       }
 
       const data = await response.json();
-      setOgData(data);
+      setImage(data.image);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -62,22 +53,9 @@ export default function Home() {
     }
   }
 
-  function getOgUrl() {
-    if (!ogData) return "";
-    const params = new URLSearchParams({
-      title: ogData.title,
-      subtitle: ogData.subtitle,
-      cta: ogData.callToAction,
-      theme: ogData.theme,
-      from: ogData.gradientFrom,
-      to: ogData.gradientTo,
-    });
-    return `/api/og?${params.toString()}`;
-  }
-
   async function handleDownload() {
-    const url = getOgUrl();
-    const response = await fetch(url);
+    if (!image) return;
+    const response = await fetch(image);
     const blob = await response.blob();
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -86,22 +64,12 @@ export default function Home() {
     URL.revokeObjectURL(a.href);
   }
 
-  function handleCopyUrl() {
-    const url = `${window.location.origin}${getOgUrl()}`;
-    navigator.clipboard.writeText(url);
+  function handleCopyDataUrl() {
+    if (!image) return;
+    navigator.clipboard.writeText(image);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
-
-  const previewBg =
-    ogData?.theme === "minimal"
-      ? { background: "#ffffff", color: "#0a0a0a" }
-      : ogData?.theme === "bold"
-        ? { background: ogData.gradientFrom, color: "#ffffff" }
-        : {
-            background: `linear-gradient(135deg, ${ogData?.gradientFrom || "#6366f1"}, ${ogData?.gradientTo || "#8b5cf6"})`,
-            color: "#ffffff",
-          };
 
   return (
     <main className="min-h-screen p-8">
@@ -119,7 +87,7 @@ export default function Home() {
           </div>
           <h1 className="mb-2 text-4xl font-bold">OG Image Generator</h1>
           <p className="text-lg text-muted-foreground">
-            Generate Open Graph images with AI-powered copy via LLM Gateway
+            Generate Open Graph images with AI via LLM Gateway
           </p>
         </header>
 
@@ -128,7 +96,7 @@ export default function Home() {
             <CardHeader>
               <CardTitle>Configure</CardTitle>
               <CardDescription>
-                Describe your product and the AI will generate OG image copy
+                Describe your product and the AI will generate an OG image
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -195,34 +163,16 @@ export default function Home() {
             <Card>
               <CardHeader>
                 <CardTitle>Preview</CardTitle>
-                <CardDescription>1200 x 630 — Open Graph image</CardDescription>
+                <CardDescription>AI-generated Open Graph image</CardDescription>
               </CardHeader>
               <CardContent>
-                <div
-                  className="flex aspect-[1200/630] w-full flex-col items-center justify-center rounded-lg border border-border p-8 text-center"
-                  style={ogData ? previewBg : { background: "#171717" }}
-                >
-                  {ogData ? (
-                    <>
-                      <p className="mb-2 text-2xl font-bold lg:text-3xl">
-                        {ogData.title}
-                      </p>
-                      <p className="mb-4 text-sm opacity-85 lg:text-base">
-                        {ogData.subtitle}
-                      </p>
-                      <span
-                        className="rounded-lg px-4 py-2 text-xs font-semibold lg:text-sm"
-                        style={{
-                          background:
-                            ogData.theme === "minimal"
-                              ? "#0a0a0a"
-                              : "rgba(255,255,255,0.2)",
-                          color: "#ffffff",
-                        }}
-                      >
-                        {ogData.callToAction}
-                      </span>
-                    </>
+                <div className="flex aspect-[1200/630] w-full items-center justify-center overflow-hidden rounded-lg border border-border bg-[#171717]">
+                  {image ? (
+                    <img
+                      src={image}
+                      alt="Generated OG image"
+                      className="h-full w-full object-cover"
+                    />
                   ) : (
                     <p className="text-sm text-muted-foreground">
                       Your preview will appear here
@@ -232,7 +182,7 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            {ogData && (
+            {image && (
               <div className="flex gap-3">
                 <Button onClick={handleDownload} className="flex-1">
                   <Download className="size-4" />
@@ -240,11 +190,11 @@ export default function Home() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={handleCopyUrl}
+                  onClick={handleCopyDataUrl}
                   className="flex-1"
                 >
                   <Copy className="size-4" />
-                  {copied ? "Copied!" : "Copy URL"}
+                  {copied ? "Copied!" : "Copy Data URL"}
                 </Button>
               </div>
             )}
