@@ -1,0 +1,81 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: #0a0a0a;
+  --color-foreground: #ededed;
+  --color-card: #171717;
+  --color-card-foreground: #ededed;
+  --color-popover: #171717;
+  --color-popover-foreground: #ededed;
+  --color-primary: #ffffff;
+  --color-primary-foreground: #0a0a0a;
+  --color-secondary: #262626;
+  --color-secondary-foreground: #ededed;
+  --color-muted: #262626;
+  --color-muted-foreground: #a3a3a3;
+  --color-accent: #262626;
+  --color-accent-foreground: #ededed;
+  --color-destructive: #7f1d1d;
+  --color-destructive-foreground: #fecaca;
+  --color-border: #262626;
+  --color-input: #262626;
+  --color-ring: #404040;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --color-chart-1: #3b82f6;
+  --color-chart-2: #22c55e;
+  --color-chart-3: #eab308;
+  --color-chart-4: #a855f7;
+  --color-chart-5: #f43e5e;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.slide-theme-dark {
+  --slide-bg: #1a1a2e;
+  --slide-bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  --slide-text: #e8e8e8;
+  --slide-text-muted: #a0a0b0;
+  --slide-accent: #4f9cf7;
+}
+
+.slide-theme-light {
+  --slide-bg: #ffffff;
+  --slide-bg-gradient: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);
+  --slide-text: #1a1a2e;
+  --slide-text-muted: #5a5a6e;
+  --slide-accent: #3b82f6;
+}
+
+.slide-theme-blue {
+  --slide-bg: #0f2b46;
+  --slide-bg-gradient: linear-gradient(135deg, #0f2b46 0%, #1a4a7a 50%, #0d3b66 100%);
+  --slide-text: #ffffff;
+  --slide-text-muted: #94c4f5;
+  --slide-accent: #60a5fa;
+}
+
+.slide-theme-gradient {
+  --slide-bg: #1e1b4b;
+  --slide-bg-gradient: linear-gradient(135deg, #1e1b4b 0%, #312e81 30%, #4338ca 60%, #6366f1 100%);
+  --slide-text: #ffffff;
+  --slide-text-muted: #c4b5fd;
+  --slide-accent: #a78bfa;
+}
