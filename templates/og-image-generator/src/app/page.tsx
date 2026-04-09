@@ -12,7 +12,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+const IMAGE_MODELS = [
+  { id: "gemini-3-pro-image-preview", name: "Gemini 3 Pro Image" },
+  { id: "gemini-3.1-flash-image-preview", name: "Gemini 3.1 Flash Image" },
+  { id: "gemini-2.5-flash-image", name: "Gemini 2.5 Flash Image" },
+  { id: "grok-imagine-image-pro", name: "Grok Imagine Pro" },
+  { id: "grok-imagine-image", name: "Grok Imagine" },
+  { id: "seedream-4-5", name: "Seedream 4.5" },
+  { id: "seedream-4-0", name: "Seedream 4.0" },
+];
+
 export default function Home() {
+  const [model, setModel] = useState(IMAGE_MODELS[0].id);
   const [productName, setProductName] = useState("");
   const [description, setDescription] = useState("");
   const [style, setStyle] = useState("gradient");
@@ -36,7 +47,7 @@ export default function Home() {
           "Content-Type": "application/json",
           ...(apiKey ? { "x-api-key": apiKey } : {}),
         },
-        body: JSON.stringify({ productName, description, style }),
+        body: JSON.stringify({ productName, description, style, model }),
       });
 
       if (!response.ok) {
@@ -136,6 +147,22 @@ export default function Home() {
                     <option value="gradient">Gradient</option>
                     <option value="minimal">Minimal</option>
                     <option value="bold">Bold</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium">
+                    Model
+                  </label>
+                  <select
+                    value={model}
+                    onChange={(e) => setModel(e.target.value)}
+                    className="w-full rounded-md border border-input bg-secondary px-3 py-2 text-sm outline-none"
+                  >
+                    {IMAGE_MODELS.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <Button

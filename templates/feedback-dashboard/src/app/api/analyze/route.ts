@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 
     const llmgateway = createLLMGateway({ apiKey });
 
-    const { reviews } = await request.json();
+    const { reviews, model } = await request.json();
 
     if (!reviews || typeof reviews !== "string" || !reviews.trim()) {
       return Response.json(
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
     }
 
     const result = await generateObject({
-      model: llmgateway("openai/gpt-4o-mini"),
+      model: llmgateway(model || "openai/gpt-4o-mini"),
       schema: analysisSchema,
       prompt: `Analyze the following customer reviews and provide structured sentiment analysis.
 

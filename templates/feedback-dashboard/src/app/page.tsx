@@ -12,6 +12,35 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+const MODELS = [
+  // OpenAI
+  { id: "openai/gpt-4o-mini", name: "GPT-4o Mini" },
+  { id: "openai/gpt-4o", name: "GPT-4o" },
+  { id: "openai/gpt-4.1", name: "GPT-4.1" },
+  { id: "openai/gpt-4.1-mini", name: "GPT-4.1 Mini" },
+  { id: "openai/gpt-4.1-nano", name: "GPT-4.1 Nano" },
+  { id: "openai/o3-mini", name: "O3 Mini" },
+  { id: "openai/o4-mini", name: "O4 Mini" },
+  // Anthropic
+  { id: "anthropic/claude-haiku-4-5", name: "Claude Haiku 4.5" },
+  { id: "anthropic/claude-sonnet-4-5", name: "Claude Sonnet 4.5" },
+  { id: "anthropic/claude-sonnet-4-6", name: "Claude Sonnet 4.6" },
+  { id: "anthropic/claude-opus-4-6", name: "Claude Opus 4.6" },
+  // Google
+  { id: "google/gemini-2.5-flash", name: "Gemini 2.5 Flash" },
+  { id: "google/gemini-2.5-pro", name: "Gemini 2.5 Pro" },
+  // xAI
+  { id: "xai/grok-3", name: "Grok 3" },
+  { id: "xai/grok-4", name: "Grok 4" },
+  // DeepSeek
+  { id: "deepseek/deepseek-v3.1", name: "DeepSeek V3.1" },
+  { id: "deepseek/deepseek-r1-0528", name: "DeepSeek R1" },
+  // Meta
+  { id: "meta/llama-4-scout", name: "Llama 4 Scout" },
+  // Mistral
+  { id: "mistral/mistral-large-latest", name: "Mistral Large" },
+];
+
 type Theme = {
   name: string;
   count: number;
@@ -57,6 +86,7 @@ const sentimentDots: Record<string, string> = {
 };
 
 export default function Home() {
+  const [model, setModel] = useState(MODELS[0].id);
   const [reviews, setReviews] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -77,7 +107,7 @@ export default function Home() {
           "Content-Type": "application/json",
           ...(apiKey ? { "x-api-key": apiKey } : {}),
         },
-        body: JSON.stringify({ reviews }),
+        body: JSON.stringify({ reviews, model }),
       });
 
       if (!response.ok) {
@@ -223,7 +253,18 @@ export default function Home() {
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-2xl">
         <header className="mb-8 text-center">
-          <div className="flex justify-end">
+          <div className="flex items-center justify-end gap-3">
+            <select
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              className="rounded-md border border-input bg-secondary px-3 py-1.5 text-sm outline-none"
+            >
+              {MODELS.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name}
+                </option>
+              ))}
+            </select>
             <Button
               variant="ghost"
               size="icon-sm"
