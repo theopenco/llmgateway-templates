@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
     const llmgateway = createLLMGateway({ apiKey });
 
-    const { text, action, tone } = await request.json();
+    const { text, action, tone, model } = await request.json();
 
     if (!text || typeof text !== "string" || !text.trim()) {
       return Response.json({ error: "Text is required" }, { status: 400 });
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     const prompt = ACTION_PROMPTS[action](text, tone);
 
     const result = await generateText({
-      model: llmgateway("openai/gpt-4o-mini"),
+      model: llmgateway(model || "openai/gpt-4o-mini"),
       prompt,
     });
 
