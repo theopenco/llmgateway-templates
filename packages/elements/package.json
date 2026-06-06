@@ -1,0 +1,56 @@
+{
+  "name": "@llmgateway/elements",
+  "version": "0.0.0",
+  "description": "React components for LLM Gateway embeddable AI — drop-in <BuyCredits>, <CreditBalance>, and hooks, like Stripe Elements.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./styles.css"
+  },
+  "files": [
+    "dist",
+    "styles.css"
+  ],
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc"
+  },
+  "keywords": [
+    "llm",
+    "ai",
+    "llmgateway",
+    "react",
+    "stripe",
+    "elements",
+    "credits"
+  ],
+  "author": "LLM Gateway",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theopenco/llmgateway-templates.git",
+    "directory": "packages/elements"
+  },
+  "dependencies": {
+    "@llmgateway/client": "workspace:*",
+    "@stripe/react-stripe-js": "^3.1.1",
+    "@stripe/stripe-js": "^5.6.0"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "react": "^19.0.0",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

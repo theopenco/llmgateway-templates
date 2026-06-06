@@ -1,0 +1,43 @@
+{
+  "name": "@llmgateway/client",
+  "version": "0.0.0",
+  "description": "Browser-safe headless client for LLM Gateway embeddable AI — call AI with an ephemeral end-user session token. Framework-agnostic.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc"
+  },
+  "keywords": [
+    "llm",
+    "ai",
+    "llmgateway",
+    "chat",
+    "streaming",
+    "sdk"
+  ],
+  "author": "LLM Gateway",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theopenco/llmgateway-templates.git",
+    "directory": "packages/client"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.10",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,163 @@
+/**
+ * @llmgateway/elements default styles. Import once in your app:
+ *   import "@llmgateway/elements/styles.css";
+ *
+ * Everything is scoped under `.lg-root` and driven by CSS custom properties so
+ * it won't leak into your app and is easy to theme via the provider's
+ * `appearance.variables`.
+ */
+.lg-root {
+	--lg-color-primary: #6d28d9;
+	--lg-color-text: #18181b;
+	--lg-color-muted: #71717a;
+	--lg-color-bg: #ffffff;
+	--lg-color-border: #e4e4e7;
+	--lg-color-error: #dc2626;
+	--lg-radius: 8px;
+	--lg-font: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+
+	color: var(--lg-color-text);
+	font-family: var(--lg-font);
+}
+
+.lg-root[data-lg-theme="dark"] {
+	--lg-color-text: #fafafa;
+	--lg-color-muted: #a1a1aa;
+	--lg-color-bg: #18181b;
+	--lg-color-border: #3f3f46;
+}
+
+.lg-credit-balance {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 0.5rem;
+}
+
+.lg-credit-balance__label {
+	color: var(--lg-color-muted);
+	font-size: 0.875rem;
+}
+
+.lg-credit-balance__value {
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
+.lg-buy-credits {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	background: var(--lg-color-bg);
+	border: 1px solid var(--lg-color-border);
+	border-radius: var(--lg-radius);
+	padding: 1rem;
+}
+
+.lg-buy-credits--loading,
+.lg-buy-credits--error {
+	color: var(--lg-color-muted);
+	font-size: 0.875rem;
+}
+
+.lg-buy-credits--error {
+	color: var(--lg-color-error);
+}
+
+.lg-buy-credits__submit {
+	appearance: none;
+	border: none;
+	border-radius: var(--lg-radius);
+	background: var(--lg-color-primary);
+	color: #fff;
+	font-weight: 600;
+	padding: 0.625rem 1rem;
+	cursor: pointer;
+}
+
+.lg-buy-credits__submit:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.lg-buy-credits__error {
+	color: var(--lg-color-error);
+	font-size: 0.875rem;
+}
+
+.lg-chat {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	background: var(--lg-color-bg);
+	border: 1px solid var(--lg-color-border);
+	border-radius: var(--lg-radius);
+	padding: 1rem;
+}
+
+.lg-chat__messages {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	min-height: 6rem;
+	max-height: 24rem;
+	overflow-y: auto;
+}
+
+.lg-chat__empty {
+	color: var(--lg-color-muted);
+	font-size: 0.875rem;
+}
+
+.lg-chat__msg {
+	padding: 0.5rem 0.75rem;
+	border-radius: var(--lg-radius);
+	white-space: pre-wrap;
+	max-width: 85%;
+}
+
+.lg-chat__msg--user {
+	align-self: flex-end;
+	background: var(--lg-color-primary);
+	color: #fff;
+}
+
+.lg-chat__msg--assistant {
+	align-self: flex-start;
+	background: var(--lg-color-border);
+	color: var(--lg-color-text);
+}
+
+.lg-chat__error {
+	color: var(--lg-color-error);
+	font-size: 0.875rem;
+}
+
+.lg-chat__form {
+	display: flex;
+	gap: 0.5rem;
+}
+
+.lg-chat__input {
+	flex: 1;
+	border: 1px solid var(--lg-color-border);
+	border-radius: var(--lg-radius);
+	padding: 0.5rem 0.75rem;
+	background: var(--lg-color-bg);
+	color: var(--lg-color-text);
+}
+
+.lg-chat__send {
+	appearance: none;
+	border: none;
+	border-radius: var(--lg-radius);
+	background: var(--lg-color-primary);
+	color: #fff;
+	font-weight: 600;
+	padding: 0.5rem 1rem;
+	cursor: pointer;
+}
+
+.lg-chat__send:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
