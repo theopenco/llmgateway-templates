@@ -164,7 +164,10 @@ export class LLMGatewayClient {
 			"",
 		);
 		this.refreshFn = options.refresh;
-		this.fetchImpl = options.fetch ?? globalThis.fetch;
+		// Bind the default to globalThis: calling `this.fetchImpl(...)` would
+		// otherwise invoke the browser's `fetch` with `this` set to this client
+		// instance, which throws "Illegal invocation".
+		this.fetchImpl = options.fetch ?? globalThis.fetch.bind(globalThis);
 	}
 
 	getPublishableKey(): string | undefined {

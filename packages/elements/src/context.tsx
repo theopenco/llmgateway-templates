@@ -1,12 +1,24 @@
 import { LLMGatewayClient } from "@llmgateway/client";
 import {
 	createContext,
+	useCallback,
 	useContext,
+	useEffect,
 	useMemo,
+	useRef,
+	useState,
 	type ReactNode,
 } from "react";
 
-import type { SessionRef } from "@llmgateway/client";
+import type {
+	Balance,
+	LLMGatewayClient as Client,
+	SessionRef,
+} from "@llmgateway/client";
+import type {
+	RefetchUntilChangeOptions,
+	UseBalanceResult,
+} from "./useBalance.js";
 
 export interface Appearance {
 	theme?: "light" | "dark";
@@ -38,9 +50,85 @@ interface LLMGatewayContextValue {
 	client: LLMGatewayClient;
 	stripePublishableKey?: string;
 	appearance?: Appearance;
+	/**
+	 * Shared wallet-balance state. Lives here (not per-hook) so every
+	 * `useBalance()` consumer — `<CreditBalance>`, a custom widget, the chat
+	 * dashboard — reflects the same balance and a single refetch updates them
+	 * all.
+	 */
+	balance: UseBalanceResult;
 }
 
 const LLMGatewayContext = createContext<LLMGatewayContextValue | null>(null);
+
+/**
+ * Owns the single shared balance state for a provider subtree. Mirrors the
+ * public `UseBalanceResult` so `useBalance()` is just a thin reader of this.
+ */
+function useBalanceController(client: Client): UseBalanceResult {
+	const [data, setData] = useState<Balance | null>(null);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<Error | null>(null);
+	// Track the latest balance synchronously so polling has a stable baseline
+	// without depending on (and re-creating callbacks for) `data`.
+	const latestBalance = useRef<string | null>(null);
+
+	const refetch = useCallback(async () => {
+		setLoading(true);
+		setError(null);
+		try {
+			const result = await client.getBalance();
+			latestBalance.current = result.balance;
+			setData(result);
+		} catch (err) {
+			setError(err instanceof Error ? err : new Error(String(err)));
+		} finally {
+			setLoading(false);
+		}
+	}, [client]);
+
+	const refetchUntilChange = useCallback(
+		async (opts?: RefetchUntilChangeOptions) => {
+			const interval = opts?.interval ?? 1500;
+			const timeout = opts?.timeout ?? 20000;
+			const baseline = latestBalance.current;
+			const deadline = Date.now() + timeout;
+			setError(null);
+			while (Date.now() < deadline) {
+				await new Promise((r) => setTimeout(r, interval));
+				try {
+					const result = await client.getBalance();
+					latestBalance.current = result.balance;
+					setData(result);
+					if (result.balance !== baseline) {
+						return true;
+					}
+				} catch (err) {
+					setError(err instanceof Error ? err : new Error(String(err)));
+				}
+			}
+			return false;
+		},
+		[client],
+	);
+
+	useEffect(() => {
+		void refetch();
+	}, [refetch]);
+
+	return useMemo(
+		() => ({
+			balance: data?.balance ?? null,
+			currency: data?.currency ?? null,
+			recentLedger: data?.recentLedger ?? [],
+			loading,
+			error,
+			refetch,
+			refetchUntilChange,
+		}),
+		[data, loading, error, refetch, refetchUntilChange],
+	);
+}
 
 export function LLMGatewayProvider(props: LLMGatewayProviderProps) {
 	const {
@@ -69,9 +157,11 @@ export function LLMGatewayProvider(props: LLMGatewayProviderProps) {
 		[publishableKey, gatewayBaseUrl, apiBaseUrl],
 	);
 
+	const balance = useBalanceController(client);
+
 	const value = useMemo<LLMGatewayContextValue>(
-		() => ({ client, stripePublishableKey, appearance }),
-		[client, stripePublishableKey, appearance],
+		() => ({ client, stripePublishableKey, appearance, balance }),
+		[client, stripePublishableKey, appearance, balance],
 	);
 
 	const style = appearanceToStyle(appearance);

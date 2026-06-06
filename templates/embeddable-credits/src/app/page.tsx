@@ -65,7 +65,7 @@ export default function Page() {
 }
 
 function Dashboard() {
-  const { refetch } = useBalance();
+  const { refetchUntilChange } = useBalance();
   const [showBuy, setShowBuy] = useState(false);
 
   return (
@@ -81,20 +81,18 @@ function Dashboard() {
           <BuyCredits
             amount={10}
             onSuccess={() => {
-              // The wallet is credited once the webhook lands — poll a moment later.
+              // The wallet is credited asynchronously once the webhook lands —
+              // poll until the balance reflects it.
               setShowBuy(false);
-              setTimeout(() => void refetch(), 2500);
+              void refetchUntilChange();
             }}
           />
         ) : null}
       </div>
 
-      {/* Each reply streams from the gateway and debits the wallet; refresh the
-          balance shortly after the turn finishes. */}
-      <Chat
-        model={MODEL}
-        onFinish={() => setTimeout(() => void refetch(), 2500)}
-      />
+      {/* Each reply streams from the gateway and debits the wallet; the debit is
+          applied by the worker after the turn, so poll until it lands. */}
+      <Chat model={MODEL} onFinish={() => void refetchUntilChange()} />
     </>
   );
 }
