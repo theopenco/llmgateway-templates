@@ -51,3 +51,21 @@ jobs:
         run: pnpm semantic-release
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Semantic Release (client)
+        working-directory: packages/client
+        run: pnpm semantic-release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Semantic Release (server)
+        working-directory: packages/server
+        run: pnpm semantic-release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Semantic Release (elements)
+        working-directory: packages/elements
+        run: pnpm semantic-release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

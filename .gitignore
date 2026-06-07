@@ -5,6 +5,7 @@ node_modules
 # Next.js
 .next
 out
+next-env.d.ts
 
 # Build outputs
 dist
@@ -46,3 +47,6 @@ coverage
 
 # Claude Code
 .claude
+
+# Local agent scratch
+.soulforge
