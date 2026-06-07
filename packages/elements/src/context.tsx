@@ -28,16 +28,22 @@ export interface Appearance {
 	className?: string;
 }
 
+/** LLM Gateway's Stripe publishable keys — safe to ship in the browser bundle. */
+const STRIPE_PUBLISHABLE_KEY_LIVE =
+	"pk_live_51RRXLsEAkKxa3kRayCPr9oW8dUp7mIzwev1FVpM3jpKU3StLaaiKvXCEPkewabL5hRip4IXLzFlFTLC4RpFWRknN00lX2vgZHP";
+const STRIPE_PUBLISHABLE_KEY_TEST =
+	"pk_test_51RRXM1CYKGHizcWTfXxFSEzN8gsUQkg2efi2FN5KO2M2hxdV9QPCjeZMPaZQHSAatxpK9wDcSeilyYU14gz2qA2p00R4q5xU1R";
+
 export interface LLMGatewayProviderProps {
 	/** The end-user session minted by your backend via `@llmgateway/server`. */
 	session: SessionRef;
 	/** Publishable key (`pk_…`) for your LLM Gateway project. */
 	publishableKey?: string;
 	/**
-	 * LLM Gateway's Stripe publishable key, used to load Stripe.js for the
-	 * `<BuyCredits>` widget. Required only if you render `<BuyCredits>`.
+	 * Use LLM Gateway's Stripe test mode for the `<BuyCredits>` widget. Defaults
+	 * to `false` (live mode).
 	 */
-	stripePublishableKey?: string;
+	test?: boolean;
 	gatewayBaseUrl?: string;
 	apiBaseUrl?: string;
 	/** Obtain a fresh session when the current one nears expiry (hits your backend). */
@@ -134,13 +140,17 @@ export function LLMGatewayProvider(props: LLMGatewayProviderProps) {
 	const {
 		session,
 		publishableKey,
-		stripePublishableKey,
+		test = false,
 		gatewayBaseUrl,
 		apiBaseUrl,
 		fetchSession,
 		appearance,
 		children,
 	} = props;
+
+	const stripePublishableKey = test
+		? STRIPE_PUBLISHABLE_KEY_TEST
+		: STRIPE_PUBLISHABLE_KEY_LIVE;
 
 	const client = useMemo(
 		() =>

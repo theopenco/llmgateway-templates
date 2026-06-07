@@ -34,7 +34,6 @@ key — never your secret key.
    and create a **platform secret** API key (`sk_…`).
 2. Copy `.env.example` to `.env.local` and fill in:
    - `LLMGATEWAY_SECRET_KEY` — your `sk_…` (server-only)
-   - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` — LLM Gateway's Stripe publishable key
 3. Install and run:
 
    ```bash

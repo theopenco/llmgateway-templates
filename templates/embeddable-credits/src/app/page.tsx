@@ -12,7 +12,6 @@ import { useEffect, useState } from "react";
 
 const MODEL = "openai/gpt-4o-mini";
 
-const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 const apiBaseUrl = process.env.NEXT_PUBLIC_LLMGATEWAY_API_URL;
 const gatewayBaseUrl = process.env.NEXT_PUBLIC_LLMGATEWAY_GATEWAY_URL;
 
@@ -52,7 +51,6 @@ export default function Page() {
       </p>
       <LLMGatewayProvider
         session={session}
-        stripePublishableKey={stripePublishableKey}
         apiBaseUrl={apiBaseUrl}
         gatewayBaseUrl={gatewayBaseUrl}
         fetchSession={fetchSession}

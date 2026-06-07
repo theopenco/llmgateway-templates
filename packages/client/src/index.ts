@@ -174,23 +174,6 @@ export class LLMGatewayClient {
 		return this.publishableKey;
 	}
 
-	/**
-	 * Fetch public SDK config (LLM Gateway's Stripe publishable key) from the API.
-	 * Used by `@llmgateway/elements` to load Stripe without hardcoding the key.
-	 */
-	async getConfig(): Promise<{ stripePublishableKey: string | null }> {
-		const res = await this.fetchImpl(`${this.apiBaseUrl}/v1/config`);
-		const data = (await res.json()) as any;
-		if (!res.ok) {
-			throw new LLMGatewayError(
-				res.status,
-				data?.message ?? "Failed to fetch config",
-				data,
-			);
-		}
-		return { stripePublishableKey: data?.stripePublishableKey ?? null };
-	}
-
 	/** Non-streaming chat completion. */
 	async chat(params: ChatParams): Promise<ChatResult> {
 		const token = await this.validToken();

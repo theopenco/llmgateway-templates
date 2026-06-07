@@ -36,41 +36,10 @@ function getStripePromise(key: string): Promise<Stripe | null> {
  */
 export function BuyCredits(props: BuyCreditsProps) {
 	const { amount, onSuccess, onError, buttonLabel } = props;
-	const { client, stripePublishableKey: providedKey, appearance } =
-		useLLMGateway();
+	const { client, stripePublishableKey, appearance } = useLLMGateway();
 
 	const [clientSecret, setClientSecret] = useState<string | null>(null);
 	const [error, setError] = useState<Error | null>(null);
-	// Fall back to LLM Gateway's publishable key from /v1/config when the host
-	// didn't pass one to the provider.
-	const [fetchedKey, setFetchedKey] = useState<string | null>(null);
-	const [configChecked, setConfigChecked] = useState(false);
-	const stripePublishableKey = providedKey ?? fetchedKey ?? undefined;
-
-	useEffect(() => {
-		if (providedKey) {
-			return;
-		}
-		let cancelled = false;
-		client
-			.getConfig()
-			.then((cfg) => {
-				if (!cancelled) {
-					setFetchedKey(cfg.stripePublishableKey);
-				}
-			})
-			.catch(() => {
-				/* surfaced below as the missing-key message */
-			})
-			.finally(() => {
-				if (!cancelled) {
-					setConfigChecked(true);
-				}
-			});
-		return () => {
-			cancelled = true;
-		};
-	}, [client, providedKey]);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -99,21 +68,6 @@ export function BuyCredits(props: BuyCreditsProps) {
 		() => (stripePublishableKey ? getStripePromise(stripePublishableKey) : null),
 		[stripePublishableKey],
 	);
-
-	if (!stripePublishableKey) {
-		// Still resolving the key from /v1/config.
-		if (!providedKey && !configChecked) {
-			return (
-				<div className="lg-buy-credits lg-buy-credits--loading">Loading…</div>
-			);
-		}
-		return (
-			<div className="lg-buy-credits lg-buy-credits--error">
-				No Stripe publishable key available. Pass `stripePublishableKey` to
-				&lt;LLMGatewayProvider&gt; or configure it on LLM Gateway.
-			</div>
-		);
-	}
 
 	if (error) {
 		return (
