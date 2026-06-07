@@ -126,6 +126,39 @@ export interface TopUp {
 	isInternational: boolean;
 }
 
+/** @internal Loose shape of an error response body. */
+interface ErrorBody {
+	error?: { message?: string };
+	message?: string;
+}
+
+/** @internal OpenAI-compatible chat completion response. */
+interface ChatCompletionResponse extends ErrorBody {
+	id?: string;
+	model?: string;
+	choices?: Array<{
+		message?: { content?: string };
+		finish_reason?: string | null;
+	}>;
+	usage?: ChatResult["usage"];
+}
+
+/** @internal OpenAI-compatible streaming chunk. */
+interface ChatCompletionChunk {
+	choices?: Array<{ delta?: { content?: string } }>;
+}
+
+/** @internal OpenAI-compatible image generation response. */
+interface ImageGenerationResponse {
+	data?: Array<{ b64_json?: string; url?: string }>;
+}
+
+/** @internal OpenAI-compatible embeddings response. */
+interface EmbeddingResponse {
+	data?: Array<{ embedding?: number[] }>;
+	usage?: EmbeddingsResult["usage"];
+}
+
 const DEFAULT_GATEWAY_BASE_URL = "https://api.llmgateway.io";
 const DEFAULT_API_BASE_URL = "https://api.llmgateway.io";
 /** Refresh this many ms before expiry. */
@@ -189,7 +222,7 @@ export class LLMGatewayClient {
 			},
 		);
 
-		const data = (await res.json()) as any;
+		const data = (await res.json()) as ChatCompletionResponse;
 		if (!res.ok) {
 			throw new LLMGatewayError(
 				res.status,
@@ -225,10 +258,12 @@ export class LLMGatewayClient {
 		);
 
 		if (!res.ok || !res.body) {
-			const data = await res.json().catch(() => undefined);
+			const data = (await res.json().catch(() => undefined)) as
+				| ErrorBody
+				| undefined;
 			throw new LLMGatewayError(
 				res.status,
-				(data as any)?.error?.message ?? "Stream request failed",
+				data?.error?.message ?? "Stream request failed",
 				data,
 			);
 		}
@@ -260,7 +295,7 @@ export class LLMGatewayClient {
 						return;
 					}
 					try {
-						const json = JSON.parse(payload);
+						const json = JSON.parse(payload) as ChatCompletionChunk;
 						const delta = json?.choices?.[0]?.delta?.content;
 						if (typeof delta === "string" && delta.length > 0) {
 							yield delta;
@@ -275,23 +310,26 @@ export class LLMGatewayClient {
 
 	/** Generate image(s) via the OpenAI-compatible images endpoint. */
 	async image(params: ImageParams): Promise<ImageResult> {
-		const data = await this.gatewayPost("/v1/images/generations", params);
-		const images: GeneratedImage[] = Array.isArray((data as any)?.data)
-			? (data as any).data.map((d: any) => ({
-					b64_json: d?.b64_json,
-					url: d?.url,
-				}))
+		const data = (await this.gatewayPost(
+			"/v1/images/generations",
+			params,
+		)) as ImageGenerationResponse;
+		const images: GeneratedImage[] = Array.isArray(data?.data)
+			? data.data.map((d) => ({ b64_json: d?.b64_json, url: d?.url }))
 			: [];
 		return { images, raw: data };
 	}
 
 	/** Create embeddings via the OpenAI-compatible embeddings endpoint. */
 	async embeddings(params: EmbeddingsParams): Promise<EmbeddingsResult> {
-		const data = await this.gatewayPost("/v1/embeddings", params);
-		const embeddings: number[][] = Array.isArray((data as any)?.data)
-			? (data as any).data.map((d: any) => d?.embedding ?? [])
+		const data = (await this.gatewayPost(
+			"/v1/embeddings",
+			params,
+		)) as EmbeddingResponse;
+		const embeddings: number[][] = Array.isArray(data?.data)
+			? data.data.map((d) => d?.embedding ?? [])
 			: [];
-		return { embeddings, usage: (data as any)?.usage, raw: data };
+		return { embeddings, usage: data?.usage, raw: data };
 	}
 
 	/** @internal POST to the gateway with the (refreshed) session token. */
@@ -305,7 +343,7 @@ export class LLMGatewayClient {
 			},
 			body: JSON.stringify(body),
 		});
-		const data = (await res.json()) as any;
+		const data = (await res.json()) as ErrorBody;
 		if (!res.ok) {
 			throw new LLMGatewayError(
 				res.status,
@@ -322,7 +360,7 @@ export class LLMGatewayClient {
 		const res = await this.fetchImpl(`${this.apiBaseUrl}/v1/wallet/balance`, {
 			headers: { Authorization: `Bearer ${token}` },
 		});
-		const data = (await res.json()) as any;
+		const data = (await res.json()) as Balance & ErrorBody;
 		if (!res.ok) {
 			throw new LLMGatewayError(
 				res.status,
@@ -330,7 +368,7 @@ export class LLMGatewayClient {
 				data,
 			);
 		}
-		return data as Balance;
+		return data;
 	}
 
 	/**
@@ -347,7 +385,7 @@ export class LLMGatewayClient {
 			},
 			body: JSON.stringify({ amount }),
 		});
-		const data = (await res.json()) as any;
+		const data = (await res.json()) as TopUp & ErrorBody;
 		if (!res.ok) {
 			throw new LLMGatewayError(
 				res.status,
@@ -355,7 +393,7 @@ export class LLMGatewayClient {
 				data,
 			);
 		}
-		return data as TopUp;
+		return data;
 	}
 
 	/**
@@ -367,7 +405,10 @@ export class LLMGatewayClient {
 			method: "POST",
 			headers: { Authorization: `Bearer ${this.session.token}` },
 		});
-		const data = (await res.json()) as any;
+		const data = (await res.json()) as {
+			sessionToken: string;
+			expiresAt?: string;
+		} & ErrorBody;
 		if (!res.ok) {
 			throw new LLMGatewayError(
 				res.status,

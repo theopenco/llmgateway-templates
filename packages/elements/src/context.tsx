@@ -163,7 +163,6 @@ export function LLMGatewayProvider(props: LLMGatewayProviderProps) {
 			}),
 		// Re-create only when connection-defining inputs change. The session token
 		// is read fresh on each call and auto-refreshed via `fetchSession`.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[publishableKey, gatewayBaseUrl, apiBaseUrl],
 	);
 
