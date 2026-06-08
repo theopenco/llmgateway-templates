@@ -73,7 +73,7 @@ export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
         setInput(apiKey ?? "");
       }
     },
-    [apiKey]
+    [apiKey],
   );
 
   if (!mounted) return null;

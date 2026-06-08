@@ -45,7 +45,10 @@ type AIToolsPanelProps = {
   onGeneratePresentation: (prompt: string, slideCount: number) => Promise<void>;
   onResearch: (topic: string) => Promise<string>;
   onGenerateImage: (prompt: string) => Promise<void>;
-  onEnhanceSlide: (instruction: string, researchContext?: string) => Promise<void>;
+  onEnhanceSlide: (
+    instruction: string,
+    researchContext?: string,
+  ) => Promise<void>;
   onGenerateChart: (prompt: string) => Promise<void>;
   onChangeLayout: (layout: SlideLayout) => void;
   isGenerating: boolean;
@@ -122,8 +125,7 @@ export function AIToolsPanel({
   const [enhanceInstruction, setEnhanceInstruction] = useState("");
   const [chartPrompt, setChartPrompt] = useState("");
 
-  const searchModelList =
-    searchModels.length > 0 ? searchModels : textModels;
+  const searchModelList = searchModels.length > 0 ? searchModels : textModels;
 
   return (
     <div className="flex h-full w-80 flex-col border-l border-border bg-card">
@@ -221,7 +223,7 @@ export function AIToolsPanel({
                 onClick={() => {
                   onEnhanceSlide(
                     "Incorporate the research findings into this slide",
-                    researchResult
+                    researchResult,
                   );
                 }}
               >
@@ -359,12 +361,12 @@ export function AIToolsPanel({
                         "bg-gradient-to-br from-[#1e1b4b] to-[#6366f1] text-white",
                       theme === t
                         ? "border-primary ring-1 ring-primary/30"
-                        : "border-transparent"
+                        : "border-transparent",
                     )}
                   >
                     {t}
                   </button>
-                )
+                ),
               )}
             </div>
           </div>
@@ -384,7 +386,9 @@ export function AIToolsPanel({
             <Label className="text-xs">Text Model</Label>
             <Select value={textModel} onValueChange={onSetTextModel}>
               <SelectTrigger size="sm" className="text-xs">
-                <SelectValue placeholder={modelsLoading ? "Loading..." : "Select model"} />
+                <SelectValue
+                  placeholder={modelsLoading ? "Loading..." : "Select model"}
+                />
               </SelectTrigger>
               <SelectContent>
                 {textModels.map((m) => (
@@ -400,7 +404,9 @@ export function AIToolsPanel({
             <Label className="text-xs">Search Model</Label>
             <Select value={searchModel} onValueChange={onSetSearchModel}>
               <SelectTrigger size="sm" className="text-xs">
-                <SelectValue placeholder={modelsLoading ? "Loading..." : "Select model"} />
+                <SelectValue
+                  placeholder={modelsLoading ? "Loading..." : "Select model"}
+                />
               </SelectTrigger>
               <SelectContent>
                 {searchModelList.map((m) => (
@@ -416,7 +422,9 @@ export function AIToolsPanel({
             <Label className="text-xs">Image Model</Label>
             <Select value={imageModel} onValueChange={onSetImageModel}>
               <SelectTrigger size="sm" className="text-xs">
-                <SelectValue placeholder={modelsLoading ? "Loading..." : "Select model"} />
+                <SelectValue
+                  placeholder={modelsLoading ? "Loading..." : "Select model"}
+                />
               </SelectTrigger>
               <SelectContent>
                 {imageModels.map((m) => (

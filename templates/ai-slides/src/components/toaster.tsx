@@ -30,11 +30,13 @@ export function Toaster() {
             key={toast.id}
             className={cn(
               "flex items-start gap-2 rounded-lg border px-3 py-2.5 text-sm shadow-lg backdrop-blur-sm animate-in slide-in-from-right-5 fade-in duration-200",
-              styles[toast.type]
+              styles[toast.type],
             )}
           >
             <Icon className="size-4 shrink-0 mt-0.5" />
-            <span className="flex-1 text-xs leading-relaxed">{toast.message}</span>
+            <span className="flex-1 text-xs leading-relaxed">
+              {toast.message}
+            </span>
             <button
               onClick={() => dismissToast(toast.id)}
               className="shrink-0 rounded p-0.5 hover:bg-white/10 transition-colors"

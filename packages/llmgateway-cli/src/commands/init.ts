@@ -27,7 +27,7 @@ interface InitOptions {
 
 export async function init(
   directory: string | undefined,
-  options: InitOptions
+  options: InitOptions,
 ): Promise<void> {
   let templateName = options.template;
   let projectName = options.name;
@@ -107,7 +107,9 @@ export async function init(
   }
 
   // Clone template
-  const spinner = ora(`Cloning ${highlight(template.name)} template...`).start();
+  const spinner = ora(
+    `Cloning ${highlight(template.name)} template...`,
+  ).start();
 
   try {
     const emitter = degit(`${REPO}/${template.path}`, {
@@ -120,7 +122,7 @@ export async function init(
   } catch (error) {
     spinner.fail("Failed to clone template");
     logger.error(
-      error instanceof Error ? error.message : "Unknown error occurred"
+      error instanceof Error ? error.message : "Unknown error occurred",
     );
     process.exit(1);
   }
@@ -140,7 +142,10 @@ export async function init(
   // Copy .env.example to .env.local if it exists
   const envExamplePath = path.join(fullPath, ".env.example");
   const envLocalPath = path.join(fullPath, ".env.local");
-  if ((await fs.pathExists(envExamplePath)) && !(await fs.pathExists(envLocalPath))) {
+  if (
+    (await fs.pathExists(envExamplePath)) &&
+    !(await fs.pathExists(envLocalPath))
+  ) {
     await fs.copy(envExamplePath, envLocalPath);
     logger.success("Created .env.local from .env.example");
   }
@@ -154,7 +159,7 @@ export async function init(
     installSpinner.succeed("Dependencies installed");
   } catch {
     installSpinner.warn(
-      "Failed to install dependencies. Run install manually."
+      "Failed to install dependencies. Run install manually.",
     );
   }
 
@@ -171,11 +176,11 @@ export async function init(
     logger.log(`  ${dim("$")} ${highlight(cdCommand)}`);
   }
 
-  logger.log(`  ${dim("$")} ${highlight("# Add your LLM Gateway API key to .env.local")}`);
+  logger.log(
+    `  ${dim("$")} ${highlight("# Add your LLM Gateway API key to .env.local")}`,
+  );
   logger.log(`  ${dim("$")} ${highlight(getRunCommand(pm, "dev"))}`);
   logger.blank();
-  logger.log(
-    `Get your API key at ${highlight("https://llmgateway.io")}`
-  );
+  logger.log(`Get your API key at ${highlight("https://llmgateway.io")}`);
   logger.blank();
 }

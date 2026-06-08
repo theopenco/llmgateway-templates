@@ -19,7 +19,7 @@ export async function GET(request: Request) {
   if (!response.ok) {
     return Response.json(
       { error: "Failed to fetch models" },
-      { status: response.status }
+      { status: response.status },
     );
   }
 

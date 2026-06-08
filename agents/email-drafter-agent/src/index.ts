@@ -16,7 +16,7 @@ const emailSchema = z.object({
 
 async function runEmailDrafter(
   notes: string,
-  tone: string
+  tone: string,
 ): Promise<z.infer<typeof emailSchema>> {
   const result = await generateText({
     model: llmgateway("openai/gpt-4o-mini"),
@@ -65,13 +65,13 @@ async function main() {
     console.log("Usage: node dist/index.js <notes> [--tone <tone>]\n");
     console.log("Examples:");
     console.log(
-      '  node dist/index.js "meeting tomorrow at 3pm, need to reschedule to Friday"'
+      '  node dist/index.js "meeting tomorrow at 3pm, need to reschedule to Friday"',
     );
     console.log(
-      '  node dist/index.js "thank client for contract, next steps onboarding" --tone formal'
+      '  node dist/index.js "thank client for contract, next steps onboarding" --tone formal',
     );
     console.log(
-      '  node dist/index.js "team lunch Friday, bring ideas for venue" --tone casual'
+      '  node dist/index.js "team lunch Friday, bring ideas for venue" --tone casual',
     );
     process.exit(0);
   }

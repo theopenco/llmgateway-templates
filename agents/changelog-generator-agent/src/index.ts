@@ -8,7 +8,7 @@ async function sendToDiscord(message: string): Promise<void> {
 
   if (!webhookUrl) {
     console.log(
-      "Discord is not configured. Set the DISCORD_WEBHOOK_URL environment variable to enable Discord notifications."
+      "Discord is not configured. Set the DISCORD_WEBHOOK_URL environment variable to enable Discord notifications.",
     );
     return;
   }
@@ -40,7 +40,7 @@ async function sendToDiscord(message: string): Promise<void> {
 
     if (!response.ok) {
       console.error(
-        `Failed to send to Discord: ${response.status} ${response.statusText}`
+        `Failed to send to Discord: ${response.status} ${response.statusText}`,
       );
       return;
     }
@@ -74,7 +74,7 @@ const getGitLogTool = tool({
       .string()
       .optional()
       .describe(
-        "Git revision range, e.g., 'v1.0.0..v2.0.0' or 'HEAD~10..HEAD'. Omit for recent commits."
+        "Git revision range, e.g., 'v1.0.0..v2.0.0' or 'HEAD~10..HEAD'. Omit for recent commits.",
       ),
     maxCount: z
       .number()
@@ -109,7 +109,7 @@ const getGitDiffTool = tool({
       .string()
       .optional()
       .describe(
-        "Git revision range, e.g., 'v1.0.0..v2.0.0'. Omit for unstaged changes."
+        "Git revision range, e.g., 'v1.0.0..v2.0.0'. Omit for unstaged changes.",
       ),
   }),
   execute: async ({ range }) => {
@@ -166,7 +166,7 @@ async function main() {
   console.log("Changelog Generator Agent - Powered by LLM Gateway\n");
   console.log("=".repeat(50));
   console.log(
-    `\nGenerating changelog${range ? ` for range: ${range}` : " for recent commits"}...`
+    `\nGenerating changelog${range ? ` for range: ${range}` : " for recent commits"}...`,
   );
   console.log("-".repeat(50));
 

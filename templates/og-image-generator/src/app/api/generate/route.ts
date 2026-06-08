@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     if (!productName || typeof productName !== "string") {
       return Response.json(
         { error: "Product name is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
             ? error.message
             : "Failed to generate OG image",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

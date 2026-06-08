@@ -26,7 +26,7 @@ function addSlideContent(
   pptSlide: PptxGenJS.Slide,
   slide: Slide,
   theme: SlideTheme,
-  chartImage?: string
+  chartImage?: string,
 ) {
   const textColor = THEME_TEXT[theme];
   const mutedColor = THEME_MUTED[theme];
@@ -231,7 +231,7 @@ function addSlideContent(
  */
 export async function exportToPptx(
   presentation: Presentation,
-  chartImages: Map<string, string>
+  chartImages: Map<string, string>,
 ) {
   const pptx = new PptxGenJS();
   pptx.title = presentation.title;

@@ -6,11 +6,11 @@ billed to their own wallet through [LLM Gateway](https://llmgateway.io) — the
 
 It uses the three embeddable SDK packages:
 
-| Package | Where it runs | Purpose |
-| --- | --- | --- |
-| `@llmgateway/server` | Your backend (secret key) | Mint ephemeral end-user **session tokens** |
-| `@llmgateway/elements` | Browser (React) | `<BuyCredits>`, `<CreditBalance>`, `useBalance` |
-| `@llmgateway/client` | Browser (headless) | Stream chat with the session token |
+| Package                | Where it runs             | Purpose                                         |
+| ---------------------- | ------------------------- | ----------------------------------------------- |
+| `@llmgateway/server`   | Your backend (secret key) | Mint ephemeral end-user **session tokens**      |
+| `@llmgateway/elements` | Browser (React)           | `<BuyCredits>`, `<CreditBalance>`, `useBalance` |
+| `@llmgateway/client`   | Browser (headless)        | Stream chat with the session token              |
 
 ## How it works
 

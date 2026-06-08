@@ -47,7 +47,7 @@ export function useToasts() {
 
   const toast = useCallback(
     (message: string, type: Toast["type"] = "error") => addToast(message, type),
-    []
+    [],
   );
 
   return { toasts: current, toast, dismiss: dismissToast };

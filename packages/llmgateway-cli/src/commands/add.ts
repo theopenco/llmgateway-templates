@@ -245,6 +245,8 @@ export async function add(type?: string, name?: string): Promise<void> {
   }
 
   logger.blank();
-  logger.log(dim("Don't forget to import and use the added code in your project."));
+  logger.log(
+    dim("Don't forget to import and use the added code in your project."),
+  );
   logger.blank();
 }

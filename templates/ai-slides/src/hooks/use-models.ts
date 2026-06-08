@@ -54,8 +54,7 @@ export function useModels(apiKey: string | null): ModelLists {
           const outputModalities: string[] =
             m.architecture?.output_modalities || [];
           const isImageModel = outputModalities.includes("image");
-          const isTextOnly =
-            outputModalities.includes("text") && !isImageModel;
+          const isTextOnly = outputModalities.includes("text") && !isImageModel;
 
           if (id === "custom" || id === "auto") continue;
 

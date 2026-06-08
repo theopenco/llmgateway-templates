@@ -92,6 +92,7 @@ The weather agent uses a tool-based architecture:
 Get current weather conditions for a location.
 
 **Parameters:**
+
 - `location` (string): City name or location
 - `unit` (optional): "celsius" or "fahrenheit"
 
@@ -100,6 +101,7 @@ Get current weather conditions for a location.
 Get a 5-day weather forecast for a location.
 
 **Parameters:**
+
 - `location` (string): City name or location
 - `unit` (optional): "celsius" or "fahrenheit"
 

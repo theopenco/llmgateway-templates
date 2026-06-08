@@ -9,7 +9,9 @@ function createBrowserTools(browser: BrowserManager) {
   return {
     browser_navigate: tool({
       description: "Navigate the browser to a URL",
-      inputSchema: z.object({ url: z.string().describe("The URL to navigate to") }),
+      inputSchema: z.object({
+        url: z.string().describe("The URL to navigate to"),
+      }),
       execute: async ({ url }) => {
         const page = browser.getPage();
         await page.goto(url, { waitUntil: "domcontentloaded" });
@@ -22,7 +24,10 @@ function createBrowserTools(browser: BrowserManager) {
       inputSchema: z.object({}),
       execute: async () => {
         const snapshot = await browser.getSnapshot({ interactive: true });
-        const tree = typeof snapshot.tree === "string" ? snapshot.tree : JSON.stringify(snapshot.tree);
+        const tree =
+          typeof snapshot.tree === "string"
+            ? snapshot.tree
+            : JSON.stringify(snapshot.tree);
         // Truncate to avoid blowing up context — 30K chars ≈ ~8K tokens
         const maxChars = 30_000;
         if (tree.length > maxChars) {
@@ -32,7 +37,8 @@ function createBrowserTools(browser: BrowserManager) {
       },
     }),
     browser_click: tool({
-      description: "Click an element on the page using its ref from a snapshot (e.g. @e1)",
+      description:
+        "Click an element on the page using its ref from a snapshot (e.g. @e1)",
       inputSchema: z.object({
         ref: z.string().describe("The ref of the element to click, e.g. @e1"),
       }),
@@ -43,11 +49,15 @@ function createBrowserTools(browser: BrowserManager) {
       },
     }),
     browser_type: tool({
-      description: "Type text into an input field using its ref from a snapshot",
+      description:
+        "Type text into an input field using its ref from a snapshot",
       inputSchema: z.object({
         ref: z.string().describe("The ref of the input element, e.g. @e3"),
         text: z.string().describe("The text to type"),
-        clear: z.boolean().optional().describe("Clear the field before typing (default: true)"),
+        clear: z
+          .boolean()
+          .optional()
+          .describe("Clear the field before typing (default: true)"),
       }),
       execute: async ({ ref, text, clear = true }) => {
         const locator = browser.getLocator(ref);
@@ -96,13 +106,20 @@ function createBrowserTools(browser: BrowserManager) {
     browser_scroll: tool({
       description: "Scroll the page in a direction",
       inputSchema: z.object({
-        direction: z.enum(["up", "down", "left", "right"]).describe("Scroll direction"),
-        amount: z.number().optional().describe("Scroll amount in pixels (default: 500)"),
+        direction: z
+          .enum(["up", "down", "left", "right"])
+          .describe("Scroll direction"),
+        amount: z
+          .number()
+          .optional()
+          .describe("Scroll amount in pixels (default: 500)"),
       }),
       execute: async ({ direction, amount = 500 }) => {
         const page = browser.getPage();
-        const deltaX = direction === "left" ? -amount : direction === "right" ? amount : 0;
-        const deltaY = direction === "up" ? -amount : direction === "down" ? amount : 0;
+        const deltaX =
+          direction === "left" ? -amount : direction === "right" ? amount : 0;
+        const deltaY =
+          direction === "up" ? -amount : direction === "down" ? amount : 0;
         await page.mouse.wheel(deltaX, deltaY);
         return { scrolled: direction, amount };
       },
@@ -126,12 +143,16 @@ function createBrowserTools(browser: BrowserManager) {
       },
     }),
     browser_take_screenshot: tool({
-      description: "Take a screenshot of the current page for visual verification. The screenshot is streamed to the user via the live preview — you will get a confirmation, not the image data.",
+      description:
+        "Take a screenshot of the current page for visual verification. The screenshot is streamed to the user via the live preview — you will get a confirmation, not the image data.",
       inputSchema: z.object({}),
       execute: async () => {
         // Screenshot is already visible to the user via the live screencast.
         // Don't return base64 data — it would consume ~100K+ tokens per call.
-        return { status: "screenshot_captured", note: "The screenshot is visible in the live preview stream." };
+        return {
+          status: "screenshot_captured",
+          note: "The screenshot is visible in the live preview stream.",
+        };
       },
     }),
   };
@@ -164,7 +185,13 @@ export async function POST(request: Request) {
           (frame) => {
             emit({ type: "screenshot", imageData: frame.data });
           },
-          { format: "jpeg", quality: 50, maxWidth: 1280, maxHeight: 720, everyNthFrame: 2 }
+          {
+            format: "jpeg",
+            quality: 50,
+            maxWidth: 1280,
+            maxHeight: 720,
+            everyNthFrame: 2,
+          },
         );
 
         emit({ type: "status", message: "Browser ready. Running test..." });
@@ -221,8 +248,7 @@ Be methodical: always snapshot the page before acting so you know what elements 
                 typeof apiErr.responseBody === "string"
                   ? JSON.parse(apiErr.responseBody)
                   : apiErr.responseBody;
-              message =
-                body?.error?.message || body?.message || message;
+              message = body?.error?.message || body?.message || message;
             } catch {
               message = String(apiErr.responseBody);
             }

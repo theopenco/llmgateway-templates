@@ -24,9 +24,19 @@ const weatherTool = tool({
     > = {
       "london, uk": { temp: 12, condition: "Cloudy", humidity: 78, wind: 15 },
       "new york, usa": { temp: 8, condition: "Sunny", humidity: 45, wind: 20 },
-      "tokyo, japan": { temp: 18, condition: "Partly Cloudy", humidity: 60, wind: 10 },
+      "tokyo, japan": {
+        temp: 18,
+        condition: "Partly Cloudy",
+        humidity: 60,
+        wind: 10,
+      },
       "paris, france": { temp: 14, condition: "Rainy", humidity: 85, wind: 12 },
-      "sydney, australia": { temp: 25, condition: "Sunny", humidity: 55, wind: 18 },
+      "sydney, australia": {
+        temp: 25,
+        condition: "Sunny",
+        humidity: 55,
+        wind: 18,
+      },
     };
 
     const normalizedLocation = location.toLowerCase();
@@ -35,12 +45,16 @@ const weatherTool = tool({
     if (!weather) {
       // Generate random weather for unknown locations
       const conditions = ["Sunny", "Cloudy", "Rainy", "Partly Cloudy", "Windy"];
-      const randomCondition = conditions[Math.floor(Math.random() * conditions.length)];
+      const randomCondition =
+        conditions[Math.floor(Math.random() * conditions.length)];
       const randomTemp = Math.floor(Math.random() * 35) - 5;
 
       return {
         location,
-        temperature: unit === "fahrenheit" ? Math.round(randomTemp * 1.8 + 32) : randomTemp,
+        temperature:
+          unit === "fahrenheit"
+            ? Math.round(randomTemp * 1.8 + 32)
+            : randomTemp,
         unit,
         condition: randomCondition,
         humidity: Math.floor(Math.random() * 60) + 30,
@@ -50,7 +64,10 @@ const weatherTool = tool({
 
     return {
       location,
-      temperature: unit === "fahrenheit" ? Math.round(weather.temp * 1.8 + 32) : weather.temp,
+      temperature:
+        unit === "fahrenheit"
+          ? Math.round(weather.temp * 1.8 + 32)
+          : weather.temp,
       unit,
       condition: weather.condition,
       humidity: weather.humidity,
@@ -70,7 +87,14 @@ const forecastTool = tool({
       .describe("Temperature unit"),
   }),
   execute: async ({ location, unit }) => {
-    const conditions = ["Sunny", "Cloudy", "Rainy", "Partly Cloudy", "Windy", "Stormy"];
+    const conditions = [
+      "Sunny",
+      "Cloudy",
+      "Rainy",
+      "Partly Cloudy",
+      "Windy",
+      "Stormy",
+    ];
     const forecast = [];
     const today = new Date();
 
@@ -81,7 +105,10 @@ const forecastTool = tool({
       const tempCelsius = Math.floor(Math.random() * 25) + 5;
       forecast.push({
         date: date.toISOString().split("T")[0],
-        temperature: unit === "fahrenheit" ? Math.round(tempCelsius * 1.8 + 32) : tempCelsius,
+        temperature:
+          unit === "fahrenheit"
+            ? Math.round(tempCelsius * 1.8 + 32)
+            : tempCelsius,
         condition: conditions[Math.floor(Math.random() * conditions.length)],
         humidity: Math.floor(Math.random() * 50) + 40,
       });

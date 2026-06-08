@@ -19,14 +19,19 @@ const program = new Command();
 program
   .name("llmgateway")
   .alias("lg")
-  .description("CLI tool for scaffolding LLM Gateway templates and managing AI projects")
+  .description(
+    "CLI tool for scaffolding LLM Gateway templates and managing AI projects",
+  )
   .version(pkg.version);
 
 // init command
 program
   .command("init [directory]")
   .description("Create a new project from a template")
-  .option("-t, --template <name>", "Template to use (default: image-generation)")
+  .option(
+    "-t, --template <name>",
+    "Template to use (default: image-generation)",
+  )
   .option("-n, --name <name>", "Project name")
   .action(init);
 
@@ -43,7 +48,10 @@ program
   .command("models")
   .description("Browse and search available models")
   .option("-c, --capability <type>", "Filter by capability (e.g., image, text)")
-  .option("-p, --provider <name>", "Filter by provider (e.g., openai, anthropic)")
+  .option(
+    "-p, --provider <name>",
+    "Filter by provider (e.g., openai, anthropic)",
+  )
   .option("-s, --search <term>", "Search models by name")
   .option("--json", "Output as JSON")
   .action(listModels);

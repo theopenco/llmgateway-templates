@@ -47,7 +47,7 @@ export const ModelSelectorContent = ({
     showCloseButton={false}
     className={cn(
       "outline! border-none! p-0 outline-border! outline-solid!",
-      className
+      className,
     )}
     {...props}
   >
@@ -134,7 +134,7 @@ export const ModelSelectorLogoGroup = ({
   <div
     className={cn(
       "flex shrink-0 items-center -space-x-1 [&>svg]:rounded-full [&>svg]:bg-muted [&>svg]:p-0.5 [&>svg]:ring-1 [&>svg]:ring-border",
-      className
+      className,
     )}
     {...props}
   />

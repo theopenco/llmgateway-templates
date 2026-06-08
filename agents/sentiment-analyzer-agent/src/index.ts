@@ -25,7 +25,7 @@ const sentimentSchema = z.object({
 });
 
 async function runSentimentAnalyzer(
-  text: string
+  text: string,
 ): Promise<z.infer<typeof sentimentSchema>> {
   const result = await generateText({
     model: llmgateway("openai/gpt-4o-mini"),
@@ -49,19 +49,16 @@ function resolveInput(args: string[]): string {
   const input = args.join(" ");
 
   if (!input) {
+    console.error("Usage: node dist/index.js <text or file path>\n\nExamples:");
     console.error(
-      "Usage: node dist/index.js <text or file path>\n\nExamples:"
+      '  node dist/index.js "I love this product, it works great!"',
     );
-    console.error('  node dist/index.js "I love this product, it works great!"');
     console.error("  node dist/index.js review.txt");
     process.exit(1);
   }
 
   // Check if the input looks like a file path
-  if (
-    (input.endsWith(".txt") || input.endsWith(".md")) &&
-    existsSync(input)
-  ) {
+  if ((input.endsWith(".txt") || input.endsWith(".md")) && existsSync(input)) {
     return readFileSync(input, "utf-8");
   }
 
@@ -74,7 +71,9 @@ async function main() {
 
   console.log("Sentiment Analyzer Agent - Powered by LLM Gateway\n");
   console.log("=".repeat(50));
-  console.log(`\nInput: ${text.length > 100 ? text.slice(0, 100) + "..." : text}`);
+  console.log(
+    `\nInput: ${text.length > 100 ? text.slice(0, 100) + "..." : text}`,
+  );
   console.log("-".repeat(50));
 
   const analysis = await runSentimentAnalyzer(text);

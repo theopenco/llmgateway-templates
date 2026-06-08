@@ -54,9 +54,7 @@ function ChartWrapper({ title, description, children }: ChartWrapperProps) {
           {title && (
             <h4 className="text-sm font-semibold text-inherit">{title}</h4>
           )}
-          {description && (
-            <p className="text-xs opacity-70">{description}</p>
-          )}
+          {description && <p className="text-xs opacity-70">{description}</p>}
         </div>
       )}
       <div className="flex-1 min-h-0">
@@ -90,7 +88,11 @@ export function BarChartComponent({
   return (
     <ChartWrapper title={title} description={description}>
       <RechartsBarChart data={data} layout={layout}>
-        <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke="currentColor"
+          opacity={0.1}
+        />
         <XAxis
           dataKey={layout === "horizontal" ? undefined : xAxisKey}
           type={layout === "horizontal" ? "number" : "category"}
@@ -151,7 +153,11 @@ export function LineChartComponent({
   return (
     <ChartWrapper title={title} description={description}>
       <RechartsLineChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke="currentColor"
+          opacity={0.1}
+        />
         <XAxis
           dataKey={xAxisKey}
           tick={{ fontSize: 11, fill: "currentColor" }}
@@ -210,7 +216,11 @@ export function AreaChartComponent({
   return (
     <ChartWrapper title={title} description={description}>
       <RechartsAreaChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" stroke="currentColor" opacity={0.1} />
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke="currentColor"
+          opacity={0.1}
+        />
         <XAxis
           dataKey={xAxisKey}
           tick={{ fontSize: 11, fill: "currentColor" }}

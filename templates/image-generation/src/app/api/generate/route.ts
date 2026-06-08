@@ -22,7 +22,7 @@ export async function POST(request: Request) {
 
     const images = result.images.map(
       (image) =>
-        `data:${image.mediaType || "image/png"};base64,${image.base64}`
+        `data:${image.mediaType || "image/png"};base64,${image.base64}`,
     );
 
     return Response.json({ images });
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
         error:
           error instanceof Error ? error.message : "Failed to generate image",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

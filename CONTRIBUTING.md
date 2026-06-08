@@ -28,17 +28,20 @@ By participating in this project, you agree to maintain a respectful and inclusi
 1. **Fork the repository**
 
 2. **Clone your fork**
+
    ```bash
    git clone https://github.com/your-username/llmgateway-templates.git
    cd llmgateway-templates
    ```
 
 3. **Install dependencies**
+
    ```bash
    pnpm install
    ```
 
 4. **Create a feature branch**
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -49,17 +52,20 @@ By participating in this project, you agree to maintain a respectful and inclusi
    - Update documentation as needed
 
 6. **Run checks**
+
    ```bash
    pnpm lint
    pnpm build
    ```
 
 7. **Commit your changes**
+
    ```bash
    git commit -m "Add: description of your changes"
    ```
 
 8. **Push to your fork**
+
    ```bash
    git push origin feature/your-feature-name
    ```

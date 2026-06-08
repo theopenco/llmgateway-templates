@@ -23,17 +23,15 @@ const presentationSchema = z.object({
       content: z
         .string()
         .describe(
-          "The main content. Use bullet points separated by newlines for list items. Prefix each bullet with '- '."
+          "The main content. Use bullet points separated by newlines for list items. Prefix each bullet with '- '.",
         ),
       secondaryContent: z
         .string()
         .describe(
-          "Secondary content for two-column layout, or empty string if not applicable"
+          "Secondary content for two-column layout, or empty string if not applicable",
         ),
-      speakerNotes: z
-        .string()
-        .describe("Speaker notes for the presenter"),
-    })
+      speakerNotes: z.string().describe("Speaker notes for the presenter"),
+    }),
   ),
 });
 

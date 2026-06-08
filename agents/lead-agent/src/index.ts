@@ -10,7 +10,7 @@ async function sendToDiscord(message: string): Promise<void> {
 
   if (!webhookUrl) {
     console.log(
-      "Discord is not configured. Set the DISCORD_WEBHOOK_URL environment variable to enable Discord notifications."
+      "Discord is not configured. Set the DISCORD_WEBHOOK_URL environment variable to enable Discord notifications.",
     );
     return;
   }
@@ -23,7 +23,7 @@ async function sendToDiscord(message: string): Promise<void> {
 
   if (!response.ok) {
     console.error(
-      `Failed to send to Discord: ${response.status} ${response.statusText}`
+      `Failed to send to Discord: ${response.status} ${response.statusText}`,
     );
   } else {
     console.log("Summary sent to Discord successfully.");

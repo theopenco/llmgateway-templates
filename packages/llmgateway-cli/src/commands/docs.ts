@@ -27,7 +27,11 @@ export async function docs(topic?: string): Promise<void> {
         logger.log(`  ${highlight(key.padEnd(12))} ${dim(DOCS_URLS[key])}`);
       });
     logger.blank();
-    logger.log(dim(`Run ${highlight("npx @llmgateway/cli docs <topic>")} to open specific docs`));
+    logger.log(
+      dim(
+        `Run ${highlight("npx @llmgateway/cli docs <topic>")} to open specific docs`,
+      ),
+    );
     logger.blank();
   }
 }

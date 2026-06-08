@@ -43,16 +43,22 @@ export default function Home() {
 
   const headers = useMemo(
     () => (apiKey ? { "x-api-key": apiKey } : undefined),
-    [apiKey]
+    [apiKey],
   );
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } =
-    useChat({
-      api: "/api/chat",
-      body: { model },
-      headers,
-      streamProtocol: "text",
-    });
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    isLoading,
+    setMessages,
+  } = useChat({
+    api: "/api/chat",
+    body: { model },
+    headers,
+    streamProtocol: "text",
+  });
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -83,11 +89,7 @@ export default function Home() {
             <KeyRound className="size-4" />
           </Button>
           {messages.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setMessages([])}
-            >
+            <Button variant="ghost" size="sm" onClick={() => setMessages([])}>
               <Trash2 className="size-4" />
               Clear
             </Button>
@@ -168,10 +170,7 @@ export default function Home() {
       </div>
 
       <div className="border-t border-border px-4 py-4">
-        <form
-          onSubmit={handleSubmit}
-          className="mx-auto flex max-w-3xl gap-3"
-        >
+        <form onSubmit={handleSubmit} className="mx-auto flex max-w-3xl gap-3">
           <input
             value={input}
             onChange={handleInputChange}

@@ -35,7 +35,9 @@ export async function list(options: ListOptions): Promise<void> {
   }
 
   logger.log(
-    dim(`Run ${highlight("npx @llmgateway/cli init --template <name>")} to create a new project`)
+    dim(
+      `Run ${highlight("npx @llmgateway/cli init --template <name>")} to create a new project`,
+    ),
   );
   logger.blank();
 }

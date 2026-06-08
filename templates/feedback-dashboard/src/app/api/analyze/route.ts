@@ -10,19 +10,23 @@ const analysisSchema = z.object({
     .number()
     .min(0)
     .max(10)
-    .describe("Average sentiment score from 0 (most negative) to 10 (most positive)"),
+    .describe(
+      "Average sentiment score from 0 (most negative) to 10 (most positive)",
+    ),
   summary: z
     .string()
     .describe("A 2-3 sentence summary of the overall feedback"),
   themes: z
     .array(
       z.object({
-        name: z.string().describe("Theme name (e.g. 'Customer Support', 'Pricing')"),
+        name: z
+          .string()
+          .describe("Theme name (e.g. 'Customer Support', 'Pricing')"),
         count: z.number().describe("How many reviews mention this theme"),
         sentiment: z
           .enum(["positive", "negative", "neutral", "mixed"])
           .describe("Sentiment for this theme"),
-      })
+      }),
     )
     .describe("Key themes found across reviews"),
   reviews: z
@@ -33,8 +37,10 @@ const analysisSchema = z.object({
           .enum(["positive", "negative", "neutral"])
           .describe("Sentiment of this review"),
         score: z.number().min(0).max(10).describe("Sentiment score 0-10"),
-        keyPhrase: z.string().describe("The key phrase or takeaway from this review"),
-      })
+        keyPhrase: z
+          .string()
+          .describe("The key phrase or takeaway from this review"),
+      }),
     )
     .describe("Individual review analysis"),
 });
@@ -51,7 +57,7 @@ export async function POST(request: Request) {
     if (!reviews || typeof reviews !== "string" || !reviews.trim()) {
       return Response.json(
         { error: "Reviews text is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -63,7 +69,7 @@ export async function POST(request: Request) {
     if (reviewList.length === 0) {
       return Response.json(
         { error: "At least one review is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -86,7 +92,7 @@ Analyze each review individually and provide an overall summary with key themes.
         error:
           error instanceof Error ? error.message : "Failed to analyze reviews",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,12 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Maximize2,
-  GripVertical,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, Maximize2, GripVertical } from "lucide-react";
 import {
   BarChartComponent,
   LineChartComponent,
@@ -54,12 +49,30 @@ const themeMuted: Record<SlideTheme, string> = {
 };
 
 const CHART_PRESETS = [
-  { name: "Default", colors: ["#2563eb", "#16a34a", "#eab308", "#9333ea", "#e11d48"] },
-  { name: "Ocean", colors: ["#0ea5e9", "#06b6d4", "#14b8a6", "#10b981", "#34d399"] },
-  { name: "Sunset", colors: ["#f97316", "#ef4444", "#ec4899", "#f59e0b", "#eab308"] },
-  { name: "Neon", colors: ["#a855f7", "#6366f1", "#3b82f6", "#06b6d4", "#22d3ee"] },
-  { name: "Earth", colors: ["#92400e", "#b45309", "#a16207", "#4d7c0f", "#166534"] },
-  { name: "Pastel", colors: ["#93c5fd", "#86efac", "#fde68a", "#c4b5fd", "#fda4af"] },
+  {
+    name: "Default",
+    colors: ["#2563eb", "#16a34a", "#eab308", "#9333ea", "#e11d48"],
+  },
+  {
+    name: "Ocean",
+    colors: ["#0ea5e9", "#06b6d4", "#14b8a6", "#10b981", "#34d399"],
+  },
+  {
+    name: "Sunset",
+    colors: ["#f97316", "#ef4444", "#ec4899", "#f59e0b", "#eab308"],
+  },
+  {
+    name: "Neon",
+    colors: ["#a855f7", "#6366f1", "#3b82f6", "#06b6d4", "#22d3ee"],
+  },
+  {
+    name: "Earth",
+    colors: ["#92400e", "#b45309", "#a16207", "#4d7c0f", "#166534"],
+  },
+  {
+    name: "Pastel",
+    colors: ["#93c5fd", "#86efac", "#fde68a", "#c4b5fd", "#fda4af"],
+  },
 ];
 
 function EditableText({
@@ -100,7 +113,7 @@ function EditableText({
           }}
           className={cn(
             "w-full resize-none rounded bg-black/20 p-1 outline-none ring-1 ring-white/20",
-            className
+            className,
           )}
           autoFocus
           rows={Math.max(3, draft.split("\n").length)}
@@ -118,7 +131,7 @@ function EditableText({
         }}
         className={cn(
           "w-full rounded bg-black/20 p-1 outline-none ring-1 ring-white/20",
-          className
+          className,
         )}
         autoFocus
       />
@@ -131,7 +144,7 @@ function EditableText({
       className={cn(
         "cursor-text rounded px-1 transition-colors hover:bg-white/5",
         !value && "opacity-40 italic",
-        className
+        className,
       )}
     >
       {value || placeholder || "Click to edit"}
@@ -172,7 +185,7 @@ function ContentRenderer({
         }}
         className={cn(
           "w-full resize-none rounded bg-black/20 p-2 text-sm outline-none ring-1 ring-white/20",
-          className
+          className,
         )}
         autoFocus
         rows={Math.max(5, draft.split("\n").length + 1)}
@@ -186,7 +199,7 @@ function ContentRenderer({
       onClick={startEdit}
       className={cn(
         "cursor-text rounded px-1 transition-colors hover:bg-white/5",
-        className
+        className,
       )}
     >
       {lines.length > 0 ? (
@@ -221,22 +234,40 @@ function MediaPositionControls({
   return (
     <div className="absolute top-1 right-1 flex gap-0.5 rounded bg-black/60 p-0.5 opacity-0 transition-opacity group-hover/media:opacity-100 z-10">
       <button
-        onClick={(e) => { e.stopPropagation(); onChange("left"); }}
-        className={cn("rounded p-1 hover:bg-white/20", position === "left" && "bg-white/20")}
+        onClick={(e) => {
+          e.stopPropagation();
+          onChange("left");
+        }}
+        className={cn(
+          "rounded p-1 hover:bg-white/20",
+          position === "left" && "bg-white/20",
+        )}
         title="Position left"
       >
         <ArrowLeft className="size-3 text-white" />
       </button>
       <button
-        onClick={(e) => { e.stopPropagation(); onChange("full"); }}
-        className={cn("rounded p-1 hover:bg-white/20", position === "full" && "bg-white/20")}
+        onClick={(e) => {
+          e.stopPropagation();
+          onChange("full");
+        }}
+        className={cn(
+          "rounded p-1 hover:bg-white/20",
+          position === "full" && "bg-white/20",
+        )}
         title="Full width"
       >
         <Maximize2 className="size-3 text-white" />
       </button>
       <button
-        onClick={(e) => { e.stopPropagation(); onChange("right"); }}
-        className={cn("rounded p-1 hover:bg-white/20", position === "right" && "bg-white/20")}
+        onClick={(e) => {
+          e.stopPropagation();
+          onChange("right");
+        }}
+        className={cn(
+          "rounded p-1 hover:bg-white/20",
+          position === "right" && "bg-white/20",
+        )}
         title="Position right"
       >
         <ArrowRight className="size-3 text-white" />
@@ -279,7 +310,12 @@ function ResizableMedia({
         const deltaPercent = (delta / containerWidth) * 100;
         const newSize = Math.min(
           70,
-          Math.max(20, side === "left" ? startSize + deltaPercent : startSize - deltaPercent)
+          Math.max(
+            20,
+            side === "left"
+              ? startSize + deltaPercent
+              : startSize - deltaPercent,
+          ),
         );
         onResize(Math.round(newSize));
       };
@@ -293,13 +329,16 @@ function ResizableMedia({
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     },
-    [size, onResize, side]
+    [size, onResize, side],
   );
 
   if (position === "full") {
     return (
       <div className="group/media relative w-full">
-        <MediaPositionControls position={position} onChange={onPositionChange} />
+        <MediaPositionControls
+          position={position}
+          onChange={onPositionChange}
+        />
         {children}
       </div>
     );
@@ -317,7 +356,7 @@ function ResizableMedia({
         onMouseDown={handleMouseDown}
         className={cn(
           "absolute top-0 bottom-0 w-2 cursor-col-resize flex items-center justify-center opacity-0 transition-opacity group-hover/media:opacity-100 z-10",
-          side === "left" ? "right-0" : "left-0"
+          side === "left" ? "right-0" : "left-0",
         )}
       >
         <GripVertical className="size-4 text-white/60" />
@@ -373,7 +412,7 @@ function ChartColorPicker({
   theme: SlideTheme;
 }) {
   const currentPreset = CHART_PRESETS.find(
-    (p) => JSON.stringify(p.colors) === JSON.stringify(colors)
+    (p) => JSON.stringify(p.colors) === JSON.stringify(colors),
   );
 
   return (
@@ -388,7 +427,8 @@ function ChartColorPicker({
             }}
             className={cn(
               "flex flex-col items-center gap-1 rounded-md px-2 py-1 hover:bg-white/15 transition-colors",
-              currentPreset?.name === preset.name && "bg-white/20 ring-1 ring-white/30"
+              currentPreset?.name === preset.name &&
+                "bg-white/20 ring-1 ring-white/30",
             )}
             title={preset.name}
           >
@@ -398,7 +438,9 @@ function ChartColorPicker({
                 background: `linear-gradient(to right, ${preset.colors.slice(0, 4).join(", ")})`,
               }}
             />
-            <span className="text-[8px] text-white/70 leading-none">{preset.name}</span>
+            <span className="text-[8px] text-white/70 leading-none">
+              {preset.name}
+            </span>
           </button>
         ))}
       </div>
@@ -426,11 +468,11 @@ function MediaWithContent({
   const mediaContent = isImage ? (
     slide.image ? (
       /* eslint-disable-next-line @next/next/no-img-element -- base64 data URL, not optimizable */
-        <img
+      <img
         src={slide.image}
         alt="Slide image"
-          className="max-h-full max-w-full rounded-lg object-cover"
-        />
+        className="max-h-full max-w-full rounded-lg object-cover"
+      />
     ) : (
       <div className="flex aspect-video w-full items-center justify-center rounded-lg border border-dashed border-current/20">
         <span className="text-xs opacity-40">Generate an image</span>
@@ -452,7 +494,9 @@ function MediaWithContent({
         </>
       ) : (
         <div className="flex aspect-video w-full items-center justify-center rounded-lg border border-dashed border-current/20">
-          <span className="text-sm opacity-40">Use AI Tools to generate a chart</span>
+          <span className="text-sm opacity-40">
+            Use AI Tools to generate a chart
+          </span>
         </div>
       )}
     </div>
@@ -486,11 +530,11 @@ function MediaWithContent({
           )}
           {isImage && slide.image ? (
             /* eslint-disable-next-line @next/next/no-img-element -- base64 data URL, not optimizable */
-              <img
+            <img
               src={slide.image}
               alt="Slide image"
-                className="max-h-full max-w-full rounded-lg object-contain"
-              />
+              className="max-h-full max-w-full rounded-lg object-contain"
+            />
           ) : isImage ? (
             <div className="flex aspect-video w-full items-center justify-center rounded-lg border border-dashed border-current/20">
               <span className="text-xs opacity-40">Generate an image</span>
@@ -521,7 +565,7 @@ function MediaWithContent({
       <div
         className={cn(
           "flex flex-1 gap-4 min-h-0",
-          isLeft ? "flex-row" : "flex-row-reverse"
+          isLeft ? "flex-row" : "flex-row-reverse",
         )}
       >
         <ResizableMedia
@@ -578,7 +622,7 @@ export function SlideEditor({
           "relative aspect-video w-full max-w-4xl overflow-hidden rounded-lg shadow-2xl",
           themeClasses[theme],
           themeBg[theme],
-          themeText[theme]
+          themeText[theme],
         )}
       >
         <div className="absolute inset-0 flex flex-col p-8 md:p-12">
@@ -599,21 +643,23 @@ export function SlideEditor({
             </div>
           )}
 
-          {slide.layout === "content" && !showImageLayout && !showChartLayout && (
-            <>
-              <EditableText
-                value={slide.title}
-                onChange={(title) => onUpdate({ title })}
-                className="mb-6 text-xl font-bold md:text-3xl"
-                placeholder="Slide Title"
-              />
-              <ContentRenderer
-                content={slide.content}
-                onChange={(content) => onUpdate({ content })}
-                className="flex-1 text-sm md:text-lg"
-              />
-            </>
-          )}
+          {slide.layout === "content" &&
+            !showImageLayout &&
+            !showChartLayout && (
+              <>
+                <EditableText
+                  value={slide.title}
+                  onChange={(title) => onUpdate({ title })}
+                  className="mb-6 text-xl font-bold md:text-3xl"
+                  placeholder="Slide Title"
+                />
+                <ContentRenderer
+                  content={slide.content}
+                  onChange={(content) => onUpdate({ content })}
+                  className="flex-1 text-sm md:text-lg"
+                />
+              </>
+            )}
 
           {/* Content + Image: flexible positioning */}
           {slide.layout !== "title" &&

@@ -68,10 +68,7 @@ function getToolInfo(toolName: string) {
   );
 }
 
-function formatArgs(
-  toolName: string,
-  args: Record<string, unknown>
-): string {
+function formatArgs(toolName: string, args: Record<string, unknown>): string {
   switch (toolName) {
     case "browser_navigate":
       return String(args.url || "");
@@ -121,7 +118,7 @@ interface ModelItemProps {
 const ModelItem = memo(({ model, selectedModel, onSelect }: ModelItemProps) => {
   const handleSelect = useCallback(
     () => onSelect(model.id),
-    [onSelect, model.id]
+    [onSelect, model.id],
   );
   return (
     <ModelSelectorItem onSelect={handleSelect} value={model.id}>
@@ -266,16 +263,11 @@ export function QATester({ models }: { models: Model[] }) {
             onOpenChange={setModelSelectorOpen}
           >
             <ModelSelectorTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-[220px] justify-between"
-              >
+              <Button variant="outline" className="w-[220px] justify-between">
                 {selectedModel && (
                   <>
                     <ModelSelectorLogo provider={selectedModel.family} />
-                    <ModelSelectorName>
-                      {selectedModel.name}
-                    </ModelSelectorName>
+                    <ModelSelectorName>{selectedModel.name}</ModelSelectorName>
                   </>
                 )}
                 <ChevronsUpDown className="size-3.5 opacity-50" />

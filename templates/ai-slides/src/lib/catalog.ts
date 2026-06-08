@@ -15,9 +15,7 @@ export const catalog = schema.createCatalog({
       props: z.object({
         title: z.string().optional(),
         description: z.string().optional(),
-        data: z.array(
-          z.record(z.string(), z.union([z.string(), z.number()]))
-        ),
+        data: z.array(z.record(z.string(), z.union([z.string(), z.number()]))),
         series: z.array(seriesSchema),
         xAxisKey: z.string(),
         layout: z.enum(["vertical", "horizontal"]).optional(),
@@ -29,9 +27,7 @@ export const catalog = schema.createCatalog({
       props: z.object({
         title: z.string().optional(),
         description: z.string().optional(),
-        data: z.array(
-          z.record(z.string(), z.union([z.string(), z.number()]))
-        ),
+        data: z.array(z.record(z.string(), z.union([z.string(), z.number()]))),
         series: z.array(seriesSchema),
         xAxisKey: z.string(),
         curved: z.boolean().optional(),
@@ -42,9 +38,7 @@ export const catalog = schema.createCatalog({
       props: z.object({
         title: z.string().optional(),
         description: z.string().optional(),
-        data: z.array(
-          z.record(z.string(), z.union([z.string(), z.number()]))
-        ),
+        data: z.array(z.record(z.string(), z.union([z.string(), z.number()]))),
         series: z.array(seriesSchema),
         xAxisKey: z.string(),
         stacked: z.boolean().optional(),
@@ -60,7 +54,7 @@ export const catalog = schema.createCatalog({
             label: z.string(),
             value: z.number(),
             fill: z.string().optional(),
-          })
+          }),
         ),
         innerRadius: z.number().optional(),
         showLabel: z.boolean().optional(),

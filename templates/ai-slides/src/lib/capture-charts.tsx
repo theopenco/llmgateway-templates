@@ -12,7 +12,7 @@ import type { Slide } from "./types";
 
 function renderChart(
   chartSpec: Record<string, unknown>,
-  colors?: string[]
+  colors?: string[],
 ): React.ReactNode {
   const root = chartSpec.root as string | undefined;
   const elements = chartSpec.elements as
@@ -55,7 +55,7 @@ function waitForRender(): Promise<void> {
  * and returns a map of slide ID -> base64 data URL.
  */
 export async function captureChartImages(
-  slides: Slide[]
+  slides: Slide[],
 ): Promise<Map<string, string>> {
   const chartSlides = slides.filter((s) => s.chartSpec);
   const images = new Map<string, string>();

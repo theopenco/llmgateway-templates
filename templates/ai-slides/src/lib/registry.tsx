@@ -12,16 +12,32 @@ import {
 export const registry = defineRegistry(catalog, {
   components: {
     BarChart: (renderProps) => (
-      <BarChartComponent props={renderProps.props as Parameters<typeof BarChartComponent>[0]["props"]} />
+      <BarChartComponent
+        props={
+          renderProps.props as Parameters<typeof BarChartComponent>[0]["props"]
+        }
+      />
     ),
     LineChart: (renderProps) => (
-      <LineChartComponent props={renderProps.props as Parameters<typeof LineChartComponent>[0]["props"]} />
+      <LineChartComponent
+        props={
+          renderProps.props as Parameters<typeof LineChartComponent>[0]["props"]
+        }
+      />
     ),
     AreaChart: (renderProps) => (
-      <AreaChartComponent props={renderProps.props as Parameters<typeof AreaChartComponent>[0]["props"]} />
+      <AreaChartComponent
+        props={
+          renderProps.props as Parameters<typeof AreaChartComponent>[0]["props"]
+        }
+      />
     ),
     PieChart: (renderProps) => (
-      <PieChartComponent props={renderProps.props as Parameters<typeof PieChartComponent>[0]["props"]} />
+      <PieChartComponent
+        props={
+          renderProps.props as Parameters<typeof PieChartComponent>[0]["props"]
+        }
+      />
     ),
   },
   actions: {},

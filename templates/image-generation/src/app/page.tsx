@@ -157,7 +157,9 @@ export default function Home() {
                   height={512}
                 />
                 <CardContent className="border-t border-border p-4">
-                  <p className="text-sm text-muted-foreground">{image.prompt}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {image.prompt}
+                  </p>
                 </CardContent>
               </Card>
             ))}

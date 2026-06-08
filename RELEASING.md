@@ -18,6 +18,7 @@ Use the GitHub Actions workflow to publish a new version:
 4. Click "Run workflow"
 
 The workflow will:
+
 - Build the package
 - Bump the version in package.json
 - Commit the version change

@@ -10,9 +10,7 @@ const enhancedSlideSchema = z.object({
   subtitle: z
     .string()
     .describe("Improved subtitle, or empty string if not applicable"),
-  speakerNotes: z
-    .string()
-    .describe("Improved speaker notes for the presenter"),
+  speakerNotes: z.string().describe("Improved speaker notes for the presenter"),
 });
 
 export async function POST(request: Request) {

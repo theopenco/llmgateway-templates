@@ -101,9 +101,11 @@ The lead agent uses Perplexity's sonar-pro model which has built-in web search c
 Send a formatted message to a Discord channel via webhook.
 
 **Parameters:**
+
 - `message` (string): The formatted summary to send
 
 **Environment:**
+
 - `DISCORD_WEBHOOK_URL`: Discord webhook URL (optional — if unset, the tool reports that Discord is not configured)
 
 ## Example Queries

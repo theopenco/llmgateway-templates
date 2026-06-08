@@ -1,7 +1,12 @@
 import prompts from "prompts";
 import open from "open";
 import { logger, highlight, dim, bold } from "../utils/logger.js";
-import { getConfig, setConfig, clearConfig, getEnvApiKey } from "../utils/config.js";
+import {
+  getConfig,
+  setConfig,
+  clearConfig,
+  getEnvApiKey,
+} from "../utils/config.js";
 
 export async function authLogin(): Promise<void> {
   logger.blank();
@@ -11,8 +16,14 @@ export async function authLogin(): Promise<void> {
   // Check if already configured via env
   const envKey = getEnvApiKey();
   if (envKey) {
-    logger.warn("API key is already set via LLMGATEWAY_API_KEY environment variable.");
-    logger.log(dim("The stored API key will be used as a fallback when the env var is not set."));
+    logger.warn(
+      "API key is already set via LLMGATEWAY_API_KEY environment variable.",
+    );
+    logger.log(
+      dim(
+        "The stored API key will be used as a fallback when the env var is not set.",
+      ),
+    );
     logger.blank();
   }
 
@@ -55,7 +66,9 @@ export async function authStatus(): Promise<void> {
     logger.log(`  ${dim("Config:")} ~/.llmgateway/config.json`);
   } else {
     logger.warn("Not authenticated");
-    logger.log(dim(`Run ${highlight("npx @llmgateway/cli auth login")} to authenticate`));
+    logger.log(
+      dim(`Run ${highlight("npx @llmgateway/cli auth login")} to authenticate`),
+    );
   }
 
   logger.blank();

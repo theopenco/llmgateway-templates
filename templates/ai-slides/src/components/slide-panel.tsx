@@ -21,7 +21,8 @@ const themeStyles: Record<SlideTheme, string> = {
   dark: "bg-[#1a1a2e] text-[#e8e8e8]",
   light: "bg-white text-[#1a1a2e]",
   blue: "bg-[#0f2b46] text-white",
-  gradient: "bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#6366f1] text-white",
+  gradient:
+    "bg-gradient-to-br from-[#1e1b4b] via-[#312e81] to-[#6366f1] text-white",
 };
 
 function SlideThumbnail({
@@ -41,14 +42,11 @@ function SlideThumbnail({
         "relative aspect-video w-full overflow-hidden rounded-sm border-2 transition-colors",
         isActive
           ? "border-primary ring-2 ring-primary/20"
-          : "border-transparent hover:border-muted-foreground/30"
+          : "border-transparent hover:border-muted-foreground/30",
       )}
     >
       <div
-        className={cn(
-          "absolute inset-0 flex flex-col p-2",
-          themeStyles[theme]
-        )}
+        className={cn("absolute inset-0 flex flex-col p-2", themeStyles[theme])}
       >
         {slide.layout === "title" ? (
           <div className="flex flex-1 flex-col items-center justify-center text-center">

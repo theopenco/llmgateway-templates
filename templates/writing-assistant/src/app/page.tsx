@@ -15,12 +15,7 @@ import {
 } from "lucide-react";
 import { useApiKey } from "@/components/api-key-provider";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const MODELS = [
   // OpenAI

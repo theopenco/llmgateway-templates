@@ -34,9 +34,7 @@ export async function upgrade(options: UpgradeOptions): Promise<void> {
   };
 
   // Find installed LLM Gateway packages
-  const installedPackages = LLMGATEWAY_PACKAGES.filter(
-    (pkg) => pkg in allDeps
-  );
+  const installedPackages = LLMGATEWAY_PACKAGES.filter((pkg) => pkg in allDeps);
 
   if (installedPackages.length === 0) {
     logger.warn("No @llmgateway packages found in this project.");
@@ -98,7 +96,9 @@ export async function upgrade(options: UpgradeOptions): Promise<void> {
       const oldVersion = allDeps[pkg];
       const newVersion = updatedDeps[pkg];
       if (oldVersion !== newVersion) {
-        logger.log(`  ${highlight(pkg)} ${dim(oldVersion)} -> ${highlight(newVersion)}`);
+        logger.log(
+          `  ${highlight(pkg)} ${dim(oldVersion)} -> ${highlight(newVersion)}`,
+        );
       } else {
         logger.log(`  ${highlight(pkg)} ${dim(newVersion)} (no change)`);
       }

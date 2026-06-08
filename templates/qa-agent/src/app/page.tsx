@@ -11,7 +11,7 @@ async function getToolModels(): Promise<Model[]> {
     .filter(
       (m: any) =>
         m.family !== "llmgateway" &&
-        m.providers?.some((p: any) => p.tools === true)
+        m.providers?.some((p: any) => p.tools === true),
     )
     .map((m: any) => ({
       id: `${m.family}/${m.id}`,
@@ -21,7 +21,7 @@ async function getToolModels(): Promise<Model[]> {
         ...new Set(
           m.providers
             ?.filter((p: any) => p.tools === true)
-            .map((p: any) => p.providerId as string) ?? []
+            .map((p: any) => p.providerId as string) ?? [],
         ),
       ],
     }));

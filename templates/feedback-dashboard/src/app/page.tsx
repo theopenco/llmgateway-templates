@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { BarChart3, KeyRound, Loader2, MessageSquare, RotateCcw } from "lucide-react";
+import {
+  BarChart3,
+  KeyRound,
+  Loader2,
+  MessageSquare,
+  RotateCcw,
+} from "lucide-react";
 import { useApiKey } from "@/components/api-key-provider";
 import { Button } from "@/components/ui/button";
 import {

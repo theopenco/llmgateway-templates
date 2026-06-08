@@ -17,8 +17,8 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <ApiKeyProvider>{children}</ApiKeyProvider>
-          <Toaster />
-        </body>
+        <Toaster />
+      </body>
     </html>
   );
 }

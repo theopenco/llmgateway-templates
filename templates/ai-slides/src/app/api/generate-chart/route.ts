@@ -73,7 +73,7 @@ ${research.text}`,
     } catch {
       return Response.json(
         { error: "Failed to parse chart spec" },
-        { status: 500 }
+        { status: 500 },
       );
     }
   }

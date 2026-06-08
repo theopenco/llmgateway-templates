@@ -113,10 +113,10 @@ npx @llmgateway/cli docs sdk
 
 ## Available Templates
 
-| Template | Description | Type |
-|----------|-------------|------|
-| `image-generation` | Full-stack AI image generation app (Next.js 16, React 19) | Web |
-| `weather-agent` | CLI agent that answers weather queries using tools | Agent |
+| Template           | Description                                               | Type  |
+| ------------------ | --------------------------------------------------------- | ----- |
+| `image-generation` | Full-stack AI image generation app (Next.js 16, React 19) | Web   |
+| `weather-agent`    | CLI agent that answers weather queries using tools        | Agent |
 
 ## Configuration
 

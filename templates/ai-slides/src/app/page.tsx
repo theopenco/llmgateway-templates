@@ -2,7 +2,12 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { nanoid } from "nanoid";
-import { Download, KeyRound, Loader2, Presentation as PresentationIcon } from "lucide-react";
+import {
+  Download,
+  KeyRound,
+  Loader2,
+  Presentation as PresentationIcon,
+} from "lucide-react";
 import { useApiKey } from "@/components/api-key-provider";
 import { useModels } from "@/hooks/use-models";
 import { SlidePanel } from "@/components/slide-panel";
@@ -38,7 +43,12 @@ const defaultPresentation: Presentation = {
 
 export default function SlidesPage() {
   const { apiKey, setOpen } = useApiKey();
-  const { textModels, imageModels, searchModels, isLoading: modelsLoading } = useModels(apiKey);
+  const {
+    textModels,
+    imageModels,
+    searchModels,
+    isLoading: modelsLoading,
+  } = useModels(apiKey);
   const [presentation, setPresentation] =
     useState<Presentation>(defaultPresentation);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -54,8 +64,10 @@ export default function SlidesPage() {
     if (!imageModel && imageModels.length > 0) setImageModel(imageModels[0].id);
   }, [imageModel, imageModels]);
   useEffect(() => {
-    if (!searchModel && searchModels.length > 0) setSearchModel(searchModels[0].id);
-    else if (!searchModel && textModels.length > 0) setSearchModel(textModels[0].id);
+    if (!searchModel && searchModels.length > 0)
+      setSearchModel(searchModels[0].id);
+    else if (!searchModel && textModels.length > 0)
+      setSearchModel(textModels[0].id);
   }, [searchModel, searchModels, textModels]);
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -77,17 +89,14 @@ export default function SlidesPage() {
 
   const currentSlide = presentation.slides[currentIndex];
 
-  const updateSlide = useCallback(
-    (index: number, updates: Partial<Slide>) => {
-      setPresentation((prev) => ({
-        ...prev,
-        slides: prev.slides.map((slide, i) =>
-          i === index ? { ...slide, ...updates } : slide
-        ),
-      }));
-    },
-    []
-  );
+  const updateSlide = useCallback((index: number, updates: Partial<Slide>) => {
+    setPresentation((prev) => ({
+      ...prev,
+      slides: prev.slides.map((slide, i) =>
+        i === index ? { ...slide, ...updates } : slide,
+      ),
+    }));
+  }, []);
 
   const addSlide = useCallback(() => {
     const newSlide = createSlide();
@@ -110,7 +119,7 @@ export default function SlidesPage() {
         setCurrentIndex((prev) => prev - 1);
       }
     },
-    [currentIndex, presentation.slides.length]
+    [currentIndex, presentation.slides.length],
   );
 
   const duplicateSlide = useCallback(
@@ -124,7 +133,7 @@ export default function SlidesPage() {
       });
       setCurrentIndex(index + 1);
     },
-    [presentation.slides]
+    [presentation.slides],
   );
 
   const reorderSlides = useCallback((from: number, to: number) => {
@@ -153,9 +162,8 @@ export default function SlidesPage() {
         }
 
         const data = await response.json();
-        const slides: Slide[] = data.slides.map(
-          (s: Omit<Slide, "id">) =>
-            createSlide(s)
+        const slides: Slide[] = data.slides.map((s: Omit<Slide, "id">) =>
+          createSlide(s),
         );
 
         setPresentation({
@@ -165,12 +173,16 @@ export default function SlidesPage() {
         });
         setCurrentIndex(0);
       } catch (error) {
-        addToast(error instanceof Error ? error.message : "Failed to generate presentation");
+        addToast(
+          error instanceof Error
+            ? error.message
+            : "Failed to generate presentation",
+        );
       } finally {
         setIsGenerating(false);
       }
     },
-    [headers, textModel, presentation.theme]
+    [headers, textModel, presentation.theme],
   );
 
   const handleResearch = useCallback(
@@ -196,7 +208,7 @@ export default function SlidesPage() {
         setIsResearching(false);
       }
     },
-    [headers, searchModel]
+    [headers, searchModel],
   );
 
   const handleGenerateImage = useCallback(
@@ -226,12 +238,14 @@ export default function SlidesPage() {
           });
         }
       } catch (error) {
-        addToast(error instanceof Error ? error.message : "Image generation failed");
+        addToast(
+          error instanceof Error ? error.message : "Image generation failed",
+        );
       } finally {
         setIsGeneratingImage(false);
       }
     },
-    [headers, imageModel, currentIndex, currentSlide?.layout, updateSlide]
+    [headers, imageModel, currentIndex, currentSlide?.layout, updateSlide],
   );
 
   const handleEnhanceSlide = useCallback(
@@ -261,12 +275,14 @@ export default function SlidesPage() {
           speakerNotes: data.speakerNotes,
         });
       } catch (error) {
-        addToast(error instanceof Error ? error.message : "Slide enhancement failed");
+        addToast(
+          error instanceof Error ? error.message : "Slide enhancement failed",
+        );
       } finally {
         setIsEnhancing(false);
       }
     },
-    [headers, textModel, currentSlide, currentIndex, updateSlide]
+    [headers, textModel, currentSlide, currentIndex, updateSlide],
   );
 
   const handleGenerateChart = useCallback(
@@ -289,19 +305,21 @@ export default function SlidesPage() {
           layout: "chart",
         });
       } catch (error) {
-        addToast(error instanceof Error ? error.message : "Chart generation failed");
+        addToast(
+          error instanceof Error ? error.message : "Chart generation failed",
+        );
       } finally {
         setIsGeneratingChart(false);
       }
     },
-    [headers, textModel, searchModel, currentIndex, updateSlide]
+    [headers, textModel, searchModel, currentIndex, updateSlide],
   );
 
   const handleChangeLayout = useCallback(
     (layout: SlideLayout) => {
       updateSlide(currentIndex, { layout });
     },
-    [currentIndex, updateSlide]
+    [currentIndex, updateSlide],
   );
 
   if (!currentSlide) {
@@ -330,10 +348,14 @@ export default function SlidesPage() {
             onClick={async () => {
               setIsExporting(true);
               try {
-                const chartImages = await captureChartImages(presentation.slides);
+                const chartImages = await captureChartImages(
+                  presentation.slides,
+                );
                 await exportToPptx(presentation, chartImages);
               } catch (error) {
-                addToast(error instanceof Error ? error.message : "Export failed");
+                addToast(
+                  error instanceof Error ? error.message : "Export failed",
+                );
               } finally {
                 setIsExporting(false);
               }

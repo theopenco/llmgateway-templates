@@ -42,7 +42,7 @@ export async function listModels(options: ModelsOptions): Promise<void> {
     filteredModels = filteredModels.filter(
       (model) =>
         model.id.toLowerCase().includes(searchLower) ||
-        model.name.toLowerCase().includes(searchLower)
+        model.name.toLowerCase().includes(searchLower),
     );
   }
 
