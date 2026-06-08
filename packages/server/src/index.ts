@@ -13,12 +13,26 @@ import { createHmac, timingSafeEqual } from "node:crypto";
  *   // → return session to the browser
  */
 
+/**
+ * Which LLM Gateway environment to talk to.
+ *
+ * - `"prod"` (default) — production API.
+ * - `"test"` — production API (Stripe test mode is configured client-side).
+ * - `"internal"` — local dev stack: API `localhost:4001`.
+ */
+export type LLMGatewayMode = "prod" | "test" | "internal";
+
 export interface LLMGatewayOptions {
   /** Your platform secret key, `sk_…`. Never expose this to the browser. */
   secretKey: string;
   /**
+   * Which environment to use. Defaults to `"prod"`. `"internal"` points the
+   * API at the local dev stack unless `apiBaseUrl` is set explicitly.
+   */
+  mode?: LLMGatewayMode;
+  /**
    * Base URL of the LLM Gateway API (where sessions/wallets live).
-   * Defaults to the hosted service.
+   * Overrides the `mode` default.
    */
   apiBaseUrl?: string;
   /** Optional custom fetch (e.g. for testing or a proxy). */
@@ -157,6 +171,8 @@ export interface WebhookEvent<T = Record<string, unknown>> {
 }
 
 const DEFAULT_API_BASE_URL = "https://internal.llmgateway.io";
+/** Local dev stack API URL used when `mode` is `"internal"`. */
+const INTERNAL_API_BASE_URL = "http://localhost:4001";
 
 export class LLMGatewayError extends Error {
   readonly status: number;
@@ -186,10 +202,12 @@ export class LLMGateway {
       throw new Error("LLMGateway: `secretKey` is required");
     }
     this.secretKey = options.secretKey;
-    this.apiBaseUrl = (options.apiBaseUrl ?? DEFAULT_API_BASE_URL).replace(
-      /\/$/,
-      "",
-    );
+    this.apiBaseUrl = (
+      options.apiBaseUrl ??
+      (options.mode === "internal"
+        ? INTERNAL_API_BASE_URL
+        : DEFAULT_API_BASE_URL)
+    ).replace(/\/$/, "");
     this.fetchImpl = options.fetch ?? globalThis.fetch;
     this.sessions = new Sessions(this);
     this.wallets = new Wallets(this);

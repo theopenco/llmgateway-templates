@@ -13,6 +13,7 @@ import {
 import type {
   Balance,
   LLMGatewayClient as Client,
+  LLMGatewayMode,
   SessionRef,
 } from "@llmgateway/client";
 import type {
@@ -36,25 +37,13 @@ const STRIPE_PUBLISHABLE_KEY_TEST =
 const STRIPE_PUBLISHABLE_KEY_INTERNAL =
   "pk_test_51RRXM1CYKGHizcWTfXxFSEzN8gsUQkg2efi2FN5KO2M2hxdV9QPCjeZMPaZQHSAatxpK9wDcSeilyYU14gz2qA2p00R4q5xU1R";
 
-/** Base URLs used when `mode` is `"internal"` (local development stack). */
-const INTERNAL_API_BASE_URL = "http://localhost:4001";
-const INTERNAL_GATEWAY_BASE_URL = "http://localhost:4002";
-
-/**
- * Which LLM Gateway environment the widgets talk to.
- *
- * - `"prod"` (default) — live Stripe key, production gateway/API.
- * - `"test"` — Stripe test mode key, production gateway/API.
- * - `"internal"` — internal Stripe key, gateway/API default to
- *   `localhost:4002` / `localhost:4001` for local testing.
- */
-export type LLMGatewayMode = "prod" | "test" | "internal";
-
 const STRIPE_PUBLISHABLE_KEY_BY_MODE: Record<LLMGatewayMode, string> = {
   prod: STRIPE_PUBLISHABLE_KEY_LIVE,
   test: STRIPE_PUBLISHABLE_KEY_TEST,
   internal: STRIPE_PUBLISHABLE_KEY_INTERNAL,
 };
+
+export type { LLMGatewayMode };
 
 export interface LLMGatewayProviderProps {
   /** The end-user session minted by your backend via `@llmgateway/server`. */
@@ -176,26 +165,21 @@ export function LLMGatewayProvider(props: LLMGatewayProviderProps) {
 
   const stripePublishableKey = STRIPE_PUBLISHABLE_KEY_BY_MODE[mode];
 
-  // `internal` points the widgets at the local dev stack unless the caller
-  // explicitly overrides a URL.
-  const resolvedGatewayBaseUrl =
-    gatewayBaseUrl ??
-    (mode === "internal" ? INTERNAL_GATEWAY_BASE_URL : undefined);
-  const resolvedApiBaseUrl =
-    apiBaseUrl ?? (mode === "internal" ? INTERNAL_API_BASE_URL : undefined);
-
   const client = useMemo(
     () =>
       new LLMGatewayClient({
         session,
         publishableKey,
-        gatewayBaseUrl: resolvedGatewayBaseUrl,
-        apiBaseUrl: resolvedApiBaseUrl,
+        // The client maps `mode` → base URLs (e.g. `internal` → localhost);
+        // explicit URLs still override.
+        mode,
+        gatewayBaseUrl,
+        apiBaseUrl,
         refresh: fetchSession,
       }),
     // Re-create only when connection-defining inputs change. The session token
     // is read fresh on each call and auto-refreshed via `fetchSession`.
-    [publishableKey, resolvedGatewayBaseUrl, resolvedApiBaseUrl],
+    [publishableKey, mode, gatewayBaseUrl, apiBaseUrl],
   );
 
   const balance = useBalanceController(client);

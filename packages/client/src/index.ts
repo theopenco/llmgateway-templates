@@ -22,13 +22,28 @@ export interface SessionRef {
   expiresAt?: string;
 }
 
+/**
+ * Which LLM Gateway environment to talk to.
+ *
+ * - `"prod"` (default) — production gateway/API.
+ * - `"test"` — production gateway/API (Stripe test mode, handled by elements).
+ * - `"internal"` — local dev stack: gateway `localhost:4002`, API
+ *   `localhost:4001`.
+ */
+export type LLMGatewayMode = "prod" | "test" | "internal";
+
 export interface LLMGatewayClientOptions {
   session: SessionRef;
   /** Publishable key (`pk_…`) — used by `@llmgateway/elements` to load Stripe. */
   publishableKey?: string;
-  /** Gateway base URL (OpenAI-compatible). Defaults to the hosted service. */
+  /**
+   * Which environment to use. Defaults to `"prod"`. `"internal"` points the
+   * gateway/API at the local dev stack unless a base URL is set explicitly.
+   */
+  mode?: LLMGatewayMode;
+  /** Gateway base URL (OpenAI-compatible). Overrides the `mode` default. */
   gatewayBaseUrl?: string;
-  /** API base URL (wallet/balance). Defaults to the hosted service. */
+  /** API base URL (wallet/balance). Overrides the `mode` default. */
   apiBaseUrl?: string;
   /**
    * Called to obtain a fresh session when the current one is near/after expiry.
@@ -161,6 +176,9 @@ interface EmbeddingResponse {
 
 const DEFAULT_GATEWAY_BASE_URL = "https://api.llmgateway.io";
 const DEFAULT_API_BASE_URL = "https://internal.llmgateway.io";
+/** Local dev stack URLs used when `mode` is `"internal"`. */
+const INTERNAL_GATEWAY_BASE_URL = "http://localhost:4002";
+const INTERNAL_API_BASE_URL = "http://localhost:4001";
 /** Refresh this many ms before expiry. */
 const REFRESH_SKEW_MS = 60_000;
 
@@ -189,13 +207,15 @@ export class LLMGatewayClient {
     }
     this.session = options.session;
     this.publishableKey = options.publishableKey;
+    const internal = options.mode === "internal";
     this.gatewayBaseUrl = (
-      options.gatewayBaseUrl ?? DEFAULT_GATEWAY_BASE_URL
+      options.gatewayBaseUrl ??
+      (internal ? INTERNAL_GATEWAY_BASE_URL : DEFAULT_GATEWAY_BASE_URL)
     ).replace(/\/$/, "");
-    this.apiBaseUrl = (options.apiBaseUrl ?? DEFAULT_API_BASE_URL).replace(
-      /\/$/,
-      "",
-    );
+    this.apiBaseUrl = (
+      options.apiBaseUrl ??
+      (internal ? INTERNAL_API_BASE_URL : DEFAULT_API_BASE_URL)
+    ).replace(/\/$/, "");
     this.refreshFn = options.refresh;
     // Bind the default to globalThis: calling `this.fetchImpl(...)` would
     // otherwise invoke the browser's `fetch` with `this` set to this client
