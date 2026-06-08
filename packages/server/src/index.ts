@@ -18,7 +18,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
  *
  * - `"prod"` (default) — production API.
  * - `"test"` — production API (Stripe test mode is configured client-side).
- * - `"internal"` — local dev stack: API `localhost:4001`.
+ * - `"internal"` — local dev stack: API `localhost:4002`.
  */
 export type LLMGatewayMode = "prod" | "test" | "internal";
 
@@ -172,7 +172,7 @@ export interface WebhookEvent<T = Record<string, unknown>> {
 
 const DEFAULT_API_BASE_URL = "https://internal.llmgateway.io";
 /** Local dev stack API URL used when `mode` is `"internal"`. */
-const INTERNAL_API_BASE_URL = "http://localhost:4001";
+const INTERNAL_API_BASE_URL = "http://localhost:4002";
 
 export class LLMGatewayError extends Error {
   readonly status: number;

@@ -27,8 +27,8 @@ export interface SessionRef {
  *
  * - `"prod"` (default) — production gateway/API.
  * - `"test"` — production gateway/API (Stripe test mode, handled by elements).
- * - `"internal"` — local dev stack: gateway `localhost:4002`, API
- *   `localhost:4001`.
+ * - `"internal"` — local dev stack: gateway `localhost:4001`, API
+ *   `localhost:4002`.
  */
 export type LLMGatewayMode = "prod" | "test" | "internal";
 
@@ -177,8 +177,8 @@ interface EmbeddingResponse {
 const DEFAULT_GATEWAY_BASE_URL = "https://api.llmgateway.io";
 const DEFAULT_API_BASE_URL = "https://internal.llmgateway.io";
 /** Local dev stack URLs used when `mode` is `"internal"`. */
-const INTERNAL_GATEWAY_BASE_URL = "http://localhost:4002";
-const INTERNAL_API_BASE_URL = "http://localhost:4001";
+const INTERNAL_GATEWAY_BASE_URL = "http://localhost:4001";
+const INTERNAL_API_BASE_URL = "http://localhost:4002";
 /** Refresh this many ms before expiry. */
 const REFRESH_SKEW_MS = 60_000;
 

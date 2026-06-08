@@ -56,7 +56,7 @@ export interface LLMGatewayProviderProps {
    * - `"prod"` — live Stripe key + production URLs.
    * - `"test"` — Stripe test-mode key + production URLs.
    * - `"internal"` — internal Stripe key + local URLs
-   *   (`localhost:4001` API, `localhost:4002` gateway) for testing.
+   *   (`localhost:4002` API, `localhost:4001` gateway) for testing.
    */
   mode?: LLMGatewayMode;
   gatewayBaseUrl?: string;
