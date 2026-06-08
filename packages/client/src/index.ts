@@ -160,7 +160,7 @@ interface EmbeddingResponse {
 }
 
 const DEFAULT_GATEWAY_BASE_URL = "https://api.llmgateway.io";
-const DEFAULT_API_BASE_URL = "https://api.llmgateway.io";
+const DEFAULT_API_BASE_URL = "https://internal.llmgateway.io";
 /** Refresh this many ms before expiry. */
 const REFRESH_SKEW_MS = 60_000;
 

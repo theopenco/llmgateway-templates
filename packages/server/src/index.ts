@@ -156,7 +156,7 @@ export interface WebhookEvent<T = Record<string, unknown>> {
 	data: T;
 }
 
-const DEFAULT_API_BASE_URL = "https://api.llmgateway.io";
+const DEFAULT_API_BASE_URL = "https://internal.llmgateway.io";
 
 export class LLMGatewayError extends Error {
 	readonly status: number;
