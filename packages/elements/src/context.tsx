@@ -33,6 +33,28 @@ const STRIPE_PUBLISHABLE_KEY_LIVE =
 	"pk_live_51RRXLsEAkKxa3kRayCPr9oW8dUp7mIzwev1FVpM3jpKU3StLaaiKvXCEPkewabL5hRip4IXLzFlFTLC4RpFWRknN00lX2vgZHP";
 const STRIPE_PUBLISHABLE_KEY_TEST =
 	"pk_test_51Tg7FdClMO1TUqxQyb9JNdUvhTrklBtarL7hN4OXAM2dpcjYoz1AvS1245HRezcguhrYqQRKKsyKnrAVLwaspfQe00teC3fLDZ";
+// TODO: replace with the dedicated internal/staging Stripe publishable key.
+const STRIPE_PUBLISHABLE_KEY_INTERNAL = STRIPE_PUBLISHABLE_KEY_TEST;
+
+/** Base URLs used when `mode` is `"internal"` (local development stack). */
+const INTERNAL_API_BASE_URL = "http://localhost:4001";
+const INTERNAL_GATEWAY_BASE_URL = "http://localhost:4002";
+
+/**
+ * Which LLM Gateway environment the widgets talk to.
+ *
+ * - `"prod"` (default) — live Stripe key, production gateway/API.
+ * - `"test"` — Stripe test mode key, production gateway/API.
+ * - `"internal"` — internal Stripe key, gateway/API default to
+ *   `localhost:4002` / `localhost:4001` for local testing.
+ */
+export type LLMGatewayMode = "prod" | "test" | "internal";
+
+const STRIPE_PUBLISHABLE_KEY_BY_MODE: Record<LLMGatewayMode, string> = {
+	prod: STRIPE_PUBLISHABLE_KEY_LIVE,
+	test: STRIPE_PUBLISHABLE_KEY_TEST,
+	internal: STRIPE_PUBLISHABLE_KEY_INTERNAL,
+};
 
 export interface LLMGatewayProviderProps {
 	/** The end-user session minted by your backend via `@llmgateway/server`. */
@@ -40,10 +62,14 @@ export interface LLMGatewayProviderProps {
 	/** Publishable key (`pk_…`) for your LLM Gateway project. */
 	publishableKey?: string;
 	/**
-	 * Use LLM Gateway's Stripe test mode for the `<BuyCredits>` widget. Defaults
-	 * to `false` (live mode).
+	 * Which LLM Gateway environment to use. Defaults to `"prod"`.
+	 *
+	 * - `"prod"` — live Stripe key + production URLs.
+	 * - `"test"` — Stripe test-mode key + production URLs.
+	 * - `"internal"` — internal Stripe key + local URLs
+	 *   (`localhost:4001` API, `localhost:4002` gateway) for testing.
 	 */
-	test?: boolean;
+	mode?: LLMGatewayMode;
 	gatewayBaseUrl?: string;
 	apiBaseUrl?: string;
 	/** Obtain a fresh session when the current one nears expiry (hits your backend). */
@@ -140,7 +166,7 @@ export function LLMGatewayProvider(props: LLMGatewayProviderProps) {
 	const {
 		session,
 		publishableKey,
-		test = false,
+		mode = "prod",
 		gatewayBaseUrl,
 		apiBaseUrl,
 		fetchSession,
@@ -148,22 +174,28 @@ export function LLMGatewayProvider(props: LLMGatewayProviderProps) {
 		children,
 	} = props;
 
-	const stripePublishableKey = test
-		? STRIPE_PUBLISHABLE_KEY_TEST
-		: STRIPE_PUBLISHABLE_KEY_LIVE;
+	const stripePublishableKey = STRIPE_PUBLISHABLE_KEY_BY_MODE[mode];
+
+	// `internal` points the widgets at the local dev stack unless the caller
+	// explicitly overrides a URL.
+	const resolvedGatewayBaseUrl =
+		gatewayBaseUrl ??
+		(mode === "internal" ? INTERNAL_GATEWAY_BASE_URL : undefined);
+	const resolvedApiBaseUrl =
+		apiBaseUrl ?? (mode === "internal" ? INTERNAL_API_BASE_URL : undefined);
 
 	const client = useMemo(
 		() =>
 			new LLMGatewayClient({
 				session,
 				publishableKey,
-				gatewayBaseUrl,
-				apiBaseUrl,
+				gatewayBaseUrl: resolvedGatewayBaseUrl,
+				apiBaseUrl: resolvedApiBaseUrl,
 				refresh: fetchSession,
 			}),
 		// Re-create only when connection-defining inputs change. The session token
 		// is read fresh on each call and auto-refreshed via `fetchSession`.
-		[publishableKey, gatewayBaseUrl, apiBaseUrl],
+		[publishableKey, resolvedGatewayBaseUrl, resolvedApiBaseUrl],
 	);
 
 	const balance = useBalanceController(client);

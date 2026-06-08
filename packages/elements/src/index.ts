@@ -2,6 +2,7 @@ export {
 	LLMGatewayProvider,
 	useLLMGateway,
 	type LLMGatewayProviderProps,
+	type LLMGatewayMode,
 	type Appearance,
 } from "./context.js";
 export { useBalance, type UseBalanceResult } from "./useBalance.js";
