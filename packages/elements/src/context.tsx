@@ -32,7 +32,7 @@ export interface Appearance {
 const STRIPE_PUBLISHABLE_KEY_LIVE =
 	"pk_live_51RRXLsEAkKxa3kRayCPr9oW8dUp7mIzwev1FVpM3jpKU3StLaaiKvXCEPkewabL5hRip4IXLzFlFTLC4RpFWRknN00lX2vgZHP";
 const STRIPE_PUBLISHABLE_KEY_TEST =
-	"pk_test_51RRXM1CYKGHizcWTfXxFSEzN8gsUQkg2efi2FN5KO2M2hxdV9QPCjeZMPaZQHSAatxpK9wDcSeilyYU14gz2qA2p00R4q5xU1R";
+	"pk_test_51Tg7FdClMO1TUqxQyb9JNdUvhTrklBtarL7hN4OXAM2dpcjYoz1AvS1245HRezcguhrYqQRKKsyKnrAVLwaspfQe00teC3fLDZ";
 
 export interface LLMGatewayProviderProps {
 	/** The end-user session minted by your backend via `@llmgateway/server`. */
