@@ -16,7 +16,9 @@ export interface Config {
   defaultProjectId?: string;
 }
 
-const DEFAULT_API_URL = "https://api.llmgateway.io";
+// Management API (Better Auth, orgs, keys, usage) — NOT the gateway
+// (https://api.llmgateway.io), which only serves /v1 inference routes.
+const DEFAULT_API_URL = "https://internal.llmgateway.io";
 
 const CONFIG_DIR = path.join(os.homedir(), ".llmgateway");
 const CONFIG_FILE = path.join(CONFIG_DIR, "config.json");

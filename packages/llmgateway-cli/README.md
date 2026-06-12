@@ -235,7 +235,7 @@ The CLI stores configuration in `~/.llmgateway/config.json`:
 Environment variables take precedence over the config file:
 
 - `LLMGATEWAY_API_KEY` - Your LLM Gateway API key
-- `LLMGATEWAY_API_URL` - Management API base URL (defaults to `https://api.llmgateway.io`; use `http://localhost:4002` for local dev)
+- `LLMGATEWAY_API_URL` - Management API base URL (defaults to `https://internal.llmgateway.io`; use `http://localhost:4002` for local dev)
 
 ## License
 
