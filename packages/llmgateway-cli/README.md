@@ -69,17 +69,117 @@ npx @llmgateway/cli add route generate
 npx @llmgateway/cli add route chat
 ```
 
-### `auth` - Manage API key
+### `auth` - Authentication
+
+Two kinds of credentials:
+
+- **Dashboard session** (email & password) — required for `keys`, `budget`, `usage`, `orgs`, `projects`, and `credits`.
+- **API key** — used by scaffolded apps to call the gateway itself.
 
 ```bash
-# Login (opens browser to get API key)
+# Sign in (interactive — pick email & password or API key)
 npx @llmgateway/cli auth login
 
-# Check authentication status
-npx @llmgateway/cli auth status
+# Sign in with email & password directly
+npx @llmgateway/cli auth login --email you@example.com
 
-# Logout (remove stored key)
+# Store a gateway API key (opens browser)
+npx @llmgateway/cli auth login --key
+
+# Check authentication status / current user
+npx @llmgateway/cli auth status
+npx @llmgateway/cli auth whoami
+
+# Logout (removes session and stored key)
 npx @llmgateway/cli auth logout
+```
+
+> Signed up with GitHub or Google? Set a password in the dashboard settings first.
+
+### `keys` - Manage API keys
+
+```bash
+# Create a key (interactive project picker if no default set)
+npx @llmgateway/cli keys create --description "production"
+
+# Create a key with a budget, rolling period limit, and TTL
+npx @llmgateway/cli keys create \
+  --description "ci-bot" \
+  --project <projectId> \
+  --limit 100 \              # total spending limit in USD
+  --period-limit 10 \        # USD per rolling period
+  --period 1d \              # 12h, 1d, 2w, 1mo
+  --expires 30d              # TTL: duration or ISO date
+
+# List keys (add --all to see every key in the org)
+npx @llmgateway/cli keys list
+npx @llmgateway/cli keys list --project <projectId> --json
+
+# Activate / deactivate
+npx @llmgateway/cli keys update <keyId> --deactivate
+npx @llmgateway/cli keys update <keyId> --activate --expires 90d
+
+# Regenerate the token
+npx @llmgateway/cli keys roll <keyId>
+
+# Delete
+npx @llmgateway/cli keys delete <keyId>
+```
+
+### `budget` - API key spending limits
+
+```bash
+# Set a total budget
+npx @llmgateway/cli budget set <keyId> --limit 50
+
+# Set a rolling budget ($5 per day)
+npx @llmgateway/cli budget set <keyId> --period-limit 5 --period 1d
+
+# Show budget and current spend
+npx @llmgateway/cli budget get <keyId>
+
+# Remove all limits
+npx @llmgateway/cli budget set <keyId> --clear
+```
+
+### `usage` - Usage & cost analytics
+
+```bash
+# Usage for the default project (last 7 days)
+npx @llmgateway/cli usage
+
+# By organization (aggregated across its projects)
+npx @llmgateway/cli usage --org <orgId>
+
+# By project / by API key
+npx @llmgateway/cli usage --project <projectId>
+npx @llmgateway/cli usage --api-key <keyId>
+
+# Break down by model or by API key
+npx @llmgateway/cli usage --by model
+npx @llmgateway/cli usage --by key
+
+# Time windows
+npx @llmgateway/cli usage --range 24h        # 1h, 4h, 24h, 7d, 30d, 365d
+npx @llmgateway/cli usage --days 14
+npx @llmgateway/cli usage --from 2026-06-01 --to 2026-06-12
+
+# By session/agent source
+npx @llmgateway/cli usage sources --project <projectId>
+```
+
+### `orgs`, `projects`, `credits`
+
+```bash
+# List organizations (id, plan, credits)
+npx @llmgateway/cli orgs list
+
+# List projects, set a default for keys/usage commands
+npx @llmgateway/cli projects list
+npx @llmgateway/cli projects use <projectId>
+
+# Show org credit balances
+npx @llmgateway/cli credits
 ```
 
 ### `dev` - Start development server
@@ -125,13 +225,17 @@ The CLI stores configuration in `~/.llmgateway/config.json`:
 ```json
 {
   "apiKey": "your-api-key",
-  "defaultTemplate": "image-generation"
+  "defaultTemplate": "image-generation",
+  "sessionEmail": "you@example.com",
+  "defaultOrgId": "org_...",
+  "defaultProjectId": "proj_..."
 }
 ```
 
 Environment variables take precedence over the config file:
 
 - `LLMGATEWAY_API_KEY` - Your LLM Gateway API key
+- `LLMGATEWAY_API_URL` - Management API base URL (defaults to `https://api.llmgateway.io`; use `http://localhost:4002` for local dev)
 
 ## License
 
