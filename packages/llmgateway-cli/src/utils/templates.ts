@@ -1,7 +1,7 @@
 export interface Template {
   name: string;
   description: string;
-  category: "web" | "agent";
+  category: "web" | "agent" | "bot";
   path: string;
 }
 
@@ -41,6 +41,12 @@ export const templates: Template[] = [
     description: "AI QA testing agent with live browser preview",
     category: "web",
     path: "templates/qa-agent",
+  },
+  {
+    name: "slack-qa-bot",
+    description: "Slack bot that streams AI answers and keeps thread context",
+    category: "bot",
+    path: "templates/slack-qa-bot",
   },
   {
     name: "weather-agent",
@@ -84,7 +90,9 @@ export function getTemplate(name: string): Template | undefined {
   return templates.find((t) => t.name === name);
 }
 
-export function getTemplatesByCategory(category: "web" | "agent"): Template[] {
+export function getTemplatesByCategory(
+  category: "web" | "agent" | "bot",
+): Template[] {
   return templates.filter((t) => t.category === category);
 }
 

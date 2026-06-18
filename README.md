@@ -19,6 +19,7 @@ A collection of open-source templates for building AI-powered applications using
 | [OG Image Generator](./templates/og-image-generator)      | AI-powered Open Graph image generator with preview and download     | Next.js 16, React 19, Tailwind CSS |
 | [Feedback Dashboard](./templates/feedback-dashboard)      | Customer feedback sentiment analysis dashboard                      | Next.js 16, React 19, Tailwind CSS |
 | [Writing Assistant](./templates/writing-assistant)        | AI writing assistant with text actions (rewrite, summarize, expand) | Next.js 16, React 19, Tailwind CSS |
+| [Slack Q&A Bot](./templates/slack-qa-bot)                 | Slack bot that streams AI answers and keeps thread context          | Chat SDK, AI SDK, Hono, Redis      |
 | [Weather Agent](./agents/weather-agent)                   | CLI agent that answers weather queries using tools                  | Node.js, TypeScript, Vercel AI SDK |
 | [Lead Agent](./agents/lead-agent)                         | CLI agent that researches people and posts to Discord               | Node.js, TypeScript, Vercel AI SDK |
 | [Changelog Generator](./agents/changelog-generator-agent) | CLI agent that generates changelogs from git history                | Node.js, TypeScript, Vercel AI SDK |
@@ -108,7 +109,8 @@ llmgateway-templates/
 │   ├── ai-chatbot/          # Next.js streaming chatbot
 │   ├── og-image-generator/  # Next.js OG image generator
 │   ├── feedback-dashboard/  # Next.js sentiment dashboard
-│   └── writing-assistant/   # Next.js writing assistant
+│   ├── writing-assistant/   # Next.js writing assistant
+│   └── slack-qa-bot/        # Chat SDK Slack Q&A bot
 ├── agents/
 │   ├── weather-agent/              # CLI weather agent
 │   ├── lead-agent/                 # CLI lead research agent
