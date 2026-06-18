@@ -1,0 +1,33 @@
+{
+  "name": "@llmgateway-templates/slack-qa-bot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file=.env.local src/lib/local.ts",
+    "build": "tsc",
+    "start": "node --env-file=.env.local dist/lib/local.js",
+    "test": "vitest run --coverage",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@chat-adapter/slack": "^4.20.2",
+    "@chat-adapter/state-redis": "^4.20.2",
+    "@llmgateway/ai-sdk-provider": "^3.8.0",
+    "ai": "^6.0.207",
+    "chat": "^4.20.2",
+    "hono": "^4.12.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@hono/node-server": "^1.19.11",
+    "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^4.1.0",
+    "eslint": "^9.17.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.18.0",
+    "vitest": "^4.1.0"
+  }
+}

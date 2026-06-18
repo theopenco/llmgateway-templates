@@ -16,11 +16,20 @@ export async function list(options: ListOptions): Promise<void> {
   logger.blank();
 
   const webTemplates = getTemplatesByCategory("web");
+  const botTemplates = getTemplatesByCategory("bot");
   const agentTemplates = getTemplatesByCategory("agent");
 
   if (webTemplates.length > 0) {
     logger.log(dim("  Web Applications:"));
     webTemplates.forEach((t) => {
+      logger.log(`    ${highlight(t.name.padEnd(20))} ${t.description}`);
+    });
+    logger.blank();
+  }
+
+  if (botTemplates.length > 0) {
+    logger.log(dim("  Chat Bots:"));
+    botTemplates.forEach((t) => {
       logger.log(`    ${highlight(t.name.padEnd(20))} ${t.description}`);
     });
     logger.blank();
