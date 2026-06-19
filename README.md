@@ -27,6 +27,14 @@ A collection of open-source templates for building AI-powered applications using
 | [Sentiment Analyzer](./agents/sentiment-analyzer-agent)   | CLI agent that analyzes text sentiment                              | Node.js, TypeScript, Vercel AI SDK |
 | [Data Extractor](./agents/data-extractor-agent)           | CLI agent that extracts structured entities from text               | Node.js, TypeScript, Vercel AI SDK |
 
+## Skills
+
+[Claude Code skills](https://docs.claude.com/en/docs/claude-code/skills) for working with LLM Gateway — drop a `SKILL.md` into `.claude/skills/` and trigger it by name. See [`skills/`](./skills) for installation details.
+
+| Skill                           | Trigger     | Description                                                                                                      |
+| ------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------- |
+| [Changelog](./skills/changelog) | `changelog` | Writes a new LLM Gateway changelog entry in the house style, plus a `gpt-image-2` prompt for its OpenGraph image |
+
 ## Quick Start
 
 The easiest way to get started is with the CLI:
