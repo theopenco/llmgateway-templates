@@ -84,6 +84,12 @@
 	font-size: 0.875rem;
 }
 
+.lg-buy-credits__powered-by {
+	display: flex;
+	justify-content: center;
+	padding-top: 0.25rem;
+}
+
 .lg-chat {
 	display: flex;
 	flex-direction: column;

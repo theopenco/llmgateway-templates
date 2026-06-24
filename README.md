@@ -4,6 +4,10 @@ A collection of open-source templates for building AI-powered applications using
 
 ## Deploy
 
+### Monetize your AI app in 5 minutes (Embeddable Credits) ⭐
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftheopenco%2Fllmgateway-templates&env=LLMGATEWAY_SECRET_KEY&envDescription=Platform%20secret%20key%20from%20llmgateway.io&envLink=https%3A%2F%2Fllmgateway.io&project-name=llm-embeddable-credits&repository-name=llm-embeddable-credits&root-directory=templates/embeddable-credits)
+
 ### Image Generation App
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftheopenco%2Fllmgateway-templates&env=LLMGATEWAY_API_KEY&envDescription=Get%20your%20API%20key%20from%20llmgateway.io&envLink=https%3A%2F%2Fllmgateway.io&project-name=llm-image-generation&repository-name=llm-image-generation&root-directory=templates/image-generation)
@@ -14,6 +18,8 @@ A collection of open-source templates for building AI-powered applications using
 
 | Template                                                  | Description                                                         | Stack                              |
 | --------------------------------------------------------- | ------------------------------------------------------------------- | ---------------------------------- |
+| [Embeddable Credits](./templates/embeddable-credits) ⭐   | Monetize your AI app in 5 min — end-user wallets ("Stripe for AI")  | Next.js 16, React 19, Embeddable SDK |
+| [Showcase](./templates/showcase)                          | Public gallery of apps built with LLM Gateway templates             | Next.js 16, React 19, Tailwind CSS |
 | [Image Generation](./templates/image-generation)          | Full-stack web app for AI image generation                          | Next.js 16, React 19, Tailwind CSS |
 | [AI Chatbot](./templates/ai-chatbot)                      | Streaming chat with conversation history and model selector         | Next.js 16, React 19, Tailwind CSS |
 | [OG Image Generator](./templates/og-image-generator)      | AI-powered Open Graph image generator with preview and download     | Next.js 16, React 19, Tailwind CSS |
@@ -26,6 +32,26 @@ A collection of open-source templates for building AI-powered applications using
 | [Email Drafter](./agents/email-drafter-agent)             | CLI agent that drafts polished emails from notes                    | Node.js, TypeScript, Vercel AI SDK |
 | [Sentiment Analyzer](./agents/sentiment-analyzer-agent)   | CLI agent that analyzes text sentiment                              | Node.js, TypeScript, Vercel AI SDK |
 | [Data Extractor](./agents/data-extractor-agent)           | CLI agent that extracts structured entities from text               | Node.js, TypeScript, Vercel AI SDK |
+
+## Showcase
+
+Shipped something on a template? Add it to the [**Showcase**](./templates/showcase) — a public, filterable gallery of apps built with LLM Gateway. It's a deployable template itself, so you can host your own, and it doubles as inspiration for new builders. Submit your app via the [showcase issue form](https://github.com/theopenco/llmgateway-templates/issues/new?template=showcase-submission.yml).
+
+## Powered-By badge
+
+Every app you deploy with these templates can carry a small, referral-tagged **"Powered by LLM Gateway"** badge — turning each deployment into an impression that helps other developers discover the gateway.
+
+- Already using the embeddable SDK? Import it:
+
+  ```tsx
+  import { PoweredBy } from "@llmgateway/elements";
+
+  <PoweredBy campaign="my-app" />;
+  ```
+
+  `<BuyCredits>` also renders the attribution under the pay button by default (`poweredBy={false}` to opt out).
+
+- Any other app? Copy the dependency-free component — see [`templates/showcase/src/components/powered-by.tsx`](./templates/showcase/src/components/powered-by.tsx) (light) or [`templates/ai-chatbot/src/components/powered-by.tsx`](./templates/ai-chatbot/src/components/powered-by.tsx) (dark) — and drop `<PoweredBy />` in your footer.
 
 ## Skills
 

@@ -1,0 +1,72 @@
+name: "🏆 Showcase submission"
+description: Built an app with an LLM Gateway template? Get it listed in the Showcase.
+title: "[Showcase] <your app name>"
+labels: ["showcase"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for building on LLM Gateway! Fill this in and a maintainer will
+        add your app to [the Showcase](../tree/main/templates/showcase).
+  - type: input
+    id: name
+    attributes:
+      label: App name
+      placeholder: Acme AI
+    validations:
+      required: true
+  - type: input
+    id: tagline
+    attributes:
+      label: One-line description
+      description: What does it do? Keep it to a single sentence.
+      placeholder: Drafts cold emails from a few bullet points.
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Link
+      description: A live app, a landing page, or a public repo.
+      placeholder: https://acme.ai
+    validations:
+      required: true
+  - type: input
+    id: author
+    attributes:
+      label: Who built it
+      placeholder: Jane Doe / Acme Inc.
+    validations:
+      required: true
+  - type: dropdown
+    id: template
+    attributes:
+      label: Which template did you start from?
+      options:
+        - embeddable-credits
+        - image-generation
+        - ai-chatbot
+        - og-image-generator
+        - ai-slides
+        - writing-assistant
+        - feedback-dashboard
+        - slack-qa-bot
+        - qa-agent
+        - other / built from scratch on the SDK
+    validations:
+      required: true
+  - type: input
+    id: tags
+    attributes:
+      label: Tags
+      description: Comma-separated, for filtering.
+      placeholder: chat, saas, payments
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirm
+      options:
+        - label: The app uses LLM Gateway and the link works.
+          required: true
