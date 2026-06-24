@@ -1,8 +1,17 @@
-# Embeddable Credits Demo
+# Monetize your AI app in 5 minutes
 
-A Next.js app that lets **your end-users** buy AI credits and chat with AI in-app,
-billed to their own wallet through [LLM Gateway](https://llmgateway.io) — the
-"Stripe for AI" model.
+The flagship **"Stripe for AI"** template. A polished Next.js app that lets
+**your end-users** buy AI credits and use AI in-app, billed to _their own_
+wallet through [LLM Gateway](https://llmgateway.io) — so you keep your margin and
+never front their token spend.
+
+Drop in three React components and one backend route. The landing page is a real,
+live demo: it boots a wallet, takes a Stripe top-up, and streams a chat that
+debits the balance.
+
+```bash
+npx @llmgateway/cli init --template embeddable-credits
+```
 
 It uses the three embeddable SDK packages:
 
@@ -50,3 +59,16 @@ chat completion (debits the wallet), and buy credits via Stripe.
   with your authenticated user's stable id so each user keeps their wallet.
 - `fetchSession` is wired as the provider's refresh hook, so expired session
   tokens are renewed transparently.
+- `<BuyCredits>` renders a "Powered by LLM Gateway" line under the pay button by
+  default — pass `poweredBy={false}` to remove it. The footer uses the standalone
+  [`<PoweredBy>`](../../packages/elements/src/PoweredBy.tsx) badge, which you can
+  drop into any app:
+
+  ```tsx
+  import { PoweredBy } from "@llmgateway/elements";
+
+  <PoweredBy campaign="my-app" theme="dark" />;
+  ```
+
+Built something with this template? [Add it to the Showcase](../showcase) so
+other developers can find it.

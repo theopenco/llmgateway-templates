@@ -43,6 +43,19 @@ export const templates: Template[] = [
     path: "templates/qa-agent",
   },
   {
+    name: "embeddable-credits",
+    description:
+      'Monetize your AI app in 5 minutes — end-user wallets ("Stripe for AI")',
+    category: "web",
+    path: "templates/embeddable-credits",
+  },
+  {
+    name: "showcase",
+    description: "Public gallery of apps built with LLM Gateway templates",
+    category: "web",
+    path: "templates/showcase",
+  },
+  {
     name: "slack-qa-bot",
     description: "Slack bot that streams AI answers and keeps thread context",
     category: "bot",

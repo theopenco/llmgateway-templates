@@ -4,6 +4,7 @@ import { useChat } from "@ai-sdk/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Bot, KeyRound, Send, Trash2, User } from "lucide-react";
 import { useApiKey } from "@/components/api-key-provider";
+import { PoweredBy } from "@/components/powered-by";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -182,6 +183,9 @@ export default function Home() {
             <Send className="size-4" />
           </Button>
         </form>
+        <div className="mx-auto mt-3 flex max-w-3xl justify-center">
+          <PoweredBy />
+        </div>
       </div>
     </main>
   );

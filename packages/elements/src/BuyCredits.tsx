@@ -8,6 +8,7 @@ import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import { useEffect, useMemo, useState } from "react";
 
 import { useLLMGateway } from "./context.js";
+import { PoweredBy } from "./PoweredBy.js";
 
 export interface BuyCreditsProps {
   /** Credits (USD) to add. The end-user is charged this plus platform fees. */
@@ -16,6 +17,11 @@ export interface BuyCreditsProps {
   onSuccess?: () => void;
   onError?: (error: Error) => void;
   buttonLabel?: string;
+  /**
+   * Show the "Powered by LLM Gateway" attribution under the pay button.
+   * @default true
+   */
+  poweredBy?: boolean;
 }
 
 // Cache loadStripe per publishable key (Stripe.js must load once).
@@ -35,7 +41,7 @@ function getStripePromise(key: string): Promise<Stripe | null> {
  * The wallet is credited once LLM Gateway's webhook processes the payment.
  */
 export function BuyCredits(props: BuyCreditsProps) {
-  const { amount, onSuccess, onError, buttonLabel } = props;
+  const { amount, onSuccess, onError, buttonLabel, poweredBy = true } = props;
   const { client, stripePublishableKey, appearance } = useLLMGateway();
 
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -97,6 +103,8 @@ export function BuyCredits(props: BuyCreditsProps) {
       <CheckoutForm
         amount={amount}
         buttonLabel={buttonLabel}
+        poweredBy={poweredBy}
+        theme={appearance?.theme}
         onSuccess={onSuccess}
         onError={onError}
       />
@@ -107,10 +115,12 @@ export function BuyCredits(props: BuyCreditsProps) {
 function CheckoutForm(props: {
   amount: number;
   buttonLabel?: string;
+  poweredBy: boolean;
+  theme?: "light" | "dark";
   onSuccess?: () => void;
   onError?: (error: Error) => void;
 }) {
-  const { amount, buttonLabel, onSuccess, onError } = props;
+  const { amount, buttonLabel, poweredBy, theme, onSuccess, onError } = props;
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
@@ -154,6 +164,11 @@ function CheckoutForm(props: {
         {submitting ? "Processing…" : (buttonLabel ?? `Add $${amount} credits`)}
       </button>
       {message ? <div className="lg-buy-credits__error">{message}</div> : null}
+      {poweredBy ? (
+        <div className="lg-buy-credits__powered-by">
+          <PoweredBy variant="inline" theme={theme ?? "auto"} campaign="embeddable-checkout" />
+        </div>
+      ) : null}
     </form>
   );
 }

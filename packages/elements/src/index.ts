@@ -8,6 +8,7 @@ export {
 export { useBalance, type UseBalanceResult } from "./useBalance.js";
 export { CreditBalance, type CreditBalanceProps } from "./CreditBalance.js";
 export { BuyCredits, type BuyCreditsProps } from "./BuyCredits.js";
+export { PoweredBy, type PoweredByProps } from "./PoweredBy.js";
 export {
   useChat,
   type UseChatOptions,

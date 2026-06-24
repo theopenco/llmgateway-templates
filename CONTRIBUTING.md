@@ -107,7 +107,25 @@ cd templates/image-generation && pnpm dev
 3. Include an `.env.example` file
 4. Add a comprehensive `README.md`
 5. Update the root `README.md` to include your template
-6. Update `pnpm-workspace.yaml` if needed
+6. Register it in the CLI at `packages/llmgateway-cli/src/utils/templates.ts`
+7. Update `pnpm-workspace.yaml` if needed
+8. Add the **Powered-By badge** to web templates (see below)
+
+### Powered-By badge
+
+Web templates should carry a small "Powered by LLM Gateway" badge in their UI
+(usually the footer). It's a referral-tagged link, so every deployment helps
+other developers find the gateway.
+
+- Templates that depend on `@llmgateway/elements` can
+  `import { PoweredBy } from "@llmgateway/elements"`.
+- Standalone templates copy the dependency-free component — see
+  `templates/showcase/src/components/powered-by.tsx` (light) or
+  `templates/ai-chatbot/src/components/powered-by.tsx` (dark) — and render
+  `<PoweredBy />`.
+
+Built an app on a template? Also add it to the
+[Showcase](./templates/showcase).
 
 ### Template Requirements
 
