@@ -14,6 +14,55 @@ npm install -g @llmgateway/cli
 
 ## Commands
 
+### `launch` - Launch coding agents with LLM Gateway configured
+
+Start any supported coding agent pre-wired to LLM Gateway: one API key, 200+ models, and every request tracked in your [dashboard](https://llmgateway.io/dashboard).
+
+```bash
+# Interactive picker
+npx @llmgateway/cli launch
+
+# Launch a specific agent (shortcuts work too: `llmgateway claude`)
+npx @llmgateway/cli launch claude
+npx @llmgateway/cli launch opencode
+npx @llmgateway/cli launch empryo
+npx @llmgateway/cli launch soulforge
+npx @llmgateway/cli launch codex
+
+# Pick a model — launcher flags go before the agent name
+npx @llmgateway/cli launch -m gpt-5.5 claude
+
+# Everything after the agent name is passed to the agent itself
+npx @llmgateway/cli launch claude --continue
+
+# List all supported agents and see which are installed
+npx @llmgateway/cli launch --list
+
+# Inspect what would run without launching
+npx @llmgateway/cli launch --dry-run codex
+```
+
+Supported agents and how they're configured:
+
+| Agent | Launch | Configuration |
+| --- | --- | --- |
+| Claude Code | `llmgateway claude` | `ANTHROPIC_BASE_URL` + `ANTHROPIC_AUTH_TOKEN` env vars |
+| OpenCode | `llmgateway opencode` | Built-in `llmgateway` provider via `LLMGATEWAY_API_KEY` |
+| Empryo | `llmgateway empryo` | Registers your key via `empryo --set-key llmgateway` |
+| SoulForge | `llmgateway soulforge` | Registers your key via `soulforge --set-key llmgateway` |
+| Codex CLI | `llmgateway codex` | Per-session `-c` provider overrides (no config file changes) |
+| DevPass Code | `llmgateway devpass-code` | `LLMGATEWAY_API_KEY` env var |
+| Autohand Code | `llmgateway autohand` | `OPENAI_BASE_URL` + `OPENAI_API_KEY` env vars |
+| Pi | `llmgateway pi` | Adds an `llmgateway` provider to `~/.pi/agent/models.json` |
+| Kimi Code | `llmgateway kimi` | Adds an `llmgateway` provider to `~/.kimi-code/config.toml` |
+| MiMo Code | `llmgateway mimo` | Routes the provider through the gateway in `mimocode.json` |
+| OpenClaw | `llmgateway openclaw` | Adds an `llmgateway` provider to `~/.openclaw/openclaw.json` |
+| Hermes Agent | `llmgateway hermes` | Runs `hermes setup` with gateway values on first launch |
+
+The API key is resolved from `--key`, the `LLMGATEWAY_API_KEY` environment variable, or the key stored by `llmgateway auth login --key` — in that order. If none is found, you'll be prompted once and the key is saved for next time. If an agent isn't installed, the launcher prints its official install command and exits.
+
+See the [integration guides](https://llmgateway.io/guides) for per-agent details.
+
 ### `init` - Create a new project
 
 ```bash

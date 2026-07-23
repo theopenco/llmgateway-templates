@@ -1,0 +1,516 @@
+import { spawnSync } from "child_process";
+import fs from "fs-extra";
+import os from "os";
+import path from "path";
+import { logger, highlight, dim } from "./logger.js";
+
+export const DEFAULT_GATEWAY_URL = "https://api.llmgateway.io";
+
+export interface LaunchContext {
+  /** LLM Gateway API key (llmgtwy_...) */
+  apiKey: string;
+  /** Gateway base URL without trailing slash, e.g. https://api.llmgateway.io */
+  gatewayUrl: string;
+  /** Optional model id from --model */
+  model?: string;
+}
+
+export interface AgentDefinition {
+  /** Primary launch name: `llmgateway launch <id>` / `llmgateway <id>` */
+  id: string;
+  /** Alternate launch names */
+  aliases?: string[];
+  label: string;
+  description: string;
+  /** Executable to spawn */
+  bin: string;
+  /** Shown when the binary is missing */
+  installCommand?: string;
+  installUrl: string;
+  guideUrl: string;
+  /** Whether --model maps onto the agent's model setting */
+  supportsModel: boolean;
+  /** Shown when models are picked inside the agent instead */
+  modelHint?: string;
+  /** Extra environment variables for the agent process */
+  env?: (ctx: LaunchContext) => Record<string, string>;
+  /** Args injected before user-provided passthrough args */
+  args?: (ctx: LaunchContext, passthrough: string[]) => string[];
+  /** One-line summary of what prepare() does (shown in --dry-run) */
+  prepareSummary?: string;
+  /** Config-file setup or key registration, run before spawning */
+  prepare?: (ctx: LaunchContext) => Promise<void>;
+}
+
+function homeFile(...segments: string[]): string {
+  return path.join(os.homedir(), ...segments);
+}
+
+/** External agent config files have no schema, so values stay untyped. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AgentConfig = Record<string, any>;
+
+async function readJsonConfig(file: string): Promise<AgentConfig | undefined> {
+  if (!(await fs.pathExists(file))) {
+    return undefined;
+  }
+  try {
+    return await fs.readJson(file);
+  } catch {
+    throw new Error(
+      `${file} exists but is not valid JSON. Fix or remove it, then retry.`,
+    );
+  }
+}
+
+async function writeConfigFile(file: string, content: string): Promise<void> {
+  await fs.ensureDir(path.dirname(file));
+  await fs.writeFile(file, content, { mode: 0o600 });
+}
+
+/**
+ * Registers the key with Empryo/SoulForge via their documented
+ * `--set-key llmgateway <key>` flag. Idempotent, so it runs on every launch
+ * and picks up rotated keys.
+ */
+function setKeyViaFlag(bin: string, ctx: LaunchContext): void {
+  const result = spawnSync(bin, ["--set-key", "llmgateway", ctx.apiKey], {
+    stdio: "ignore",
+    shell: process.platform === "win32",
+  });
+  if (result.status !== 0) {
+    logger.warn(
+      `Could not register the key automatically. Inside ${bin}, type ${highlight("/keys")} and paste your LLM Gateway key.`,
+    );
+  } else {
+    logger.log(dim(`Registered LLM Gateway key with ${bin} (--set-key).`));
+  }
+}
+
+const PI_DEFAULT_MODELS = [
+  { id: "gpt-5.5", name: "GPT-5.5" },
+  { id: "claude-opus-4-7", name: "Claude Opus 4.7" },
+  { id: "gemini-3.1-pro", name: "Gemini 3.1 Pro" },
+  { id: "deepseek-v4", name: "DeepSeek V4", reasoning: true },
+];
+
+async function preparePi(ctx: LaunchContext): Promise<void> {
+  const file = homeFile(".pi", "agent", "models.json");
+  const config = (await readJsonConfig(file)) ?? {};
+  config.providers ??= {};
+  if (!config.providers.llmgateway) {
+    config.providers.llmgateway = {
+      baseUrl: `${ctx.gatewayUrl}/v1`,
+      api: "openai-completions",
+      // Pi resolves this as an env var name; the launcher sets it.
+      apiKey: "LLM_GATEWAY_API_KEY",
+      models: [...PI_DEFAULT_MODELS],
+    };
+    logger.log(dim(`Added the llmgateway provider to ${file}`));
+  }
+  const models: { id: string; name?: string }[] =
+    (config.providers.llmgateway.models ??= []);
+  if (ctx.model && !models.some((m) => m.id === ctx.model)) {
+    models.push({ id: ctx.model, name: ctx.model });
+  }
+  await fs.ensureDir(path.dirname(file));
+  await fs.writeJson(file, config, { spaces: 2 });
+}
+
+const MIMO_DEFAULT_MODELS = [
+  "claude-opus-4-8",
+  "gpt-5.5",
+  "deepseek-v4-pro",
+  "qwen3.7-max",
+];
+
+async function prepareMimo(ctx: LaunchContext): Promise<void> {
+  const file = homeFile(".config", "mimocode", "mimocode.json");
+  const existing = await readJsonConfig(file);
+  const config = existing ?? {};
+  config.provider ??= {};
+  config.provider.anthropic ??= {};
+  config.provider.anthropic.options = {
+    apiKey: ctx.apiKey,
+    baseURL: `${ctx.gatewayUrl}/v1`,
+  };
+  const models: Record<string, { name: string }> =
+    (config.provider.anthropic.models ??= {});
+  for (const id of MIMO_DEFAULT_MODELS) {
+    models[id] ??= { name: id };
+  }
+  if (ctx.model) {
+    models[ctx.model] ??= { name: ctx.model };
+    config.model = `anthropic/${ctx.model}`;
+  } else if (!existing) {
+    config.model = `anthropic/${MIMO_DEFAULT_MODELS[0]}`;
+  }
+  await fs.ensureDir(path.dirname(file));
+  await fs.writeJson(file, config, { spaces: 2 });
+  logger.log(dim(`Routed MiMo Code through LLM Gateway in ${file}`));
+}
+
+const OPENCLAW_DEFAULT_MODELS = [
+  { id: "gpt-5.4", name: "GPT-5.4", contextWindow: 128000, maxTokens: 32000 },
+  {
+    id: "claude-opus-4-6",
+    name: "Claude Opus 4.6",
+    contextWindow: 200000,
+    maxTokens: 8192,
+  },
+  {
+    id: "gemini-3-1-pro-preview",
+    name: "Gemini 3.1 Pro",
+    contextWindow: 1000000,
+    maxTokens: 8192,
+  },
+];
+
+async function prepareOpenClaw(ctx: LaunchContext): Promise<void> {
+  const file = homeFile(".openclaw", "openclaw.json");
+  const existing = await readJsonConfig(file);
+  const config = existing ?? {};
+  config.models ??= {};
+  config.models.mode ??= "merge";
+  config.models.providers ??= {};
+  const provider = (config.models.providers.llmgateway ??= {});
+  provider.baseUrl = `${ctx.gatewayUrl}/v1`;
+  provider.apiKey = "${LLMGATEWAY_API_KEY}";
+  provider.api = "openai-completions";
+  provider.models ??= [...OPENCLAW_DEFAULT_MODELS];
+  if (
+    ctx.model &&
+    !provider.models.some((m: { id: string }) => m.id === ctx.model)
+  ) {
+    provider.models.push({ id: ctx.model, name: ctx.model });
+  }
+  if (ctx.model) {
+    config.agents ??= {};
+    config.agents.defaults ??= {};
+    config.agents.defaults.model ??= {};
+    config.agents.defaults.model.primary = `llmgateway/${ctx.model}`;
+  } else if (!existing) {
+    config.agents = {
+      defaults: {
+        model: { primary: `llmgateway/${OPENCLAW_DEFAULT_MODELS[0].id}` },
+      },
+    };
+  }
+  await fs.ensureDir(path.dirname(file));
+  await fs.writeJson(file, config, { spaces: 2 });
+  logger.log(dim(`Added the llmgateway provider to ${file}`));
+}
+
+const KIMI_DEFAULT_MODELS: {
+  id: string;
+  name: string;
+  context: number;
+  output: number;
+  capabilities: string[];
+}[] = [
+  {
+    id: "gpt-5.5",
+    name: "GPT-5.5",
+    context: 1050000,
+    output: 128000,
+    capabilities: ["thinking", "tool_use"],
+  },
+  {
+    id: "claude-opus-4-8",
+    name: "Claude Opus 4.8",
+    context: 200000,
+    output: 32000,
+    capabilities: ["image_in", "thinking", "tool_use"],
+  },
+  {
+    id: "gemini-3.1-pro",
+    name: "Gemini 3.1 Pro",
+    context: 1000000,
+    output: 65536,
+    capabilities: ["thinking", "tool_use"],
+  },
+];
+
+function kimiModelTable(model: {
+  id: string;
+  name: string;
+  context: number;
+  output: number;
+  capabilities: string[];
+}): string {
+  return [
+    `[models."llmgateway/${model.id}"]`,
+    `provider = "llmgateway"`,
+    `model = "${model.id}"`,
+    `max_context_size = ${model.context}`,
+    `max_output_size = ${model.output}`,
+    `capabilities = [ ${model.capabilities.map((c) => `"${c}"`).join(", ")} ]`,
+    `display_name = "${model.name}"`,
+  ].join("\n");
+}
+
+async function prepareKimi(ctx: LaunchContext): Promise<void> {
+  const file = homeFile(".kimi-code", "config.toml");
+  const models = [...KIMI_DEFAULT_MODELS];
+  if (ctx.model && !models.some((m) => m.id === ctx.model)) {
+    models.push({
+      id: ctx.model,
+      name: ctx.model,
+      context: 200000,
+      output: 32000,
+      capabilities: ["tool_use"],
+    });
+  }
+  const providerBlock = [
+    `[providers.llmgateway]`,
+    `type = "openai"`,
+    `api_key = "${ctx.apiKey}"`,
+    `base_url = "${ctx.gatewayUrl}/v1"`,
+    "",
+    models.map(kimiModelTable).join("\n\n"),
+  ].join("\n");
+
+  if (!(await fs.pathExists(file))) {
+    const defaultModel = ctx.model ?? KIMI_DEFAULT_MODELS[0].id;
+    await writeConfigFile(
+      file,
+      `default_model = "llmgateway/${defaultModel}"\n\n${providerBlock}\n`,
+    );
+    logger.log(dim(`Created ${file} with the llmgateway provider.`));
+    return;
+  }
+
+  const content = await fs.readFile(file, "utf8");
+  if (content.includes("[providers.llmgateway]")) {
+    logger.log(dim(`LLM Gateway provider already configured in ${file}`));
+    return;
+  }
+  // Appending tables at EOF keeps existing top-level keys (like
+  // default_model) valid, so only the provider/model tables are added here.
+  await fs.writeFile(file, `${content.replace(/\n*$/, "\n\n")}${providerBlock}\n`);
+  logger.log(dim(`Appended the llmgateway provider to ${file}`));
+  logger.log(
+    dim(`Type ${highlight("/model")} inside Kimi Code to switch to an llmgateway model.`),
+  );
+}
+
+function hermesIsConfigured(): boolean {
+  return fs.pathExistsSync(homeFile(".hermes", "config.yaml"));
+}
+
+function prepareHermes(): Promise<void> {
+  if (!hermesIsConfigured()) {
+    logger.info(
+      "First run: launching the Hermes setup wizard. Pick \"Custom OpenAI-compatible endpoint\" and use:",
+    );
+    logger.log(`  ${dim("Base URL:")} ${highlight(`${DEFAULT_GATEWAY_URL}/v1`)}`);
+    logger.log(
+      `  ${dim("API key:")}  your LLM Gateway key (${highlight("llmgateway auth status")} shows where it's stored)`,
+    );
+    logger.blank();
+  }
+  return Promise.resolve();
+}
+
+export const AGENTS: AgentDefinition[] = [
+  {
+    id: "claude",
+    aliases: ["claude-code"],
+    label: "Claude Code",
+    description: "Anthropic's terminal agent on any LLM Gateway model",
+    bin: "claude",
+    installCommand: "npm install -g @anthropic-ai/claude-code",
+    installUrl: "https://docs.anthropic.com/en/docs/claude-code",
+    guideUrl: "https://llmgateway.io/guides/claude-code",
+    supportsModel: true,
+    env: (ctx) => ({
+      ANTHROPIC_BASE_URL: ctx.gatewayUrl,
+      ANTHROPIC_AUTH_TOKEN: ctx.apiKey,
+      ...(ctx.model ? { ANTHROPIC_MODEL: ctx.model } : {}),
+    }),
+  },
+  {
+    id: "opencode",
+    label: "OpenCode",
+    description: "Open-source terminal agent — LLM Gateway is built in",
+    bin: "opencode",
+    installCommand: "npm install -g opencode-ai",
+    installUrl: "https://opencode.ai/download",
+    guideUrl: "https://llmgateway.io/guides/opencode",
+    supportsModel: true,
+    env: (ctx) => ({ LLMGATEWAY_API_KEY: ctx.apiKey }),
+    args: (ctx) => (ctx.model ? ["--model", `llmgateway/${ctx.model}`] : []),
+  },
+  {
+    id: "empryo",
+    label: "Empryo",
+    description: "Graph-powered agent that edits symbols, not strings",
+    bin: "empryo",
+    installCommand: "curl -fsSL https://empryo.com/install.sh | bash",
+    installUrl: "https://empryo.com/download",
+    guideUrl: "https://llmgateway.io/guides/empryo",
+    supportsModel: false,
+    modelHint: "Pick a model inside Empryo (llmgateway provider).",
+    prepareSummary: "register key via `empryo --set-key llmgateway <key>`",
+    prepare: (ctx) => {
+      setKeyViaFlag("empryo", ctx);
+      return Promise.resolve();
+    },
+  },
+  {
+    id: "soulforge",
+    label: "SoulForge",
+    description: "Empryo's predecessor — same graph engine, still supported",
+    bin: "soulforge",
+    installCommand: "npm install -g @proxysoul/soulforge",
+    installUrl: "https://github.com/proxysoul/soulforge",
+    guideUrl: "https://llmgateway.io/guides/soulforge",
+    supportsModel: false,
+    modelHint: "Pick a model inside SoulForge (llmgateway provider).",
+    prepareSummary: "register key via `soulforge --set-key llmgateway <key>`",
+    prepare: (ctx) => {
+      setKeyViaFlag("soulforge", ctx);
+      return Promise.resolve();
+    },
+  },
+  {
+    id: "codex",
+    aliases: ["codex-cli"],
+    label: "Codex CLI",
+    description: "OpenAI's terminal agent routed through LLM Gateway",
+    bin: "codex",
+    installCommand: "npm install -g @openai/codex",
+    installUrl: "https://github.com/openai/codex",
+    guideUrl: "https://llmgateway.io/guides/codex-cli",
+    supportsModel: true,
+    env: (ctx) => ({ LLMGATEWAY_API_KEY: ctx.apiKey }),
+    // -c overrides configure the provider per-session without touching
+    // ~/.codex/config.toml. Values are TOML, hence the embedded quotes.
+    args: (ctx) => [
+      "-c",
+      `model_provider="llmgateway"`,
+      "-c",
+      `model_providers.llmgateway.name="LLM Gateway"`,
+      "-c",
+      `model_providers.llmgateway.base_url="${ctx.gatewayUrl}/v1"`,
+      "-c",
+      `model_providers.llmgateway.env_key="LLMGATEWAY_API_KEY"`,
+      "-c",
+      `model_providers.llmgateway.wire_api="responses"`,
+      ...(ctx.model ? ["-c", `model="${ctx.model}"`] : []),
+    ],
+  },
+  {
+    id: "devpass-code",
+    aliases: ["devpass"],
+    label: "DevPass Code",
+    description: "First-party terminal agent built for LLM Gateway",
+    bin: "devpass-code",
+    installCommand: "npm install -g devpass-code",
+    installUrl: "https://llmgateway.io/guides/devpass-code",
+    guideUrl: "https://llmgateway.io/guides/devpass-code",
+    supportsModel: false,
+    modelHint: "Every gateway model is in the picker — switching is a keystroke.",
+    env: (ctx) => ({ LLMGATEWAY_API_KEY: ctx.apiKey }),
+  },
+  {
+    id: "autohand",
+    label: "Autohand Code",
+    description: "Autonomous coding agent for terminal, IDE, and Slack",
+    bin: "autohand",
+    installCommand: "npm install -g autohand-cli",
+    installUrl: "https://llmgateway.io/guides/autohand",
+    guideUrl: "https://llmgateway.io/guides/autohand",
+    supportsModel: true,
+    env: (ctx) => ({
+      OPENAI_BASE_URL: `${ctx.gatewayUrl}/v1`,
+      OPENAI_API_KEY: ctx.apiKey,
+      ...(ctx.model ? { OPENAI_MODEL: ctx.model } : {}),
+    }),
+  },
+  {
+    id: "pi",
+    label: "Pi",
+    description: "Minimal terminal coding agent",
+    bin: "pi",
+    installCommand: "npm install -g @mariozechner/pi",
+    installUrl: "https://pi.dev",
+    guideUrl: "https://llmgateway.io/guides/pi",
+    supportsModel: true,
+    modelHint: "Type /model inside Pi to switch models.",
+    env: (ctx) => ({ LLM_GATEWAY_API_KEY: ctx.apiKey }),
+    prepareSummary: "add llmgateway provider to ~/.pi/agent/models.json",
+    prepare: preparePi,
+  },
+  {
+    id: "kimi",
+    aliases: ["kimi-code"],
+    label: "Kimi Code",
+    description: "Moonshot AI's open-source terminal agent",
+    bin: "kimi",
+    installCommand: "curl -fsSL https://code.kimi.com/kimi-code/install.sh | bash",
+    installUrl: "https://github.com/MoonshotAI/kimi-code",
+    guideUrl: "https://llmgateway.io/guides/kimi-code",
+    supportsModel: true,
+    prepareSummary: "add llmgateway provider to ~/.kimi-code/config.toml",
+    prepare: prepareKimi,
+  },
+  {
+    id: "mimo",
+    aliases: ["mimocode"],
+    label: "MiMo Code",
+    description: "Xiaomi's AI coding agent CLI",
+    bin: "mimo",
+    installCommand: "curl -fsSL https://mimo.xiaomi.com/install | bash",
+    installUrl: "https://mimo.xiaomi.com/mimocode",
+    guideUrl: "https://llmgateway.io/guides/mimocode",
+    supportsModel: true,
+    prepareSummary: "route provider through LLM Gateway in ~/.config/mimocode/mimocode.json",
+    prepare: prepareMimo,
+  },
+  {
+    id: "openclaw",
+    label: "OpenClaw",
+    description: "Chat agents across Discord, WhatsApp, Telegram, and more",
+    bin: "openclaw",
+    installCommand: "npm install -g openclaw",
+    installUrl: "https://llmgateway.io/guides/openclaw",
+    guideUrl: "https://llmgateway.io/guides/openclaw",
+    supportsModel: true,
+    env: (ctx) => ({ LLMGATEWAY_API_KEY: ctx.apiKey }),
+    prepareSummary: "add llmgateway provider to ~/.openclaw/openclaw.json",
+    prepare: prepareOpenClaw,
+  },
+  {
+    id: "hermes",
+    aliases: ["hermes-agent"],
+    label: "Hermes Agent",
+    description: "Nous Research's agent with tools, skills, and messaging",
+    bin: "hermes",
+    installCommand:
+      "curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash",
+    installUrl: "https://github.com/nousresearch/hermes-agent",
+    guideUrl: "https://llmgateway.io/guides/hermes-agent",
+    supportsModel: false,
+    modelHint: "Type /model inside Hermes to switch models.",
+    args: (_ctx, passthrough) =>
+      !hermesIsConfigured() && passthrough.length === 0 ? ["setup"] : [],
+    prepareSummary: "run the hermes setup wizard on first launch",
+    prepare: prepareHermes,
+  },
+];
+
+export function findAgent(name: string): AgentDefinition | undefined {
+  const normalized = name.toLowerCase();
+  return AGENTS.find(
+    (agent) =>
+      agent.id === normalized || agent.aliases?.includes(normalized),
+  );
+}
+
+export function isAgentInstalled(agent: AgentDefinition): boolean {
+  const checker = process.platform === "win32" ? "where" : "which";
+  return (
+    spawnSync(checker, [agent.bin], { stdio: "ignore" }).status === 0
+  );
+}
