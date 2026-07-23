@@ -13,6 +13,8 @@ export interface LaunchContext {
   gatewayUrl: string;
   /** Optional model id from --model */
   model?: string;
+  /** Resolved executable (absolute path when found outside PATH) */
+  bin: string;
 }
 
 export interface AgentDefinition {
@@ -24,6 +26,11 @@ export interface AgentDefinition {
   description: string;
   /** Executable to spawn */
   bin: string;
+  /**
+   * Extra locations to look for the binary when it's not on PATH
+   * (e.g. CLIs bundled by desktop apps). `~` expands to the home dir.
+   */
+  binPaths?: string[];
   /** Shown when the binary is missing */
   installCommand?: string;
   installUrl: string;
@@ -73,18 +80,39 @@ async function writeConfigFile(file: string, content: string): Promise<void> {
  * `--set-key llmgateway <key>` flag. Idempotent, so it runs on every launch
  * and picks up rotated keys.
  */
-function setKeyViaFlag(bin: string, ctx: LaunchContext): void {
-  const result = spawnSync(bin, ["--set-key", "llmgateway", ctx.apiKey], {
+function setKeyViaFlag(ctx: LaunchContext): void {
+  const result = spawnSync(ctx.bin, ["--set-key", "llmgateway", ctx.apiKey], {
     stdio: "ignore",
     shell: process.platform === "win32",
   });
   if (result.status !== 0) {
     logger.warn(
-      `Could not register the key automatically. Inside ${bin}, type ${highlight("/keys")} and paste your LLM Gateway key.`,
+      `Could not register the key automatically. Inside the agent, type ${highlight("/keys")} and paste your LLM Gateway key.`,
     );
   } else {
-    logger.log(dim(`Registered LLM Gateway key with ${bin} (--set-key).`));
+    logger.log(dim(`Registered LLM Gateway key via --set-key.`));
   }
+}
+
+/**
+ * Refreshes the llmgateway entry in an opencode-family auth store
+ * (`~/.local/share/<tool>/auth.json`). These tools prefer their stored
+ * credential over the LLMGATEWAY_API_KEY env var, so a stale entry from an
+ * earlier /connect would otherwise override the launcher's key.
+ */
+async function upsertOpencodeAuth(tool: string, key: string): Promise<void> {
+  const dataHome =
+    process.env.XDG_DATA_HOME ?? path.join(os.homedir(), ".local", "share");
+  const file = path.join(dataHome, tool, "auth.json");
+  const auth = (await readJsonConfig(file)) ?? {};
+  const existing = auth.llmgateway;
+  if (existing?.type === "api" && existing.key === key) {
+    return;
+  }
+  auth.llmgateway = { type: "api", key };
+  await fs.ensureDir(path.dirname(file));
+  await fs.writeJson(file, auth, { spaces: 2, mode: 0o600 });
+  logger.log(dim(`Refreshed the llmgateway credential in ${file}`));
 }
 
 const PI_DEFAULT_MODELS = [
@@ -314,6 +342,24 @@ function prepareHermes(): Promise<void> {
 
 export const AGENTS: AgentDefinition[] = [
   {
+    id: "devpass-code",
+    aliases: ["devpass"],
+    label: "DevPass Code",
+    description: "First-party terminal agent built for LLM Gateway",
+    bin: "devpass-code",
+    installCommand: "npm install -g devpass-code",
+    installUrl: "https://llmgateway.io/guides/devpass-code",
+    guideUrl: "https://llmgateway.io/guides/devpass-code",
+    supportsModel: true,
+    modelHint:
+      "DevPass Code has a curated catalog (e.g. gpt-5.4-nano) — every gateway model is a keystroke away in the picker.",
+    env: (ctx) => ({ LLMGATEWAY_API_KEY: ctx.apiKey }),
+    args: (ctx) => (ctx.model ? ["--model", `llmgateway/${ctx.model}`] : []),
+    prepareSummary:
+      "refresh the llmgateway credential in ~/.local/share/devpass-code/auth.json",
+    prepare: (ctx) => upsertOpencodeAuth("devpass-code", ctx.apiKey),
+  },
+  {
     id: "claude",
     aliases: ["claude-code"],
     label: "Claude Code",
@@ -340,12 +386,17 @@ export const AGENTS: AgentDefinition[] = [
     supportsModel: true,
     env: (ctx) => ({ LLMGATEWAY_API_KEY: ctx.apiKey }),
     args: (ctx) => (ctx.model ? ["--model", `llmgateway/${ctx.model}`] : []),
+    prepareSummary:
+      "refresh the llmgateway credential in ~/.local/share/opencode/auth.json",
+    prepare: (ctx) => upsertOpencodeAuth("opencode", ctx.apiKey),
   },
   {
     id: "empryo",
     label: "Empryo",
     description: "Graph-powered agent that edits symbols, not strings",
     bin: "empryo",
+    // The Empryo desktop app installs the CLI here without adding it to PATH.
+    binPaths: ["~/.empryo/bin/empryo"],
     installCommand: "curl -fsSL https://empryo.com/install.sh | bash",
     installUrl: "https://empryo.com/download",
     guideUrl: "https://llmgateway.io/guides/empryo",
@@ -353,7 +404,7 @@ export const AGENTS: AgentDefinition[] = [
     modelHint: "Pick a model inside Empryo (llmgateway provider).",
     prepareSummary: "register key via `empryo --set-key llmgateway <key>`",
     prepare: (ctx) => {
-      setKeyViaFlag("empryo", ctx);
+      setKeyViaFlag(ctx);
       return Promise.resolve();
     },
   },
@@ -362,6 +413,7 @@ export const AGENTS: AgentDefinition[] = [
     label: "SoulForge",
     description: "Empryo's predecessor — same graph engine, still supported",
     bin: "soulforge",
+    binPaths: ["~/.soulforge/bin/soulforge", "~/.empryo/bin/soulforge"],
     installCommand: "npm install -g @proxysoul/soulforge",
     installUrl: "https://github.com/proxysoul/soulforge",
     guideUrl: "https://llmgateway.io/guides/soulforge",
@@ -369,7 +421,7 @@ export const AGENTS: AgentDefinition[] = [
     modelHint: "Pick a model inside SoulForge (llmgateway provider).",
     prepareSummary: "register key via `soulforge --set-key llmgateway <key>`",
     prepare: (ctx) => {
-      setKeyViaFlag("soulforge", ctx);
+      setKeyViaFlag(ctx);
       return Promise.resolve();
     },
   },
@@ -399,19 +451,6 @@ export const AGENTS: AgentDefinition[] = [
       `model_providers.llmgateway.wire_api="responses"`,
       ...(ctx.model ? ["-c", `model="${ctx.model}"`] : []),
     ],
-  },
-  {
-    id: "devpass-code",
-    aliases: ["devpass"],
-    label: "DevPass Code",
-    description: "First-party terminal agent built for LLM Gateway",
-    bin: "devpass-code",
-    installCommand: "npm install -g devpass-code",
-    installUrl: "https://llmgateway.io/guides/devpass-code",
-    guideUrl: "https://llmgateway.io/guides/devpass-code",
-    supportsModel: false,
-    modelHint: "Every gateway model is in the picker — switching is a keystroke.",
-    env: (ctx) => ({ LLMGATEWAY_API_KEY: ctx.apiKey }),
   },
   {
     id: "autohand",
@@ -508,9 +547,30 @@ export function findAgent(name: string): AgentDefinition | undefined {
   );
 }
 
-export function isAgentInstalled(agent: AgentDefinition): boolean {
+/**
+ * Finds the agent executable: PATH first, then any binPaths fallbacks
+ * (CLIs bundled by desktop apps). Returns the spawnable command — the bare
+ * name when on PATH, an absolute path otherwise — or undefined when missing.
+ */
+export function resolveAgentBin(agent: AgentDefinition): string | undefined {
   const checker = process.platform === "win32" ? "where" : "which";
-  return (
-    spawnSync(checker, [agent.bin], { stdio: "ignore" }).status === 0
-  );
+  if (spawnSync(checker, [agent.bin], { stdio: "ignore" }).status === 0) {
+    return agent.bin;
+  }
+  for (const candidate of agent.binPaths ?? []) {
+    const resolved = candidate.startsWith("~")
+      ? path.join(os.homedir(), candidate.slice(1))
+      : candidate;
+    try {
+      fs.accessSync(resolved, fs.constants.X_OK);
+      return resolved;
+    } catch {
+      // not there — try the next candidate
+    }
+  }
+  return undefined;
+}
+
+export function isAgentInstalled(agent: AgentDefinition): boolean {
+  return resolveAgentBin(agent) !== undefined;
 }
