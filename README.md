@@ -93,6 +93,7 @@ Start any supported coding agent with LLM Gateway configured out of the box — 
 
 ```bash
 npx @llmgateway/cli launch            # Interactive agent picker
+npx @llmgateway/cli devpass-code      # DevPass Code (first-party)
 npx @llmgateway/cli claude            # Claude Code
 npx @llmgateway/cli opencode          # OpenCode
 npx @llmgateway/cli empryo            # Empryo
@@ -101,7 +102,7 @@ npx @llmgateway/cli codex             # Codex CLI
 npx @llmgateway/cli launch --list     # See all supported agents
 ```
 
-Also supported: DevPass Code, Autohand, Pi, Kimi Code, MiMo Code, OpenClaw, and Hermes Agent. Pick a model with `-m` (e.g. `npx @llmgateway/cli launch -m gpt-5.5 claude`); anything after the agent name is passed through to the agent itself. See the [integration guides](https://llmgateway.io/guides) for details per agent.
+Also supported: Autohand, Pi, Kimi Code, MiMo Code, OpenClaw, and Hermes Agent. Pick a model with `-m` (e.g. `npx @llmgateway/cli launch -m gpt-5.5 claude`); anything after the agent name is passed through to the agent itself. See the [integration guides](https://llmgateway.io/guides) for details per agent.
 
 See the [CLI documentation](./packages/llmgateway-cli/README.md) for all available commands.
 

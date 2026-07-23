@@ -46,12 +46,12 @@ Supported agents and how they're configured:
 
 | Agent | Launch | Configuration |
 | --- | --- | --- |
+| DevPass Code | `llmgateway devpass-code` | First-party agent — key refreshed in its `auth.json` + `LLMGATEWAY_API_KEY` |
 | Claude Code | `llmgateway claude` | `ANTHROPIC_BASE_URL` + `ANTHROPIC_AUTH_TOKEN` env vars |
-| OpenCode | `llmgateway opencode` | Built-in `llmgateway` provider via `LLMGATEWAY_API_KEY` |
-| Empryo | `llmgateway empryo` | Registers your key via `empryo --set-key llmgateway` |
+| OpenCode | `llmgateway opencode` | Built-in `llmgateway` provider — key refreshed in its `auth.json` |
+| Empryo | `llmgateway empryo` | Registers your key via `empryo --set-key llmgateway` (finds the desktop app's CLI too) |
 | SoulForge | `llmgateway soulforge` | Registers your key via `soulforge --set-key llmgateway` |
 | Codex CLI | `llmgateway codex` | Per-session `-c` provider overrides (no config file changes) |
-| DevPass Code | `llmgateway devpass-code` | `LLMGATEWAY_API_KEY` env var |
 | Autohand Code | `llmgateway autohand` | `OPENAI_BASE_URL` + `OPENAI_API_KEY` env vars |
 | Pi | `llmgateway pi` | Adds an `llmgateway` provider to `~/.pi/agent/models.json` |
 | Kimi Code | `llmgateway kimi` | Adds an `llmgateway` provider to `~/.kimi-code/config.toml` |
@@ -59,7 +59,7 @@ Supported agents and how they're configured:
 | OpenClaw | `llmgateway openclaw` | Adds an `llmgateway` provider to `~/.openclaw/openclaw.json` |
 | Hermes Agent | `llmgateway hermes` | Runs `hermes setup` with gateway values on first launch |
 
-The API key is resolved from `--key`, the `LLMGATEWAY_API_KEY` environment variable, or the key stored by `llmgateway auth login --key` — in that order. If none is found, you'll be prompted once and the key is saved for next time. If an agent isn't installed, the launcher prints its official install command and exits.
+The API key is resolved from `--key`, the `LLMGATEWAY_API_KEY` environment variable, or the key stored by `llmgateway auth login --key` — in that order. Before launching, the key is verified against the gateway; a stale key (e.g. one you rolled or deleted) is reported with its exact source and the launcher falls back to the next valid one, prompting you for a fresh key if none works. If an agent isn't installed, the launcher prints its official install command and exits.
 
 See the [integration guides](https://llmgateway.io/guides) for per-agent details.
 
