@@ -28,6 +28,8 @@ import {
   credits,
 } from "./commands/orgs.js";
 import { withApiErrors } from "./utils/api.js";
+import { launch } from "./commands/launch.js";
+import { AGENTS } from "./utils/agents.js";
 import { dev } from "./commands/dev.js";
 import { upgrade } from "./commands/upgrade.js";
 import { docs } from "./commands/docs.js";
@@ -44,7 +46,54 @@ program
   .description(
     "CLI tool for scaffolding LLM Gateway templates and managing AI projects",
   )
-  .version(pkg.version);
+  .version(pkg.version)
+  .enablePositionalOptions();
+
+// launch command — start coding agents with LLM Gateway configured
+const launchOptions = (cmd: Command): Command =>
+  cmd
+    .option("-m, --model <model>", "Model to use (any model on the gateway)")
+    .option("-k, --key <key>", "LLM Gateway API key (overrides stored key)")
+    .option(
+      "--gateway-url <url>",
+      "Gateway base URL (default: https://api.llmgateway.io)",
+    )
+    .option("--dry-run", "Show what would run without launching")
+    .passThroughOptions()
+    .allowUnknownOption();
+
+launchOptions(
+  program
+    .command("launch [agent] [args...]")
+    .description(
+      "Launch a coding agent (claude, opencode, empryo, soulforge, codex, ...) with LLM Gateway configured",
+    )
+    .option("--list", "List supported agents")
+    .addHelpText(
+      "after",
+      `
+Launcher flags go before the agent name; everything after it is passed to the agent:
+
+  $ llmgateway launch                          interactive agent picker
+  $ llmgateway launch claude                   launch Claude Code on LLM Gateway
+  $ llmgateway launch -m gpt-5.5 claude        ...using GPT-5.5
+  $ llmgateway launch claude --continue        ...passing --continue to claude
+  $ llmgateway opencode                        shortcut, same as launch opencode
+
+Agents: ${AGENTS.map((a) => a.id).join(", ")}`,
+    ),
+).action((agent, args, opts) => launch(agent, args, opts));
+
+// hidden per-agent shortcuts: `llmgateway claude`, `llmgateway opencode`, ...
+for (const agent of AGENTS) {
+  for (const name of [agent.id, ...(agent.aliases ?? [])]) {
+    launchOptions(
+      program
+        .command(`${name} [args...]`, { hidden: true })
+        .description(`Launch ${agent.label} with LLM Gateway configured`),
+    ).action((args, opts) => launch(agent.id, args, opts));
+  }
+}
 
 // init command
 program
