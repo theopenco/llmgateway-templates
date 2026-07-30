@@ -44,24 +44,47 @@ npx @llmgateway/cli launch --dry-run codex
 
 Supported agents and how they're configured:
 
-| Agent | Launch | Configuration |
-| --- | --- | --- |
-| DevPass Code | `llmgateway devpass-code` | First-party agent — key refreshed in its `auth.json` + `LLMGATEWAY_API_KEY` |
-| Claude Code | `llmgateway claude` | `ANTHROPIC_BASE_URL` + `ANTHROPIC_AUTH_TOKEN` env vars |
-| OpenCode | `llmgateway opencode` | Built-in `llmgateway` provider — key refreshed in its `auth.json` |
-| Empryo | `llmgateway empryo` | Registers your key via `empryo --set-key llmgateway` (finds the desktop app's CLI too) |
-| SoulForge | `llmgateway soulforge` | Registers your key via `soulforge --set-key llmgateway` |
-| Codex CLI | `llmgateway codex` | Per-session `-c` provider overrides (no config file changes) |
-| Autohand Code | `llmgateway autohand` | `OPENAI_BASE_URL` + `OPENAI_API_KEY` env vars |
-| Pi | `llmgateway pi` | Adds an `llmgateway` provider to `~/.pi/agent/models.json` |
-| Kimi Code | `llmgateway kimi` | Adds an `llmgateway` provider to `~/.kimi-code/config.toml` |
-| MiMo Code | `llmgateway mimo` | Routes the provider through the gateway in `mimocode.json` |
-| OpenClaw | `llmgateway openclaw` | Adds an `llmgateway` provider to `~/.openclaw/openclaw.json` |
-| Hermes Agent | `llmgateway hermes` | Runs `hermes setup` with gateway values on first launch |
+| Agent         | Launch                    | Configuration                                                                                                                |
+| ------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| DevPass Code  | `llmgateway devpass-code` | First-party agent — key refreshed in its `auth.json` + `LLMGATEWAY_API_KEY`                                                  |
+| Claude Code   | `llmgateway claude`       | `ANTHROPIC_BASE_URL` + `ANTHROPIC_AUTH_TOKEN` env vars + gateway model discovery, so `/model` lists the gateway catalog      |
+| OpenCode      | `llmgateway opencode`     | Built-in `llmgateway` provider — key refreshed in its `auth.json`, provider-pinned model catalog synced into `opencode.json` |
+| Empryo        | `llmgateway empryo`       | Registers your key via `empryo --set-key llmgateway` (finds the desktop app's CLI too)                                       |
+| SoulForge     | `llmgateway soulforge`    | Registers your key via `soulforge --set-key llmgateway`                                                                      |
+| Codex CLI     | `llmgateway codex`        | Per-session `-c` provider overrides (no config file changes)                                                                 |
+| Autohand Code | `llmgateway autohand`     | `OPENAI_BASE_URL` + `OPENAI_API_KEY` env vars                                                                                |
+| Pi            | `llmgateway pi`           | Adds an `llmgateway` provider to `~/.pi/agent/models.json`                                                                   |
+| Kimi Code     | `llmgateway kimi`         | Adds an `llmgateway` provider to `~/.kimi-code/config.toml`                                                                  |
+| MiMo Code     | `llmgateway mimo`         | Routes the provider through the gateway in `mimocode.json`                                                                   |
+| OpenClaw      | `llmgateway openclaw`     | Adds an `llmgateway` provider to `~/.openclaw/openclaw.json`                                                                 |
+| Hermes Agent  | `llmgateway hermes`       | Runs `hermes setup` with gateway values on first launch                                                                      |
 
 The API key is resolved from `--key`, the `LLMGATEWAY_API_KEY` environment variable, or the key stored by `llmgateway auth login --key` — in that order. Before launching, the key is verified against the gateway; a stale key (e.g. one you rolled or deleted) is reported with its exact source and the launcher falls back to the next valid one, prompting you for a fresh key if none works. If an agent isn't installed, the launcher prints its official install command and exits.
 
 See the [integration guides](https://llmgateway.io/guides) for per-agent details.
+
+### `configure` - Generate agent configs with the gateway's models
+
+Put LLM Gateway's coding-model catalog directly into an agent's own config, so its model picker lists gateway models without launching through the CLI:
+
+```bash
+# opencode: adds every coding model, pinned per upstream provider, to the picker
+npx @llmgateway/cli configure opencode
+
+# Claude Code: routes it through LLM Gateway and fills /model from the gateway catalog
+npx @llmgateway/cli configure claude
+
+# ...for the current repo only (.claude/settings.local.json)
+npx @llmgateway/cli configure claude --project
+
+# Preview without writing
+npx @llmgateway/cli configure opencode --dry-run
+```
+
+- **opencode** — merges `provider/model` entries (e.g. `anthropic/claude-sonnet-5`, `aws-bedrock/claude-sonnet-5`) into `provider.llmgateway.models` in `~/.config/opencode/opencode.json`, with display names, context limits, and per-provider pricing. They show up in the picker as `llmgateway/<provider>/<model>` and pin that upstream provider via the gateway's [provider-routing syntax](https://docs.llmgateway.io/features/routing#provider-specific-routing). Root model ids (auto-routed) are already built into opencode. Existing custom entries and the rest of the file are preserved, and a hand-written `opencode.jsonc` keeps working alongside it.
+- **Claude Code** — sets `ANTHROPIC_BASE_URL`, `ANTHROPIC_AUTH_TOKEN`, and `CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1` in `~/.claude/settings.json` (requires Claude Code v2.1.129+). Claude Code then loads the gateway's `/v1/models` catalog into its `/model` picker (shown as "From gateway"). Claude Code only lists ids starting with `claude`/`anthropic`; any other gateway model still works via `claude --model <id>`.
+
+`llmgateway launch opencode` and `llmgateway launch claude` apply the same setup automatically on every launch, keeping the catalog fresh as new models ship.
 
 ### `init` - Create a new project
 

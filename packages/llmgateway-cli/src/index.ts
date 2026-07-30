@@ -28,6 +28,7 @@ import {
   credits,
 } from "./commands/orgs.js";
 import { withApiErrors } from "./utils/api.js";
+import { configure } from "./commands/configure.js";
 import { launch } from "./commands/launch.js";
 import { AGENTS } from "./utils/agents.js";
 import { dev } from "./commands/dev.js";
@@ -94,6 +95,38 @@ for (const agent of AGENTS) {
     ).action((args, opts) => launch(agent.id, args, opts));
   }
 }
+
+// configure command — generate agent config files with the gateway's models
+program
+  .command("configure [agent]")
+  .description(
+    "Generate an agent config with LLM Gateway's coding models (opencode, claude)",
+  )
+  .option(
+    "-k, --key <key>",
+    "LLM Gateway API key (claude; overrides stored key)",
+  )
+  .option(
+    "--gateway-url <url>",
+    "Gateway base URL (default: https://api.llmgateway.io)",
+  )
+  .option(
+    "--project",
+    "Write to ./.claude/settings.local.json instead of ~/.claude/settings.json (claude)",
+  )
+  .option("--dry-run", "Show what would be written without writing")
+  .addHelpText(
+    "after",
+    `
+Examples:
+
+  $ llmgateway configure opencode    add every coding model, pinned per provider, to opencode's picker
+  $ llmgateway configure claude      route Claude Code through LLM Gateway; /model lists gateway models
+  $ llmgateway configure claude --project   ...for the current repo only
+
+\`llmgateway launch opencode\` and \`llmgateway launch claude\` apply the same setup automatically.`,
+  )
+  .action(configure);
 
 // init command
 program
