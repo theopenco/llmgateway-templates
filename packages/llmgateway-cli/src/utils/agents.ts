@@ -2,6 +2,7 @@ import { spawnSync } from "child_process";
 import fs from "fs-extra";
 import os from "os";
 import path from "path";
+import { readJsonConfig, syncOpencodeModelCatalog } from "./agent-configs.js";
 import { logger, highlight, dim } from "./logger.js";
 
 export const DEFAULT_GATEWAY_URL = "https://api.llmgateway.io";
@@ -51,23 +52,6 @@ export interface AgentDefinition {
 
 function homeFile(...segments: string[]): string {
   return path.join(os.homedir(), ...segments);
-}
-
-/** External agent config files have no schema, so values stay untyped. */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AgentConfig = Record<string, any>;
-
-async function readJsonConfig(file: string): Promise<AgentConfig | undefined> {
-  if (!(await fs.pathExists(file))) {
-    return undefined;
-  }
-  try {
-    return await fs.readJson(file);
-  } catch {
-    throw new Error(
-      `${file} exists but is not valid JSON. Fix or remove it, then retry.`,
-    );
-  }
 }
 
 async function writeConfigFile(file: string, content: string): Promise<void> {
@@ -315,10 +299,15 @@ async function prepareKimi(ctx: LaunchContext): Promise<void> {
   }
   // Appending tables at EOF keeps existing top-level keys (like
   // default_model) valid, so only the provider/model tables are added here.
-  await fs.writeFile(file, `${content.replace(/\n*$/, "\n\n")}${providerBlock}\n`);
+  await fs.writeFile(
+    file,
+    `${content.replace(/\n*$/, "\n\n")}${providerBlock}\n`,
+  );
   logger.log(dim(`Appended the llmgateway provider to ${file}`));
   logger.log(
-    dim(`Type ${highlight("/model")} inside Kimi Code to switch to an llmgateway model.`),
+    dim(
+      `Type ${highlight("/model")} inside Kimi Code to switch to an llmgateway model.`,
+    ),
   );
 }
 
@@ -329,9 +318,11 @@ function hermesIsConfigured(): boolean {
 function prepareHermes(): Promise<void> {
   if (!hermesIsConfigured()) {
     logger.info(
-      "First run: launching the Hermes setup wizard. Pick \"Custom OpenAI-compatible endpoint\" and use:",
+      'First run: launching the Hermes setup wizard. Pick "Custom OpenAI-compatible endpoint" and use:',
     );
-    logger.log(`  ${dim("Base URL:")} ${highlight(`${DEFAULT_GATEWAY_URL}/v1`)}`);
+    logger.log(
+      `  ${dim("Base URL:")} ${highlight(`${DEFAULT_GATEWAY_URL}/v1`)}`,
+    );
     logger.log(
       `  ${dim("API key:")}  your LLM Gateway key (${highlight("llmgateway auth status")} shows where it's stored)`,
     );
@@ -369,9 +360,13 @@ export const AGENTS: AgentDefinition[] = [
     installUrl: "https://docs.anthropic.com/en/docs/claude-code",
     guideUrl: "https://llmgateway.io/guides/claude-code",
     supportsModel: true,
+    modelHint:
+      'Type /model inside Claude Code to pick any gateway model (listed as "From gateway").',
     env: (ctx) => ({
       ANTHROPIC_BASE_URL: ctx.gatewayUrl,
       ANTHROPIC_AUTH_TOKEN: ctx.apiKey,
+      // Fills the /model picker from the gateway's /v1/models catalog.
+      CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY: "1",
       ...(ctx.model ? { ANTHROPIC_MODEL: ctx.model } : {}),
     }),
   },
@@ -387,8 +382,18 @@ export const AGENTS: AgentDefinition[] = [
     env: (ctx) => ({ LLMGATEWAY_API_KEY: ctx.apiKey }),
     args: (ctx) => (ctx.model ? ["--model", `llmgateway/${ctx.model}`] : []),
     prepareSummary:
-      "refresh the llmgateway credential in ~/.local/share/opencode/auth.json",
-    prepare: (ctx) => upsertOpencodeAuth("opencode", ctx.apiKey),
+      "refresh the llmgateway credential in ~/.local/share/opencode/auth.json and sync the provider-pinned model catalog into ~/.config/opencode/opencode.json",
+    prepare: async (ctx) => {
+      await upsertOpencodeAuth("opencode", ctx.apiKey);
+      const result = await syncOpencodeModelCatalog();
+      if (result.added > 0 || result.updated > 0) {
+        logger.log(
+          dim(
+            `Synced ${result.total} provider-pinned gateway models into ${result.file}`,
+          ),
+        );
+      }
+    },
   },
   {
     id: "empryo",
@@ -487,7 +492,8 @@ export const AGENTS: AgentDefinition[] = [
     label: "Kimi Code",
     description: "Moonshot AI's open-source terminal agent",
     bin: "kimi",
-    installCommand: "curl -fsSL https://code.kimi.com/kimi-code/install.sh | bash",
+    installCommand:
+      "curl -fsSL https://code.kimi.com/kimi-code/install.sh | bash",
     installUrl: "https://github.com/MoonshotAI/kimi-code",
     guideUrl: "https://llmgateway.io/guides/kimi-code",
     supportsModel: true,
@@ -504,7 +510,8 @@ export const AGENTS: AgentDefinition[] = [
     installUrl: "https://mimo.xiaomi.com/mimocode",
     guideUrl: "https://llmgateway.io/guides/mimocode",
     supportsModel: true,
-    prepareSummary: "route provider through LLM Gateway in ~/.config/mimocode/mimocode.json",
+    prepareSummary:
+      "route provider through LLM Gateway in ~/.config/mimocode/mimocode.json",
     prepare: prepareMimo,
   },
   {
@@ -542,8 +549,7 @@ export const AGENTS: AgentDefinition[] = [
 export function findAgent(name: string): AgentDefinition | undefined {
   const normalized = name.toLowerCase();
   return AGENTS.find(
-    (agent) =>
-      agent.id === normalized || agent.aliases?.includes(normalized),
+    (agent) => agent.id === normalized || agent.aliases?.includes(normalized),
   );
 }
 

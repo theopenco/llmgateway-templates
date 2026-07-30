@@ -31,7 +31,7 @@
     "directory": "packages/llmgateway-cli"
   },
   "dependencies": {
-    "@llmgateway/models": "^1.1.1",
+    "@llmgateway/models": "^1.212.0",
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
     "degit": "^2.8.4",
