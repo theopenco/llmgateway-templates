@@ -11,6 +11,7 @@ A full-stack Next.js app for AI-powered customer feedback sentiment analysis usi
 ## Features
 
 - Paste customer reviews (one per line) for analysis
+- Searchable model picker ([AI Elements model selector](https://elements.ai-sdk.dev/components/model-selector)) filled live from the LLM Gateway catalog
 - AI-powered sentiment analysis with structured output
 - Overall sentiment badge and average score
 - Key themes extraction with sentiment indicators
@@ -103,6 +104,10 @@ Analyze customer reviews for sentiment.
   ]
 }
 ```
+
+## Model catalog
+
+The picker is filled at request time from the gateway's public [`/v1/models`](https://api.llmgateway.io/v1/models) catalog (`src/lib/models.ts`, revalidated hourly), so models added to LLM Gateway show up without a code change. Model ids are sent unprefixed (`gpt-5.4-mini`) so the gateway [smart-routes](https://docs.llmgateway.io/features/routing) each request to the best available provider — prefix one with a provider id (`openai/gpt-5.4-mini`) to pin it instead.
 
 ## License
 

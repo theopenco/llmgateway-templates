@@ -16,8 +16,13 @@ import { AIToolsPanel } from "@/components/ai-tools-panel";
 import { Button } from "@/components/ui/button";
 import { exportToPptx } from "@/lib/export-pptx";
 import { captureChartImages } from "@/lib/capture-charts";
+import { pickDefaultModel } from "@/lib/models";
 import type { Presentation, Slide, SlideLayout, SlideTheme } from "@/lib/types";
 import { addToast } from "@/hooks/use-toast";
+
+const DEFAULT_TEXT_MODEL = "gpt-5.4-mini";
+const DEFAULT_IMAGE_MODEL = "gemini-3.1-flash-image-preview";
+const DEFAULT_SEARCH_MODEL = "sonar-pro";
 
 function createSlide(overrides?: Partial<Slide>): Slide {
   return {
@@ -48,27 +53,30 @@ export default function SlidesPage() {
     imageModels,
     searchModels,
     isLoading: modelsLoading,
-  } = useModels(apiKey);
+  } = useModels();
   const [presentation, setPresentation] =
     useState<Presentation>(defaultPresentation);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [textModel, setTextModel] = useState("");
-  const [imageModel, setImageModel] = useState("");
-  const [searchModel, setSearchModel] = useState("");
+  const [textModel, setTextModel] = useState(DEFAULT_TEXT_MODEL);
+  const [imageModel, setImageModel] = useState(DEFAULT_IMAGE_MODEL);
+  const [searchModel, setSearchModel] = useState(DEFAULT_SEARCH_MODEL);
 
-  // Auto-select first model when lists load
+  // Fall back to the first available model if the gateway stopped serving the
+  // default one.
   useEffect(() => {
-    if (!textModel && textModels.length > 0) setTextModel(textModels[0].id);
-  }, [textModel, textModels]);
+    setTextModel((current) => pickDefaultModel(textModels, current));
+  }, [textModels]);
   useEffect(() => {
-    if (!imageModel && imageModels.length > 0) setImageModel(imageModels[0].id);
-  }, [imageModel, imageModels]);
+    setImageModel((current) => pickDefaultModel(imageModels, current));
+  }, [imageModels]);
   useEffect(() => {
-    if (!searchModel && searchModels.length > 0)
-      setSearchModel(searchModels[0].id);
-    else if (!searchModel && textModels.length > 0)
-      setSearchModel(textModels[0].id);
-  }, [searchModel, searchModels, textModels]);
+    setSearchModel((current) =>
+      pickDefaultModel(
+        searchModels.length > 0 ? searchModels : textModels,
+        current,
+      ),
+    );
+  }, [searchModels, textModels]);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [isResearching, setIsResearching] = useState(false);

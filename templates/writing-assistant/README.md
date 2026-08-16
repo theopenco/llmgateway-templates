@@ -11,6 +11,7 @@ A full-stack Next.js app for AI-powered text transformation using LLM Gateway.
 ## Features
 
 - Multiple text actions: rewrite, summarize, expand, fix grammar, change tone
+- Searchable model picker ([AI Elements model selector](https://elements.ai-sdk.dev/components/model-selector)) filled live from the LLM Gateway catalog
 - Tone selector with professional, casual, formal, friendly, persuasive, and academic options
 - Apply result to replace original text
 - Copy result to clipboard
@@ -95,6 +96,10 @@ Transform text with a specified action.
   "result": "Transformed text..."
 }
 ```
+
+## Model catalog
+
+The picker is filled at request time from the gateway's public [`/v1/models`](https://api.llmgateway.io/v1/models) catalog (`src/lib/models.ts`, revalidated hourly), so models added to LLM Gateway show up without a code change. Model ids are sent unprefixed (`gpt-5.4-mini`) so the gateway [smart-routes](https://docs.llmgateway.io/features/routing) each request to the best available provider — prefix one with a provider id (`openai/gpt-5.4-mini`) to pin it instead.
 
 ## License
 

@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     : "";
 
   const result = await generateObject({
-    model: llmgateway(model || "gpt-4o-mini"),
+    model: llmgateway(model || "gpt-5.4-mini"),
     schema: enhancedSlideSchema,
     system: `You are a presentation content expert. Enhance slide content to be more engaging, clear, and professional.
 

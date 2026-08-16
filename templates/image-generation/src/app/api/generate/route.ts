@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     }
 
     const result = await generateImage({
-      model: llmgateway.image(model || "gemini-3-pro-image-preview"),
+      model: llmgateway.image(model || "gemini-3.1-flash-image-preview"),
       prompt,
       n: 1,
     });

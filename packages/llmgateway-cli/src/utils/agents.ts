@@ -100,10 +100,10 @@ async function upsertOpencodeAuth(tool: string, key: string): Promise<void> {
 }
 
 const PI_DEFAULT_MODELS = [
-  { id: "gpt-5.5", name: "GPT-5.5" },
-  { id: "claude-opus-4-7", name: "Claude Opus 4.7" },
-  { id: "gemini-3.1-pro", name: "Gemini 3.1 Pro" },
-  { id: "deepseek-v4", name: "DeepSeek V4", reasoning: true },
+  { id: "gpt-5.6-sol", name: "GPT-5.6 Sol" },
+  { id: "claude-opus-5", name: "Claude Opus 5" },
+  { id: "gemini-3.1-pro-preview", name: "Gemini 3.1 Pro" },
+  { id: "deepseek-v4-pro", name: "DeepSeek V4 Pro", reasoning: true },
 ];
 
 async function preparePi(ctx: LaunchContext): Promise<void> {
@@ -130,10 +130,10 @@ async function preparePi(ctx: LaunchContext): Promise<void> {
 }
 
 const MIMO_DEFAULT_MODELS = [
-  "claude-opus-4-8",
-  "gpt-5.5",
+  "claude-opus-5",
+  "gpt-5.6-sol",
   "deepseek-v4-pro",
-  "qwen3.7-max",
+  "qwen3.8-max",
 ];
 
 async function prepareMimo(ctx: LaunchContext): Promise<void> {
@@ -163,17 +163,22 @@ async function prepareMimo(ctx: LaunchContext): Promise<void> {
 }
 
 const OPENCLAW_DEFAULT_MODELS = [
-  { id: "gpt-5.4", name: "GPT-5.4", contextWindow: 128000, maxTokens: 32000 },
   {
-    id: "claude-opus-4-6",
-    name: "Claude Opus 4.6",
-    contextWindow: 200000,
-    maxTokens: 8192,
+    id: "gpt-5.6-sol",
+    name: "GPT-5.6 Sol",
+    contextWindow: 1050000,
+    maxTokens: 32000,
   },
   {
-    id: "gemini-3-1-pro-preview",
-    name: "Gemini 3.1 Pro",
+    id: "claude-opus-5",
+    name: "Claude Opus 5",
     contextWindow: 1000000,
+    maxTokens: 32000,
+  },
+  {
+    id: "gemini-3.1-pro-preview",
+    name: "Gemini 3.1 Pro",
+    contextWindow: 1048576,
     maxTokens: 8192,
   },
 ];
@@ -221,23 +226,23 @@ const KIMI_DEFAULT_MODELS: {
   capabilities: string[];
 }[] = [
   {
-    id: "gpt-5.5",
-    name: "GPT-5.5",
+    id: "gpt-5.6-sol",
+    name: "GPT-5.6 Sol",
     context: 1050000,
     output: 128000,
     capabilities: ["thinking", "tool_use"],
   },
   {
-    id: "claude-opus-4-8",
-    name: "Claude Opus 4.8",
-    context: 200000,
+    id: "claude-opus-5",
+    name: "Claude Opus 5",
+    context: 1000000,
     output: 32000,
     capabilities: ["image_in", "thinking", "tool_use"],
   },
   {
-    id: "gemini-3.1-pro",
+    id: "gemini-3.1-pro-preview",
     name: "Gemini 3.1 Pro",
-    context: 1000000,
+    context: 1048576,
     output: 65536,
     capabilities: ["thinking", "tool_use"],
   },

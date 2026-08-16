@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     const prompt = ACTION_PROMPTS[action](text, tone);
 
     const result = await generateText({
-      model: llmgateway(model || "openai/gpt-4o-mini"),
+      model: llmgateway(model || "gpt-5.4-mini"),
       prompt,
     });
 

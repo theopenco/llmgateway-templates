@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   const { prompt, model } = await request.json();
 
   const result = await generateImage({
-    model: llmgateway.image(model || "gemini-3-pro-image-preview"),
+    model: llmgateway.image(model || "gemini-3.1-flash-image-preview"),
     prompt: `Professional presentation slide image: ${prompt}. Clean, modern, minimal style suitable for a business presentation. No text overlays.`,
     n: 1,
   });

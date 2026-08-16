@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     const styleDesc = styleDescriptions[style] || styleDescriptions.gradient;
 
     const result = await generateImage({
-      model: llmgateway.image(model || "gemini-3-pro-image-preview"),
+      model: llmgateway.image(model || "gemini-3.1-flash-image-preview"),
       prompt: `Create a professional Open Graph social media preview image in landscape orientation (wider than tall, roughly 1200x630 aspect ratio) for a product called "${productName}".${description ? ` The product: ${description}.` : ""} The design should feature ${styleDesc}. Include the product name "${productName}" as prominent heading text on the image. Make it look polished and suitable for social media sharing.`,
       n: 1,
     });

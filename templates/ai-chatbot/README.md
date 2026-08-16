@@ -12,7 +12,7 @@ A full-stack Next.js chatbot with streaming responses using LLM Gateway.
 
 - Streaming chat with real-time token delivery
 - Conversation history with user/assistant message bubbles
-- Model selector to switch between LLM providers
+- Searchable model picker ([AI Elements model selector](https://elements.ai-sdk.dev/components/model-selector)) filled live from the LLM Gateway catalog
 - Clear chat functionality
 - Auto-scroll to latest message
 - Built with modern React 19 and Next.js 16
@@ -81,11 +81,15 @@ Stream a chat completion.
 ```json
 {
   "messages": [{ "role": "user", "content": "Hello!" }],
-  "model": "openai/gpt-4o-mini"
+  "model": "gpt-5.4-mini"
 }
 ```
 
 **Response:** Server-sent events (data stream).
+
+## Model catalog
+
+The picker is filled at request time from the gateway's public [`/v1/models`](https://api.llmgateway.io/v1/models) catalog (`src/lib/models.ts`, revalidated hourly), so models added to LLM Gateway show up without a code change. Model ids are sent unprefixed (`gpt-5.4-mini`) so the gateway [smart-routes](https://docs.llmgateway.io/features/routing) each request to the best available provider — prefix one with a provider id (`openai/gpt-5.4-mini`) to pin it instead.
 
 ## License
 

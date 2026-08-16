@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   const { topic, model } = await request.json();
 
   const result = await generateText({
-    model: llmgateway(model || "perplexity/sonar-pro"),
+    model: llmgateway(model || "sonar-pro"),
     system: `You are a research assistant. Provide accurate, up-to-date information with specific facts, statistics, and data points that can be used in a presentation.
 
 Format your response as structured research notes:

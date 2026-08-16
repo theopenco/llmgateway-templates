@@ -1,19 +1,12 @@
-const GATEWAY_BASE = "https://api.llmgateway.io/v1";
+import { MODELS_REVALIDATE_SECONDS, MODELS_URL } from "@/lib/models";
 
-export async function GET(request: Request) {
-  const apiKey =
-    request.headers.get("x-api-key") ||
-    new URL(request.url).searchParams.get("apiKey") ||
-    process.env.LLMGATEWAY_API_KEY;
-
-  if (!apiKey) {
-    return Response.json({ error: "API key required" }, { status: 401 });
-  }
-
-  const response = await fetch(`${GATEWAY_BASE}/models?limit=500`, {
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-    },
+/**
+ * Proxy for the gateway model catalog. The catalog itself is public, but
+ * `/v1/models` sends no CORS headers, so the browser can't read it directly.
+ */
+export async function GET() {
+  const response = await fetch(MODELS_URL, {
+    next: { revalidate: MODELS_REVALIDATE_SECONDS },
   });
 
   if (!response.ok) {
@@ -23,6 +16,5 @@ export async function GET(request: Request) {
     );
   }
 
-  const data = await response.json();
-  return Response.json(data);
+  return Response.json(await response.json());
 }

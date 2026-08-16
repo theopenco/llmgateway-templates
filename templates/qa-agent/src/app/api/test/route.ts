@@ -199,7 +199,7 @@ export async function POST(request: Request) {
         const tools = createBrowserTools(browser);
 
         const result = await generateText({
-          model: llmgateway(model || "anthropic/claude-sonnet-4-5"),
+          model: llmgateway(model || "claude-sonnet-5"),
           tools,
           stopWhen: stepCountIs(25),
           system: `You are a QA testing agent. Your task is to test a web application by interacting with it through a browser.

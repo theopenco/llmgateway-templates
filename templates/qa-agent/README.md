@@ -12,7 +12,7 @@ An AI-powered QA testing agent that uses Agent Browser to interact with your run
 - Agent Browser — the agent controls a headless browser to navigate, click, type, and screenshot
 - Real-time action timeline — see each step as the agent executes it
 - Live iframe preview of the target application
-- Model selector to switch between LLM providers
+- Searchable model picker ([AI Elements model selector](https://elements.ai-sdk.dev/components/model-selector)) filled live from the LLM Gateway catalog
 - Runs on port 3001 so it doesn't conflict with your app on port 3000
 
 ## Tech Stack
@@ -93,7 +93,7 @@ Run an AI-powered QA test.
 ```json
 {
   "instruction": "Test the signup flow",
-  "model": "anthropic/claude-sonnet-4-5",
+  "model": "claude-sonnet-5",
   "targetUrl": "http://localhost:3000"
 }
 ```
@@ -109,6 +109,10 @@ Run an AI-powered QA test.
 {"type":"text","content":"I can see the signup form with email and password fields."}
 {"type":"result","summary":"Test passed: signup flow works correctly."}
 ```
+
+## Model catalog
+
+The picker is filled at request time from the gateway's public [`/v1/models`](https://api.llmgateway.io/v1/models) catalog (`src/lib/models.ts`, revalidated hourly), so models added to LLM Gateway show up without a code change. Model ids are sent unprefixed (`claude-sonnet-5`) so the gateway [smart-routes](https://docs.llmgateway.io/features/routing) each request to the best available provider — prefix one with a provider id (`anthropic/claude-sonnet-5`) to pin it instead.
 
 ## License
 

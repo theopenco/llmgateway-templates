@@ -46,7 +46,9 @@ export async function launch(
 
   const resolvedBin = resolveAgentBin(agent);
   if (!options.dryRun && !resolvedBin) {
-    logger.error(`${agent.label} is not installed (missing ${highlight(agent.bin)} binary).`);
+    logger.error(
+      `${agent.label} is not installed (missing ${highlight(agent.bin)} binary).`,
+    );
     logger.blank();
     if (agent.installCommand) {
       logger.log(`Install it with:`);
@@ -137,13 +139,15 @@ function printAgentList(): void {
   for (const agent of AGENTS) {
     const installed = isAgentInstalled(agent);
     const status = installed ? "" : dim(" (not installed)");
-    logger.log(
-      `  ${highlight(agent.id.padEnd(width))}${agent.label}${status}`,
-    );
+    logger.log(`  ${highlight(agent.id.padEnd(width))}${agent.label}${status}`);
     logger.log(`  ${" ".repeat(width)}${dim(agent.description)}`);
   }
   logger.blank();
-  logger.log(dim(`Launch one with ${highlight("llmgateway launch <agent>")} or ${highlight("llmgateway <agent>")}`));
+  logger.log(
+    dim(
+      `Launch one with ${highlight("llmgateway launch <agent>")} or ${highlight("llmgateway <agent>")}`,
+    ),
+  );
   logger.log(dim(`Guides: https://llmgateway.io/guides`));
 }
 
@@ -151,7 +155,9 @@ async function pickAgent(): Promise<AgentDefinition> {
   const choices = AGENTS.map((agent) => {
     const installed = isAgentInstalled(agent);
     return {
-      title: installed ? agent.label : `${agent.label} ${dim("(not installed)")}`,
+      title: installed
+        ? agent.label
+        : `${agent.label} ${dim("(not installed)")}`,
       description: agent.description,
       value: agent.id,
     };
@@ -175,7 +181,7 @@ async function pickAgent(): Promise<AgentDefinition> {
  * validates the model before auth, so a made-up id would return 400 for
  * valid and invalid keys alike.
  */
-const KEY_CHECK_MODEL = "gpt-5-nano";
+const KEY_CHECK_MODEL = "gpt-5.4-nano";
 
 type KeyCheck =
   | { status: "valid" }
@@ -211,7 +217,9 @@ async function checkApiKey(key: string, gatewayUrl: string): Promise<KeyCheck> {
     }
     const message: string | undefined = await res
       .json()
-      .then((body) => (body as { error?: { message?: string } })?.error?.message)
+      .then(
+        (body) => (body as { error?: { message?: string } })?.error?.message,
+      )
       .catch(() => undefined);
     if (res.status === 401) {
       return { status: "invalid", message };
@@ -284,7 +292,9 @@ async function resolveApiKey(
         return candidate.key;
       case "unknown":
         logger.log(
-          dim(`Could not verify the API key (from ${candidate.source}) — continuing.`),
+          dim(
+            `Could not verify the API key (from ${candidate.source}) — continuing.`,
+          ),
         );
         return candidate.key;
       case "invalid":

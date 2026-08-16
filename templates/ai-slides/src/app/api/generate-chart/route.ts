@@ -52,7 +52,7 @@ export async function POST(request: Request) {
 
   // Step 2: Generate chart spec using the researched data
   const result = await generateText({
-    model: llmgateway(model || "gpt-4o-mini"),
+    model: llmgateway(model || "gpt-5.4-mini"),
     system: CHART_SYSTEM_PROMPT,
     prompt: `Create a chart based on this request: ${prompt}
 
