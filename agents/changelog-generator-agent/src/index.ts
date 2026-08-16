@@ -137,7 +137,7 @@ async function runChangelogAgent(range?: string): Promise<string> {
     : "Generate a changelog for the most recent commits in this repository.";
 
   const result = await generateText({
-    model: llmgateway("openai/gpt-4o-mini"),
+    model: llmgateway("gpt-5.4-mini"),
     tools: {
       getGitLog: getGitLogTool,
       getGitDiff: getGitDiffTool,

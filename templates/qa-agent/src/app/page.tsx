@@ -1,34 +1,15 @@
-import { QATester, type Model } from "@/components/qa-tester";
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-async function getToolModels(): Promise<Model[]> {
-  const res = await fetch("https://api.llmgateway.io/v1/models", {
-    next: { revalidate: false },
-  });
-  const data = await res.json();
-
-  return data.data
-    .filter(
-      (m: any) =>
-        m.family !== "llmgateway" &&
-        m.providers?.some((p: any) => p.tools === true),
-    )
-    .map((m: any) => ({
-      id: `${m.family}/${m.id}`,
-      name: m.name,
-      family: m.family,
-      providers: [
-        ...new Set(
-          m.providers
-            ?.filter((p: any) => p.tools === true)
-            .map((p: any) => p.providerId as string) ?? [],
-        ),
-      ],
-    }));
-}
-/* eslint-enable @typescript-eslint/no-explicit-any */
+import { QATester } from "@/components/qa-tester";
+import { fetchModels, pickDefaultModel } from "@/lib/models";
 
 export default async function Home() {
-  const models = await getToolModels();
-  return <QATester models={models} />;
+  // The browser agent drives the page with tools, so only tool-capable models
+  // are offered.
+  const models = await fetchModels({ output: "text", tools: true });
+
+  return (
+    <QATester
+      models={models}
+      defaultModel={pickDefaultModel(models, "claude-sonnet-5")}
+    />
+  );
 }

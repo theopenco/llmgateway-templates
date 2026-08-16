@@ -34,24 +34,24 @@ describe("ai", () => {
     const mod = await import("../src/lib/ai.js");
 
     expect(createLLMGateway).toHaveBeenCalledTimes(1);
-    expect(provider).toHaveBeenCalledWith("anthropic/claude-sonnet-4-6", {
+    expect(provider).toHaveBeenCalledWith("claude-sonnet-5", {
       extraBody: { web_search: true },
     });
-    expect(mod.model).toBe("anthropic/claude-sonnet-4-6");
+    expect(mod.model).toBe("claude-sonnet-5");
     expect(agentConstructor).toHaveBeenCalledWith(
       expect.objectContaining({ model: modelInstance }),
     );
   });
 
   it("honors the AI_MODEL override", async () => {
-    process.env.AI_MODEL = "openai/gpt-4o";
+    process.env.AI_MODEL = "gpt-5.5";
 
     const mod = await import("../src/lib/ai.js");
 
-    expect(provider).toHaveBeenCalledWith("openai/gpt-4o", {
+    expect(provider).toHaveBeenCalledWith("gpt-5.5", {
       extraBody: { web_search: true },
     });
-    expect(mod.model).toBe("openai/gpt-4o");
+    expect(mod.model).toBe("gpt-5.5");
   });
 
   it("disables web search when WEB_SEARCH=false", async () => {
@@ -59,7 +59,7 @@ describe("ai", () => {
 
     await import("../src/lib/ai.js");
 
-    expect(provider).toHaveBeenCalledWith("anthropic/claude-sonnet-4-6", {});
+    expect(provider).toHaveBeenCalledWith("claude-sonnet-5", {});
   });
 
   it("streams an answer and returns the full stream", async () => {

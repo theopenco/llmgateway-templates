@@ -19,7 +19,7 @@ async function runEmailDrafter(
   tone: string,
 ): Promise<z.infer<typeof emailSchema>> {
   const result = await generateText({
-    model: llmgateway("openai/gpt-4o-mini"),
+    model: llmgateway("gpt-5.4-mini"),
     output: Output.object({ schema: emailSchema }),
     system: `You are an email drafting assistant. Given a set of bullet points or rough notes, draft a polished email.
 

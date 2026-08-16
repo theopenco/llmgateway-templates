@@ -124,7 +124,7 @@ const forecastTool = tool({
 
 async function runWeatherAgent(query: string): Promise<string> {
   const result = await generateText({
-    model: llmgateway("openai/gpt-4o"),
+    model: llmgateway("gpt-5.4"),
     tools: {
       getWeather: weatherTool,
       getForecast: forecastTool,

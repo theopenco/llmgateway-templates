@@ -32,7 +32,7 @@ async function sendToDiscord(message: string): Promise<void> {
 
 async function runLeadAgent(query: string): Promise<string> {
   const result = await generateText({
-    model: llmgateway("perplexity/sonar-pro"),
+    model: llmgateway("sonar-pro"),
     system: `You are a lead research agent. Given a person's name or email address, research them thoroughly using your built-in web search capabilities.
 
 Produce a structured summary with the following sections:

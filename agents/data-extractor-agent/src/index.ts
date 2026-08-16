@@ -24,7 +24,7 @@ async function runDataExtractor(
   text: string,
 ): Promise<z.infer<typeof entitiesSchema>> {
   const result = await generateText({
-    model: llmgateway("openai/gpt-4o-mini"),
+    model: llmgateway("gpt-5.4-mini"),
     output: Output.object({ schema: entitiesSchema }),
     system: `You are a data extraction specialist. Extract all structured entities from the given unstructured text.
 

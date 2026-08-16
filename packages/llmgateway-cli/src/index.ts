@@ -77,7 +77,7 @@ Launcher flags go before the agent name; everything after it is passed to the ag
 
   $ llmgateway launch                          interactive agent picker
   $ llmgateway launch claude                   launch Claude Code on LLM Gateway
-  $ llmgateway launch -m gpt-5.5 claude        ...using GPT-5.5
+  $ llmgateway launch -m gpt-5.6-sol claude    ...using GPT-5.6 Sol
   $ llmgateway launch claude --continue        ...passing --continue to claude
   $ llmgateway opencode                        shortcut, same as launch opencode
 

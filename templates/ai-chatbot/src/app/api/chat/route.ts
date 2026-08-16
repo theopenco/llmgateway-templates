@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   const { messages, model } = await request.json();
 
   const result = streamText({
-    model: llmgateway(model || "openai/gpt-4o-mini"),
+    model: llmgateway(model || "gpt-5.4-mini"),
     system:
       "You are a helpful, friendly assistant. Provide clear and concise answers. Use markdown formatting when appropriate.",
     messages,

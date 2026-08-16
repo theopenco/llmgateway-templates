@@ -11,6 +11,7 @@ A full-stack Next.js app that generates Open Graph images with AI-powered copy v
 ## Features
 
 - AI-generated title, subtitle, and call-to-action copy
+- Searchable model picker ([AI Elements model selector](https://elements.ai-sdk.dev/components/model-selector)) filled live from the LLM Gateway catalog
 - Live OG image preview (1200x630)
 - Three visual themes: gradient, minimal, bold
 - Download as PNG via `next/og` ImageResponse
@@ -107,6 +108,10 @@ Render an OG image as PNG.
 **Query Parameters:** `title`, `subtitle`, `cta`, `theme`, `from`, `to`
 
 **Response:** 1200x630 PNG image.
+
+## Model catalog
+
+The picker is filled at request time from the gateway's public [`/v1/models`](https://api.llmgateway.io/v1/models) catalog (`src/lib/models.ts`, revalidated hourly), so models added to LLM Gateway show up without a code change. Model ids are sent unprefixed (`gemini-3.1-flash-image-preview`) so the gateway [smart-routes](https://docs.llmgateway.io/features/routing) each request to the best available provider — prefix one with a provider id (`google-ai-studio/gemini-3.1-flash-image-preview`) to pin it instead.
 
 ## License
 

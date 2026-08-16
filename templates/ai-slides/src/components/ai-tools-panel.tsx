@@ -12,6 +12,7 @@ import {
   ChevronUp,
   Palette,
 } from "lucide-react";
+import { ModelPicker } from "@/components/model-picker";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -384,56 +385,38 @@ export function AIToolsPanel({
 
           <div className="space-y-1.5">
             <Label className="text-xs">Text Model</Label>
-            <Select value={textModel} onValueChange={onSetTextModel}>
-              <SelectTrigger size="sm" className="text-xs">
-                <SelectValue
-                  placeholder={modelsLoading ? "Loading..." : "Select model"}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {textModels.map((m) => (
-                  <SelectItem key={m.id} value={m.id}>
-                    {m.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <ModelPicker
+              models={textModels}
+              value={textModel}
+              onChange={onSetTextModel}
+              size="sm"
+              className="w-full"
+              placeholder={modelsLoading ? "Loading..." : "Select model"}
+            />
           </div>
 
           <div className="space-y-1.5">
             <Label className="text-xs">Search Model</Label>
-            <Select value={searchModel} onValueChange={onSetSearchModel}>
-              <SelectTrigger size="sm" className="text-xs">
-                <SelectValue
-                  placeholder={modelsLoading ? "Loading..." : "Select model"}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {searchModelList.map((m) => (
-                  <SelectItem key={m.id} value={m.id}>
-                    {m.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <ModelPicker
+              models={searchModelList}
+              value={searchModel}
+              onChange={onSetSearchModel}
+              size="sm"
+              className="w-full"
+              placeholder={modelsLoading ? "Loading..." : "Select model"}
+            />
           </div>
 
           <div className="space-y-1.5">
             <Label className="text-xs">Image Model</Label>
-            <Select value={imageModel} onValueChange={onSetImageModel}>
-              <SelectTrigger size="sm" className="text-xs">
-                <SelectValue
-                  placeholder={modelsLoading ? "Loading..." : "Select model"}
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {imageModels.map((m) => (
-                  <SelectItem key={m.id} value={m.id}>
-                    {m.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <ModelPicker
+              models={imageModels}
+              value={imageModel}
+              onChange={onSetImageModel}
+              size="sm"
+              className="w-full"
+              placeholder={modelsLoading ? "Loading..." : "Select model"}
+            />
           </div>
         </div>
       </ScrollArea>

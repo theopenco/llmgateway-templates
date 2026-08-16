@@ -26,7 +26,7 @@ export async function POST() {
 
   const session = await lg.sessions.create({
     customer: { externalId },
-    scope: { models: ["openai/gpt-4o-mini"] },
+    scope: { models: ["gpt-5.4-mini"] },
     ttlSeconds: 900,
   });
 

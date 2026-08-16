@@ -12,7 +12,7 @@ A full-stack Next.js application for generating images using AI models through L
 
 ## Features
 
-- Dynamic model selection from available LLM Gateway image models
+- Searchable model picker ([AI Elements model selector](https://elements.ai-sdk.dev/components/model-selector)) filled live from the LLM Gateway catalog
 - Real-time image generation with loading states
 - Responsive grid display of generated images
 - Built with modern React 19 and Next.js 16
@@ -99,7 +99,7 @@ Generate an image from a text prompt.
 ```json
 {
   "prompt": "A beautiful sunset over mountains",
-  "model": "google/gemini-2.0-flash-exp-image-generation"
+  "model": "gemini-3.1-flash-image-preview"
 }
 ```
 
@@ -115,7 +115,7 @@ Generate an image from a text prompt.
 
 ### Adding New Models
 
-The app automatically fetches available image models from `@llmgateway/models`. Any model with `outputTypes` including `"image"` will appear in the dropdown.
+The model list is read at request time from the gateway's public [`/v1/models`](https://api.llmgateway.io/v1/models) catalog in `src/lib/models.ts` — any model the gateway serves with `image` output shows up in the picker on its own, no code change or redeploy needed. Adjust `fetchModels()`'s filter there to narrow the list.
 
 ### Styling
 

@@ -11,7 +11,7 @@ import {
 } from "@llmgateway/elements";
 import { useEffect, useState } from "react";
 
-const MODEL = "openai/gpt-4o-mini";
+const MODEL = "gpt-5.4-mini";
 const REPO = "https://github.com/theopenco/llmgateway-templates";
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_LLMGATEWAY_API_URL;
@@ -112,7 +112,12 @@ function Hero() {
           >
             Start free
           </a>
-          <a className="btn btn--ghost" href={REPO} target="_blank" rel="noreferrer">
+          <a
+            className="btn btn--ghost"
+            href={REPO}
+            target="_blank"
+            rel="noreferrer"
+          >
             View the source
           </a>
         </div>
@@ -147,7 +152,8 @@ function Hero() {
           </div>
         </div>
         <p className="hero__demo-note">
-          Real widgets from <code>@llmgateway/elements</code>, running right here.
+          Real widgets from <code>@llmgateway/elements</code>, running right
+          here.
         </p>
       </div>
     </section>
@@ -326,7 +332,7 @@ export async function POST() {
   return Response.json(
     await lg.sessions.create({
       customer: { externalId: user.id },
-      scope: { models: ["openai/gpt-4o-mini"] },
+      scope: { models: ["gpt-5.4-mini"] },
     }),
   );
 }`,
@@ -336,7 +342,7 @@ export async function POST() {
     code: `<LLMGatewayProvider session={session} fetchSession={fetchSession}>
   <CreditBalance label="Balance" />
   <BuyCredits amount={10} />
-  <Chat model="openai/gpt-4o-mini" />
+  <Chat model="gpt-5.4-mini" />
 </LLMGatewayProvider>`,
   },
 ];

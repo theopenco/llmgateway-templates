@@ -14,7 +14,7 @@
   "dependencies": {
     "@chat-adapter/slack": "^4.20.2",
     "@chat-adapter/state-redis": "^4.20.2",
-    "@llmgateway/ai-sdk-provider": "^3.8.0",
+    "@llmgateway/ai-sdk-provider": "^3.8.1",
     "ai": "^6.0.207",
     "chat": "^4.20.2",
     "hono": "^4.12.8"

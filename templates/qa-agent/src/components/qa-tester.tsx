@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback, memo } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import {
   Play,
   Square,
@@ -9,41 +9,11 @@ import {
   CheckCircle2,
   Globe,
   AlertCircle,
-  CheckIcon,
-  ChevronsUpDown,
 } from "lucide-react";
 import { useApiKey } from "@/components/api-key-provider";
+import { ModelPicker } from "@/components/model-picker";
 import { Button } from "@/components/ui/button";
-import {
-  ModelSelector,
-  ModelSelectorContent,
-  ModelSelectorEmpty,
-  ModelSelectorGroup,
-  ModelSelectorInput,
-  ModelSelectorItem,
-  ModelSelectorList,
-  ModelSelectorLogo,
-  ModelSelectorLogoGroup,
-  ModelSelectorName,
-  ModelSelectorTrigger,
-} from "@/components/model-selector";
-
-export type Model = {
-  id: string;
-  name: string;
-  family: string;
-  providers: string[];
-};
-
-const FAMILY_LABELS: Record<string, string> = {
-  openai: "OpenAI",
-  anthropic: "Anthropic",
-  google: "Google",
-  xai: "xAI",
-  meta: "Meta",
-  deepseek: "DeepSeek",
-  mistral: "Mistral",
-};
+import type { Model } from "@/lib/models";
 
 const TOOL_INFO: Record<string, { label: string; badge: string }> = {
   browser_navigate: { label: "Navigate", badge: "navigate" },
@@ -109,40 +79,14 @@ type TextEvent = {
 
 type TimelineEvent = ActionEvent | StatusEvent | TextEvent;
 
-interface ModelItemProps {
-  model: Model;
-  selectedModel: string;
-  onSelect: (id: string) => void;
-}
-
-const ModelItem = memo(({ model, selectedModel, onSelect }: ModelItemProps) => {
-  const handleSelect = useCallback(
-    () => onSelect(model.id),
-    [onSelect, model.id],
-  );
-  return (
-    <ModelSelectorItem onSelect={handleSelect} value={model.id}>
-      <ModelSelectorLogo provider={model.family} />
-      <ModelSelectorName>{model.name}</ModelSelectorName>
-      <ModelSelectorLogoGroup>
-        {model.providers.map((provider) => (
-          <ModelSelectorLogo key={provider} provider={provider} />
-        ))}
-      </ModelSelectorLogoGroup>
-      {selectedModel === model.id ? (
-        <CheckIcon className="ml-auto size-4" />
-      ) : (
-        <div className="ml-auto size-4" />
-      )}
-    </ModelSelectorItem>
-  );
-});
-
-ModelItem.displayName = "ModelItem";
-
-export function QATester({ models }: { models: Model[] }) {
-  const [model, setModel] = useState(models[0]?.id ?? "");
-  const [modelSelectorOpen, setModelSelectorOpen] = useState(false);
+export function QATester({
+  models,
+  defaultModel,
+}: {
+  models: Model[];
+  defaultModel: string;
+}) {
+  const [model, setModel] = useState(defaultModel);
   const [targetUrl, setTargetUrl] = useState("http://localhost:3000");
   const [instruction, setInstruction] = useState("");
   const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
@@ -154,19 +98,9 @@ export function QATester({ models }: { models: Model[] }) {
   const abortRef = useRef<AbortController | null>(null);
   const timelineEndRef = useRef<HTMLDivElement>(null);
 
-  const selectedModel = models.find((m) => m.id === model);
-
-  // Get unique families in order of appearance
-  const families = [...new Set(models.map((m) => m.family))];
-
   useEffect(() => {
     timelineEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [timeline, summary, error]);
-
-  const handleModelSelect = useCallback((id: string) => {
-    setModel(id);
-    setModelSelectorOpen(false);
-  }, []);
 
   const handleRun = useCallback(async () => {
     if (!instruction.trim() || isRunning) return;
@@ -258,45 +192,12 @@ export function QATester({ models }: { models: Model[] }) {
       <header className="flex items-center justify-between border-b border-border px-6 py-3">
         <h1 className="text-lg font-semibold">AI QA Tester</h1>
         <div className="flex items-center gap-3">
-          <ModelSelector
-            open={modelSelectorOpen}
-            onOpenChange={setModelSelectorOpen}
-          >
-            <ModelSelectorTrigger asChild>
-              <Button variant="outline" className="w-[220px] justify-between">
-                {selectedModel && (
-                  <>
-                    <ModelSelectorLogo provider={selectedModel.family} />
-                    <ModelSelectorName>{selectedModel.name}</ModelSelectorName>
-                  </>
-                )}
-                <ChevronsUpDown className="size-3.5 opacity-50" />
-              </Button>
-            </ModelSelectorTrigger>
-            <ModelSelectorContent>
-              <ModelSelectorInput placeholder="Search models..." />
-              <ModelSelectorList>
-                <ModelSelectorEmpty>No models found.</ModelSelectorEmpty>
-                {families.map((family) => (
-                  <ModelSelectorGroup
-                    heading={FAMILY_LABELS[family] ?? family}
-                    key={family}
-                  >
-                    {models
-                      .filter((m) => m.family === family)
-                      .map((m) => (
-                        <ModelItem
-                          key={m.id}
-                          model={m}
-                          onSelect={handleModelSelect}
-                          selectedModel={model}
-                        />
-                      ))}
-                  </ModelSelectorGroup>
-                ))}
-              </ModelSelectorList>
-            </ModelSelectorContent>
-          </ModelSelector>
+          <ModelPicker
+            models={models}
+            value={model}
+            onChange={setModel}
+            className="w-[220px]"
+          />
           <input
             type="url"
             value={targetUrl}

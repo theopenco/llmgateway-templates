@@ -47,7 +47,7 @@ export async function POST(request: Request) {
   const { prompt, model, slideCount } = await request.json();
 
   const result = await generateObject({
-    model: llmgateway(model || "gpt-4o-mini"),
+    model: llmgateway(model || "gpt-5.4-mini"),
     schema: presentationSchema,
     system: `You are an expert presentation designer. Create professional, engaging presentations.
 
