@@ -1,0 +1,3 @@
+kind: nextjs
+build: pnpm --filter @llmgateway-templates/feedback-dashboard build
+out: .next
