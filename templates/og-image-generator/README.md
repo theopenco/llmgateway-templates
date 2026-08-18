@@ -6,7 +6,7 @@ A full-stack Next.js app that generates Open Graph images with AI-powered copy v
 
 [Live Demo](https://llmgateway-templates-og-image-generator-926.meetploy.app)
 
-[![Deploy to Ploy](https://meetploy.com/button.svg)](https://meetploy.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftheopenco%2Fllmgateway-templates&repository-name=llm-og-image-generator&project-name=llm-og-image-generator&ploy-config=templates%2Fog-image-generator%2Fploy.yaml&env=LLMGATEWAY_API_KEY&envDescription=Enter%20the%20LLM%20Gateway%20API%20key%20required%20by%20this%20template.&envLink=https%3A%2F%2Fdocs.llmgateway.io%2Flearn%2Fapi-keys)
+[![Deploy to Ploy](https://meetploy.com/button.svg?v=2)](https://meetploy.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftheopenco%2Fllmgateway-templates&repository-name=llm-og-image-generator&project-name=llm-og-image-generator&ploy-config=templates%2Fog-image-generator%2Fploy.yaml&env=LLMGATEWAY_API_KEY&envDescription=Enter%20the%20LLM%20Gateway%20API%20key%20required%20by%20this%20template.&envLink=https%3A%2F%2Fdocs.llmgateway.io%2Flearn%2Fapi-keys)
 
 ## Features
 
