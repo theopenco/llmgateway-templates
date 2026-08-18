@@ -1,0 +1,3 @@
+kind: nextjs
+build: pnpm --filter @llmgateway-templates/embeddable-credits build
+out: .next

@@ -6,7 +6,7 @@ A full-stack Next.js app for AI-powered customer feedback sentiment analysis usi
 
 [Live Demo](https://llmgateway-templates-feedback-dashboard-189.meetploy.app)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftheopenco%2Fllmgateway-templates&env=LLMGATEWAY_API_KEY&envDescription=Get%20your%20API%20key%20from%20llmgateway.io&envLink=https%3A%2F%2Fllmgateway.io&project-name=llm-feedback-dashboard&repository-name=llm-feedback-dashboard&root-directory=templates/feedback-dashboard)
+[![Deploy to Ploy](https://meetploy.com/button.svg)](https://meetploy.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftheopenco%2Fllmgateway-templates&repository-name=llm-feedback-dashboard&project-name=llm-feedback-dashboard&ploy-config=templates%2Ffeedback-dashboard%2Fploy.yaml&env=LLMGATEWAY_API_KEY&envDescription=Enter%20the%20LLM%20Gateway%20API%20key%20required%20by%20this%20template.&envLink=https%3A%2F%2Fdocs.llmgateway.io%2Flearn%2Fapi-keys)
 
 ## Features
 

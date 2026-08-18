@@ -6,7 +6,7 @@ A full-stack Next.js chatbot with streaming responses using LLM Gateway.
 
 [Live Demo](https://llmgateway-templates-ai-chatbot-108.meetploy.app)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftheopenco%2Fllmgateway-templates&env=LLMGATEWAY_API_KEY&envDescription=Get%20your%20API%20key%20from%20llmgateway.io&envLink=https%3A%2F%2Fllmgateway.io&project-name=llm-ai-chatbot&repository-name=llm-ai-chatbot&root-directory=templates/ai-chatbot)
+[![Deploy to Ploy](https://meetploy.com/button.svg)](https://meetploy.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftheopenco%2Fllmgateway-templates&repository-name=llm-ai-chatbot&project-name=llm-ai-chatbot&ploy-config=templates%2Fai-chatbot%2Fploy.yaml&env=LLMGATEWAY_API_KEY&envDescription=Enter%20the%20LLM%20Gateway%20API%20key%20required%20by%20this%20template.&envLink=https%3A%2F%2Fdocs.llmgateway.io%2Flearn%2Fapi-keys)
 
 ## Features
 

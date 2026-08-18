@@ -5,6 +5,8 @@ templates. It is a fully static Next.js site â€” no API key required to run it â
 designed to be forked and self-hosted, or used as the upstream community
 directory.
 
+[![Deploy to Ploy](https://meetploy.com/button.svg)](https://meetploy.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftheopenco%2Fllmgateway-templates&repository-name=llm-showcase&project-name=llm-showcase&ploy-config=templates%2Fshowcase%2Fploy.yaml)
+
 ```bash
 npx @llmgateway/cli init --template showcase
 ```

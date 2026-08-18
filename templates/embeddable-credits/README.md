@@ -9,6 +9,8 @@ Drop in three React components and one backend route. The landing page is a real
 live demo: it boots a wallet, takes a Stripe top-up, and streams a chat that
 debits the balance.
 
+[![Deploy to Ploy](https://meetploy.com/button.svg)](https://meetploy.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftheopenco%2Fllmgateway-templates&repository-name=llm-embeddable-credits&project-name=llm-embeddable-credits&ploy-config=templates%2Fembeddable-credits%2Fploy.yaml&env=LLMGATEWAY_SECRET_KEY&envDescription=Enter%20the%20LLM%20Gateway%20platform%20secret%20key%20required%20by%20this%20template.&envLink=https%3A%2F%2Fdocs.llmgateway.io%2Flearn%2Fsdk-settings)
+
 ```bash
 npx @llmgateway/cli init --template embeddable-credits
 ```
