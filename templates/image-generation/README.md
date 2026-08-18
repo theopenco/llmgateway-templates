@@ -6,7 +6,7 @@ A full-stack Next.js application for generating images using AI models through L
 
 [Live Demo](https://llmgateway-templates-image-generation-124.meetploy.app)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftheopenco%2Fllmgateway-templates&env=LLMGATEWAY_API_KEY&envDescription=Get%20your%20API%20key%20from%20llmgateway.io&envLink=https%3A%2F%2Fllmgateway.io&project-name=llm-image-generation&repository-name=llm-image-generation&root-directory=templates/image-generation)
+[![Deploy to Ploy](https://meetploy.com/button.svg)](https://meetploy.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftheopenco%2Fllmgateway-templates&repository-name=llm-image-generation&project-name=llm-image-generation&ploy-config=templates%2Fimage-generation%2Fploy.yaml&env=LLMGATEWAY_API_KEY&envDescription=Enter%20the%20LLM%20Gateway%20API%20key%20required%20by%20this%20template.&envLink=https%3A%2F%2Fdocs.llmgateway.io%2Flearn%2Fapi-keys)
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/llm-image-generation?referralCode=llmgateway)
 
@@ -123,10 +123,10 @@ This template uses Tailwind CSS with CSS variables for theming. Customize colors
 
 ## Deployment
 
-### Vercel (Recommended)
+### Ploy (Recommended)
 
-1. Click the "Deploy with Vercel" button above
-2. Add your `LLMGATEWAY_API_KEY` environment variable
+1. Click the "Deploy to Ploy" button above
+2. Enter your `LLMGATEWAY_API_KEY` when prompted
 3. Deploy
 
 ### Railway
