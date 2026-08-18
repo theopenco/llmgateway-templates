@@ -44,10 +44,17 @@ function subscribe(callback: () => void) {
   return () => window.removeEventListener("storage", callback);
 }
 
-export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
+export function ApiKeyProvider({
+  children,
+  hasEnvironmentApiKey,
+}: {
+  children: React.ReactNode;
+  hasEnvironmentApiKey: boolean;
+}) {
   const storedKey = useSyncExternalStore(subscribe, getStoredKey, () => null);
-  const [apiKey, setApiKey] = useState<string | null>(storedKey);
-  const [open, setOpen] = useState(!storedKey);
+  const [savedApiKey, setSavedApiKey] = useState<string | null>(null);
+  const apiKey = savedApiKey ?? (hasEnvironmentApiKey ? null : storedKey);
+  const [openOverride, setOpenOverride] = useState<boolean | null>(null);
   const [input, setInput] = useState("");
 
   // Hydration: SSR returns false, client returns true — no effect needed
@@ -57,25 +64,23 @@ export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
     () => false,
   );
 
+  const open = openOverride ?? (isMounted && !hasEnvironmentApiKey && !apiKey);
+
   const handleSave = useCallback(() => {
     const trimmed = input.trim();
     if (!trimmed) return;
     localStorage.setItem(STORAGE_KEY, trimmed);
-    setApiKey(trimmed);
-    setOpen(false);
+    setSavedApiKey(trimmed);
+    setOpenOverride(false);
   }, [input]);
 
   const handleSkip = useCallback(() => {
-    setOpen(false);
+    setOpenOverride(false);
   }, []);
 
   const handleOpenChange = useCallback(
     (value: boolean) => {
-      if (!value && !apiKey) {
-        setOpen(false);
-        return;
-      }
-      setOpen(value);
+      setOpenOverride(value);
       if (value) {
         setInput(apiKey ?? "");
       }
@@ -95,7 +100,7 @@ export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ApiKeyContext.Provider value={{ apiKey, setOpen }}>
+    <ApiKeyContext.Provider value={{ apiKey, setOpen: handleOpenChange }}>
       {children}
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent showCloseButton={!!apiKey}>
@@ -131,6 +136,11 @@ export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
               >
                 Get one at llmgateway.io
               </a>
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Project owners can set{" "}
+              <code className="font-mono">LLMGATEWAY_API_KEY</code> in the
+              deployment environment so visitors aren&apos;t prompted for a key.
             </p>
           </div>
           <DialogFooter>

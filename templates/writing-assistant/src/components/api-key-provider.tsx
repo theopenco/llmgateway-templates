@@ -4,8 +4,8 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useState,
+  useSyncExternalStore,
 } from "react";
 import { KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 
 const STORAGE_KEY = "llmgateway-api-key";
+const subscribe = () => () => {};
 
 type ApiKeyContextValue = {
   apiKey: string | null;
@@ -34,42 +35,41 @@ export function useApiKey() {
   return useContext(ApiKeyContext);
 }
 
-export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
-  const [apiKey, setApiKey] = useState<string | null>(null);
-  const [open, setOpen] = useState(false);
+export function ApiKeyProvider({
+  children,
+  hasEnvironmentApiKey,
+}: {
+  children: React.ReactNode;
+  hasEnvironmentApiKey: boolean;
+}) {
+  const mounted = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
+  const [savedApiKey, setSavedApiKey] = useState<string | null>(null);
+  const storedApiKey =
+    mounted && !hasEnvironmentApiKey ? localStorage.getItem(STORAGE_KEY) : null;
+  const apiKey = savedApiKey ?? storedApiKey;
+  const [openOverride, setOpenOverride] = useState<boolean | null>(null);
+  const open = openOverride ?? (mounted && !hasEnvironmentApiKey && !apiKey);
   const [input, setInput] = useState("");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      setApiKey(stored);
-    } else {
-      setOpen(true);
-    }
-    setMounted(true);
-  }, []);
 
   const handleSave = useCallback(() => {
     const trimmed = input.trim();
     if (!trimmed) return;
     localStorage.setItem(STORAGE_KEY, trimmed);
-    setApiKey(trimmed);
-    setOpen(false);
+    setSavedApiKey(trimmed);
+    setOpenOverride(false);
   }, [input]);
 
   const handleSkip = useCallback(() => {
-    setOpen(false);
+    setOpenOverride(false);
   }, []);
 
   const handleOpenChange = useCallback(
     (value: boolean) => {
-      if (!value && !apiKey) {
-        // Allow closing even without a key (env-var deployments)
-        setOpen(false);
-        return;
-      }
-      setOpen(value);
+      setOpenOverride(value);
       if (value) {
         setInput(apiKey ?? "");
       }
@@ -80,7 +80,7 @@ export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
   if (!mounted) return null;
 
   return (
-    <ApiKeyContext.Provider value={{ apiKey, setOpen }}>
+    <ApiKeyContext.Provider value={{ apiKey, setOpen: handleOpenChange }}>
       {children}
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent showCloseButton={!!apiKey}>
@@ -116,6 +116,11 @@ export function ApiKeyProvider({ children }: { children: React.ReactNode }) {
               >
                 Get one at llmgateway.io
               </a>
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Project owners can set{" "}
+              <code className="font-mono">LLMGATEWAY_API_KEY</code> in the
+              deployment environment so visitors aren&apos;t prompted for a key.
             </p>
           </div>
           <DialogFooter>
