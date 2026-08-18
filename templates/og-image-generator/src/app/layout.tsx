@@ -12,10 +12,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const hasEnvironmentApiKey = Boolean(process.env.LLMGATEWAY_API_KEY?.trim());
+
   return (
     <html lang="en">
       <body>
-        <ApiKeyProvider>{children}</ApiKeyProvider>
+        <ApiKeyProvider hasEnvironmentApiKey={hasEnvironmentApiKey}>
+          {children}
+        </ApiKeyProvider>
       </body>
     </html>
   );
