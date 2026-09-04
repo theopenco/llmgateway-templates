@@ -1,0 +1,12 @@
+{
+  "id": "company-agent",
+  "label": "Company coding agent",
+  "description": "Our internal OpenAI-compatible agent",
+  "command": "company-agent",
+  "args": ["--model", "${model}"],
+  "defaultModel": "gpt-5.4",
+  "env": {
+    "OPENAI_API_KEY": "${apiKey}",
+    "OPENAI_BASE_URL": "${gatewayUrl}/v1"
+  }
+}

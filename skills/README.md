@@ -22,6 +22,19 @@ Or place it in `~/.claude/skills/` to make it available across every project. Th
 > changelog
 ```
 
+## Organization skills
+
+Organizations can publish a shared catalog in LLM Gateway. Sign in and install an enabled skill into any supported coding agent:
+
+```bash
+npx @llmgateway/cli auth login --sso
+npx @llmgateway/cli skills list --org <org-id>
+npx @llmgateway/cli skills show code-review --org <org-id>
+npx @llmgateway/cli skills add code-review --org <org-id> --agent codex
+```
+
+Use `--all` to install the enabled catalog, `--global` for your home directory, or `--dry-run` to preview paths. Existing directories require `--force` to replace. See the [CLI documentation](../packages/llmgateway-cli/README.md) for publishing and custom agent configuration.
+
 ## Contributing a skill
 
 1. Create a folder under `skills/` named after the skill (kebab-case).

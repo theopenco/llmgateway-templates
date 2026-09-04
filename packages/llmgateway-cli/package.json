@@ -7,13 +7,16 @@
     "llmgateway": "./dist/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "docs",
+    "examples"
   ],
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "test": "tsx --test tests/*.test.ts"
   },
   "keywords": [
     "llm",
@@ -31,32 +34,34 @@
     "directory": "packages/llmgateway-cli"
   },
   "dependencies": {
-    "@llmgateway/models": "^1.251.0",
-    "chalk": "^5.4.1",
+    "@llmgateway/models": "^1.291.0",
+    "chalk": "^5.6.2",
     "commander": "^13.1.0",
-    "degit": "^2.8.4",
-    "fs-extra": "^11.3.0",
-    "open": "^10.1.0",
+    "cross-spawn": "^7.0.6",
+    "degit": "^2.8.6",
+    "fs-extra": "^11.4.0",
+    "open": "^10.2.0",
     "ora": "^8.2.0",
     "prompts": "^2.4.2"
   },
   "devDependencies": {
-    "@eslint/js": "^9.17.0",
+    "@eslint/js": "^9.39.5",
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/exec": "^7.1.0",
-    "@semantic-release/release-notes-generator": "^14.1.0",
+    "@semantic-release/release-notes-generator": "^14.1.1",
+    "@types/cross-spawn": "^6.0.6",
     "@types/degit": "^2.8.6",
     "@types/fs-extra": "^11.0.4",
-    "@types/node": "^22.10.10",
+    "@types/node": "^22.20.1",
     "@types/prompts": "^2.4.9",
-    "eslint": "^9.17.0",
-    "semantic-release": "^25.0.2",
+    "eslint": "^9.39.5",
+    "semantic-release": "^25.0.9",
     "semantic-release-monorepo": "^8.0.2",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.18.0"
+    "tsx": "^4.23.13",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.69.0"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=20.19.0"
   }
 }

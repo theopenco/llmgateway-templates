@@ -1,16 +1,22 @@
-import { spawn } from "child_process";
+import spawn from "cross-spawn";
+import { constants } from "node:os";
 import open from "open";
 import prompts from "prompts";
 import {
-  AGENTS,
-  DEFAULT_GATEWAY_URL,
-  findAgent,
   isAgentInstalled,
   resolveAgentBin,
   type AgentDefinition,
   type LaunchContext,
 } from "../utils/agents.js";
-import { getConfig, setConfig, getEnvApiKey } from "../utils/config.js";
+import {
+  getConfig,
+  setConfig,
+  getEnvApiKey,
+  getGatewayUrl,
+  getDashboardUrl,
+  configFile,
+} from "../utils/config.js";
+import { getAgents } from "../utils/custom-agents.js";
 import { logger, highlight, dim, bold } from "../utils/logger.js";
 
 export interface LaunchOptions {
@@ -19,6 +25,7 @@ export interface LaunchOptions {
   gatewayUrl?: string;
   dryRun?: boolean;
   list?: boolean;
+  checkKey?: boolean;
 }
 
 export async function launch(
@@ -26,22 +33,26 @@ export async function launch(
   passthrough: string[] = [],
   options: LaunchOptions = {},
 ): Promise<void> {
+  const agents = await getAgents();
   if (options.list) {
-    printAgentList();
+    printAgentList(agents);
     return;
   }
 
   let agent: AgentDefinition | undefined;
   if (agentName) {
-    agent = findAgent(agentName);
+    const name = agentName.toLowerCase();
+    agent = agents.find(
+      (entry) => entry.id === name || entry.aliases?.includes(name),
+    );
     if (!agent) {
       logger.error(`Unknown agent: ${agentName}`);
       logger.blank();
-      printAgentList();
+      printAgentList(agents);
       process.exit(1);
     }
   } else {
-    agent = await pickAgent();
+    agent = await pickAgent(agents);
   }
 
   const resolvedBin = resolveAgentBin(agent);
@@ -59,11 +70,7 @@ export async function launch(
     process.exit(1);
   }
 
-  const gatewayUrl = (
-    options.gatewayUrl ??
-    process.env.LLMGATEWAY_GATEWAY_URL ??
-    DEFAULT_GATEWAY_URL
-  ).replace(/\/$/, "");
+  const gatewayUrl = await getGatewayUrl(options.gatewayUrl);
 
   const apiKey = await resolveApiKey(options, gatewayUrl);
 
@@ -90,7 +97,9 @@ export async function launch(
   if (options.dryRun) {
     logger.blank();
     logger.log(bold(`Would launch ${agent.label}:`));
-    logger.log(`  ${highlight([ctx.bin, ...args].join(" "))}`);
+    logger.log(
+      `  ${highlight([ctx.bin, ...args].map((arg) => JSON.stringify(arg.replaceAll(apiKey, "[REDACTED]"))).join(" "))}`,
+    );
     const envKeys = Object.keys(env);
     if (envKeys.length > 0) {
       logger.log(dim(`  env: ${envKeys.join(", ")}`));
@@ -111,32 +120,39 @@ export async function launch(
   );
   logger.blank();
 
-  const child = spawn(ctx.bin, args, {
-    stdio: "inherit",
-    shell: process.platform === "win32",
-    env: { ...process.env, ...env },
-  });
-
-  // Let the agent own Ctrl+C; the launcher exits when the child does.
-  const onSigint = () => {};
-  process.on("SIGINT", onSigint);
-
-  child.on("error", (error) => {
-    logger.error(`Failed to launch ${agent.bin}: ${error.message}`);
-    process.exit(1);
-  });
-
-  child.on("close", (code) => {
-    process.removeListener("SIGINT", onSigint);
-    process.exit(code ?? 0);
+  process.exitCode = await new Promise<number>((resolve, reject) => {
+    const child = spawn(ctx.bin, args, {
+      stdio: "inherit",
+      env: { ...process.env, ...env },
+    });
+    const onSigint = () => {
+      child.kill("SIGINT");
+    };
+    const onSigterm = () => {
+      child.kill("SIGTERM");
+    };
+    process.on("SIGINT", onSigint);
+    process.on("SIGTERM", onSigterm);
+    const cleanup = () => {
+      process.removeListener("SIGINT", onSigint);
+      process.removeListener("SIGTERM", onSigterm);
+    };
+    child.once("error", (error) => {
+      cleanup();
+      reject(new Error(`Failed to launch ${agent.label}: ${error.message}`));
+    });
+    child.once("close", (code, signal) => {
+      cleanup();
+      resolve(code ?? (signal ? 128 + constants.signals[signal] : 1));
+    });
   });
 }
 
-function printAgentList(): void {
+function printAgentList(agents: AgentDefinition[]): void {
   logger.log(bold("Supported coding agents:"));
   logger.blank();
-  const width = Math.max(...AGENTS.map((a) => a.id.length)) + 2;
-  for (const agent of AGENTS) {
+  const width = Math.max(...agents.map((a) => a.id.length)) + 2;
+  for (const agent of agents) {
     const installed = isAgentInstalled(agent);
     const status = installed ? "" : dim(" (not installed)");
     logger.log(`  ${highlight(agent.id.padEnd(width))}${agent.label}${status}`);
@@ -151,8 +167,12 @@ function printAgentList(): void {
   logger.log(dim(`Guides: https://llmgateway.io/guides`));
 }
 
-async function pickAgent(): Promise<AgentDefinition> {
-  const choices = AGENTS.map((agent) => {
+async function pickAgent(agents: AgentDefinition[]): Promise<AgentDefinition> {
+  if (!process.stdin.isTTY)
+    throw new Error(
+      "Specify an agent: llmgateway launch <agent>. Use --list to see choices.",
+    );
+  const choices = agents.map((agent) => {
     const installed = isAgentInstalled(agent);
     return {
       title: installed
@@ -173,7 +193,7 @@ async function pickAgent(): Promise<AgentDefinition> {
   if (!answer.agent) {
     process.exit(1);
   }
-  return findAgent(answer.agent)!;
+  return agents.find((agent) => agent.id === answer.agent)!;
 }
 
 /**
@@ -211,6 +231,7 @@ async function checkApiKey(key: string, gatewayUrl: string): Promise<KeyCheck> {
         max_tokens: 1,
       }),
       signal: controller.signal,
+      redirect: "error",
     });
     if (res.ok) {
       return { status: "valid" };
@@ -250,11 +271,12 @@ async function resolveApiKey(
 ): Promise<string> {
   const config = await getConfig();
   const candidates: KeyCandidate[] = [];
+  const keyUrl = `${await getDashboardUrl()}/dashboard/api-keys`;
   if (options.key) {
     candidates.push({
       key: options.key,
       source: "the --key flag",
-      fixHint: "Pass a key from https://llmgateway.io/dashboard/api-keys",
+      fixHint: `Pass a key from ${keyUrl}`,
     });
   }
   const envKey = getEnvApiKey();
@@ -269,7 +291,7 @@ async function resolveApiKey(
   if (config.apiKey) {
     candidates.push({
       key: config.apiKey,
-      source: "~/.llmgateway/config.json",
+      source: configFile(),
       fixHint: "Run `llmgateway auth login --key` to store a fresh key",
     });
   }
@@ -278,6 +300,9 @@ async function resolveApiKey(
     // Keep --dry-run offline-safe: report what would be used, skip the probe.
     return candidates[0]?.key ?? "llmgtwy_dry_run_placeholder";
   }
+
+  // Launching should not incur an inference charge just to inspect credentials.
+  if (!options.checkKey && candidates.length > 0) return candidates[0].key;
 
   for (const candidate of candidates) {
     const check = await checkApiKey(candidate.key, gatewayUrl);
@@ -302,7 +327,9 @@ async function resolveApiKey(
           `The API key from ${candidate.source} is invalid: ${check.message ?? "the gateway rejected it"}`,
         );
         logger.log(dim(`  Fix: ${candidate.fixHint}`));
-        break;
+        throw new Error(
+          "The selected API key was rejected. Update it before launching.",
+        );
     }
   }
 
@@ -324,8 +351,8 @@ async function resolveApiKey(
   logger.log("Opening the dashboard so you can create one...");
   logger.blank();
 
-  await open("https://llmgateway.io/dashboard/api-keys").catch(() => {
-    logger.log(dim("Get a key at https://llmgateway.io/dashboard/api-keys"));
+  await open(keyUrl).catch(() => {
+    logger.log(dim(`Get a key at ${keyUrl}`));
   });
 
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -338,7 +365,9 @@ async function resolveApiKey(
       logger.error("No API key provided.");
       process.exit(1);
     }
-    const check = await checkApiKey(response.apiKey, gatewayUrl);
+    const check: KeyCheck = options.checkKey
+      ? await checkApiKey(response.apiKey, gatewayUrl)
+      : { status: "unknown" };
     if (check.status === "invalid") {
       logger.error(
         `That key was rejected: ${check.message ?? "the gateway could not find it"}`,
@@ -349,7 +378,7 @@ async function resolveApiKey(
       logger.warn(`Heads-up from the gateway: ${check.message}`);
     }
     await setConfig({ apiKey: response.apiKey });
-    logger.success("API key saved to ~/.llmgateway/config.json");
+    logger.success(`API key saved to ${configFile()}`);
     logger.blank();
     return response.apiKey;
   }

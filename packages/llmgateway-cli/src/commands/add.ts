@@ -21,7 +21,7 @@ import { z } from "zod";
 
 export const weatherTool = tool({
   description: "Get the current weather for a location",
-  parameters: z.object({
+  inputSchema: z.object({
     location: z.string().describe("The city and country, e.g., 'London, UK'"),
   }),
   execute: async ({ location }) => {
@@ -49,7 +49,7 @@ import { z } from "zod";
 
 export const searchTool = tool({
   description: "Search the web for information",
-  parameters: z.object({
+  inputSchema: z.object({
     query: z.string().describe("The search query"),
     limit: z.number().optional().default(5).describe("Number of results to return"),
   }),
@@ -78,7 +78,7 @@ import { z } from "zod";
 
 export const calculatorTool = tool({
   description: "Perform mathematical calculations",
-  parameters: z.object({
+  inputSchema: z.object({
     expression: z.string().describe("The mathematical expression to evaluate, e.g., '2 + 2 * 3'"),
   }),
   execute: async ({ expression }) => {
@@ -111,14 +111,18 @@ import { NextResponse } from "next/server";
 
 const llmgateway = createLLMGateway({
   apiKey: process.env.LLMGATEWAY_API_KEY,
+  baseURL: process.env.LLMGATEWAY_GATEWAY_URL
+    ? process.env.LLMGATEWAY_GATEWAY_URL.replace(/\\/+$/, "") + "/v1"
+    : undefined,
 });
 
 export async function POST(request: Request) {
-  const { prompt, model = "openai/gpt-4o" } = await request.json();
+  const { prompt, model = "gpt-5.4-mini" } = await request.json();
 
   const result = await generateText({
     model: llmgateway(model),
     prompt,
+    abortSignal: request.signal,
   });
 
   return NextResponse.json({ text: result.text });
@@ -134,21 +138,25 @@ export async function POST(request: Request) {
       {
         path: "src/app/api/chat/route.ts",
         content: `import { createLLMGateway } from "@llmgateway/ai-sdk-provider";
-import { streamText } from "ai";
+import { streamText, convertToModelMessages, validateUIMessages } from "ai";
 
 const llmgateway = createLLMGateway({
   apiKey: process.env.LLMGATEWAY_API_KEY,
+  baseURL: process.env.LLMGATEWAY_GATEWAY_URL
+    ? process.env.LLMGATEWAY_GATEWAY_URL.replace(/\\/+$/, "") + "/v1"
+    : undefined,
 });
 
 export async function POST(request: Request) {
-  const { messages, model = "openai/gpt-4o" } = await request.json();
+  const { messages, model = "gpt-5.4-mini" } = await request.json();
 
   const result = streamText({
     model: llmgateway(model),
-    messages,
+    messages: await convertToModelMessages(await validateUIMessages({ messages })),
+    abortSignal: request.signal,
   });
 
-  return result.toDataStreamResponse();
+  return result.toUIMessageStreamResponse();
 }
 `,
       },
@@ -179,6 +187,12 @@ export async function add(type?: string, name?: string): Promise<void> {
     }
 
     itemType = response.type;
+  }
+
+  if (itemType !== "tool" && itemType !== "route") {
+    throw new Error(
+      `Unknown item type: ${itemType}. Use tool or route. For organization skills, use llmgateway skills add.`,
+    );
   }
 
   const items = itemType === "tool" ? TOOLS : ROUTES;

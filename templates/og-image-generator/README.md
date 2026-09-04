@@ -116,3 +116,7 @@ The picker is filled at request time from the gateway's public [`/v1/models`](ht
 ## License
 
 MIT
+
+## Enterprise deployments
+
+Set `LLMGATEWAY_GATEWAY_URL` to your inference gateway URL (without `/v1`) in `.env.local`. Keep API keys in server-side environment variables.

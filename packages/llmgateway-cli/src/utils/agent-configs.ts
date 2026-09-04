@@ -2,6 +2,7 @@ import { models, providers, type ModelDefinition } from "@llmgateway/models";
 import fs from "fs-extra";
 import os from "os";
 import path from "path";
+import { writePrivateJson } from "./config.js";
 
 // The package publishes `models` as a giant literal tuple, where optional
 // fields only type-exist on the entries that set them — widen to the
@@ -20,7 +21,11 @@ export async function readJsonConfig(
     return undefined;
   }
   try {
-    return await fs.readJson(file);
+    const config: unknown = await fs.readJson(file);
+    if (!config || typeof config !== "object" || Array.isArray(config)) {
+      throw new Error("Expected an object");
+    }
+    return config as AgentConfig;
   } catch {
     throw new Error(
       `${file} exists but is not valid JSON. Fix or remove it, then retry.`,
@@ -173,13 +178,22 @@ export interface OpencodeSyncResult {
  * opencode also reads `opencode.jsonc` and merges both files, so a
  * hand-written jsonc config keeps working next to this generated one.
  */
-export async function syncOpencodeModelCatalog(): Promise<OpencodeSyncResult> {
+export async function syncOpencodeModelCatalog(
+  gatewayUrl?: string,
+): Promise<OpencodeSyncResult> {
   const file = opencodeGlobalConfigFile();
   const config = (await readJsonConfig(file)) ?? {
     $schema: "https://opencode.ai/config.json",
   };
   config.provider ??= {};
   config.provider.llmgateway ??= {};
+  const previousUrl = config.provider.llmgateway.options?.baseURL;
+  if (gatewayUrl) {
+    config.provider.llmgateway.options = {
+      ...config.provider.llmgateway.options,
+      baseURL: `${gatewayUrl}/v1`,
+    };
+  }
   const modelMap: Record<string, AgentConfig> =
     (config.provider.llmgateway.models ??= {});
 
@@ -197,9 +211,12 @@ export async function syncOpencodeModelCatalog(): Promise<OpencodeSyncResult> {
     }
   }
 
-  if (added > 0 || updated > 0) {
-    await fs.ensureDir(path.dirname(file));
-    await fs.writeJson(file, config, { spaces: 2 });
+  if (
+    added > 0 ||
+    updated > 0 ||
+    (gatewayUrl && previousUrl !== `${gatewayUrl}/v1`)
+  ) {
+    await writePrivateJson(file, config);
   }
   return { file, total: Object.keys(entries).length, added, updated };
 }
@@ -238,8 +255,7 @@ export async function writeClaudeGatewaySettings(
     ANTHROPIC_AUTH_TOKEN: options.apiKey,
     CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY: "1",
   };
-  await fs.ensureDir(path.dirname(file));
-  await fs.writeJson(file, settings, { spaces: 2, mode: 0o600 });
+  await writePrivateJson(file, settings);
   return { file };
 }
 

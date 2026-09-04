@@ -35,6 +35,20 @@ import { dev } from "./commands/dev.js";
 import { upgrade } from "./commands/upgrade.js";
 import { docs } from "./commands/docs.js";
 import { add } from "./commands/add.js";
+import {
+  agentsList,
+  agentsAdd,
+  agentsShow,
+  agentsRemove,
+} from "./commands/agents.js";
+import { logger } from "./utils/logger.js";
+import { orgsUse } from "./commands/orgs.js";
+import {
+  skillsList,
+  skillsShow,
+  skillsAdd,
+  skillsPublish,
+} from "./commands/skills.js";
 
 const require = createRequire(import.meta.url);
 const pkg = require("../package.json");
@@ -60,6 +74,10 @@ const launchOptions = (cmd: Command): Command =>
       "Gateway base URL (default: https://api.llmgateway.io)",
     )
     .option("--dry-run", "Show what would run without launching")
+    .option(
+      "--check-key",
+      "Verify credentials with a one-token inference request (may incur a charge)",
+    )
     .passThroughOptions()
     .allowUnknownOption();
 
@@ -84,6 +102,62 @@ Launcher flags go before the agent name; everything after it is passed to the ag
 Agents: ${AGENTS.map((a) => a.id).join(", ")}`,
     ),
 ).action((agent, args, opts) => launch(agent, args, opts));
+
+const agentsCommand = program
+  .command("agents")
+  .description("List coding agents and register custom launchers");
+agentsCommand
+  .command("list")
+  .alias("ls")
+  .option("--json", "Output as JSON")
+  .action(agentsList);
+agentsCommand
+  .command("add <file>")
+  .description("Register a trusted JSON agent definition")
+  .option("--force", "Replace an existing custom agent")
+  .action(agentsAdd);
+agentsCommand
+  .command("show <id>")
+  .description("Export a custom agent as JSON")
+  .action(agentsShow);
+agentsCommand
+  .command("remove <id>")
+  .description("Remove a registered custom agent")
+  .action(agentsRemove);
+
+const skillsCommand = program
+  .command("skills")
+  .description("Browse and install your organization's shared skills");
+skillsCommand
+  .command("list")
+  .alias("ls")
+  .option("--org <id>", "Organization ID")
+  .option("--json", "Output as JSON")
+  .action(skillsList);
+skillsCommand
+  .command("show <skill>")
+  .option("--org <id>", "Organization ID")
+  .option("--json", "Output as JSON")
+  .action(skillsShow);
+skillsCommand
+  .command("add [skills...]")
+  .alias("install")
+  .option("--org <id>", "Organization ID")
+  .option("--all", "Install all enabled skills")
+  .option(
+    "--agent <agent>",
+    "Skill target: agents, codex, claude, opencode, cursor, qwen, pi",
+    "agents",
+  )
+  .option("--global", "Install in your home directory instead of this project")
+  .option("--force", "Replace existing skill files")
+  .option("--dry-run", "Preview without creating files")
+  .action(skillsAdd);
+skillsCommand
+  .command("publish <file>")
+  .description("Publish a SKILL.md file (organization admins and owners)")
+  .option("--org <id>", "Organization ID")
+  .action(skillsPublish);
 
 // hidden per-agent shortcuts: `llmgateway claude`, `llmgateway opencode`, ...
 for (const agent of AGENTS) {
@@ -137,6 +211,8 @@ program
     "Template to use (default: image-generation)",
   )
   .option("-n, --name <name>", "Project name")
+  .option("--no-install", "Create files without installing dependencies")
+  .option("--ref <ref>", "Template Git branch, tag, or commit", "main")
   .action(init);
 
 // list command
@@ -167,7 +243,24 @@ const authCommand = program
 
 authCommand
   .command("login")
-  .description("Sign in with email & password, or store an API key")
+  .description("Sign in in your browser (including SSO), or store an API key")
+  .option(
+    "--sso [email]",
+    "Open enterprise SSO, optionally prefilling your work email",
+  )
+  .option(
+    "--no-browser",
+    "Print the verification URL without opening a browser",
+  )
+  .option("--api-url <url>", "Management API URL for a self-hosted deployment")
+  .option("--dashboard-url <url>", "Dashboard URL for browser approval")
+  .option("--gateway-url <url>", "Save the inference gateway URL")
+  .option("--org <id>", "Select an organization after signing in")
+  .option(
+    "--timeout <seconds>",
+    "Browser approval timeout (1–1800 seconds)",
+    "600",
+  )
   .option("--email [email]", "Sign in with email & password")
   .option("--key", "Store a gateway API key instead of signing in")
   .action(withApiErrors(authLogin));
@@ -306,6 +399,10 @@ usageCommand
 
 // orgs command
 const orgsCommand = program.command("orgs").description("Manage organizations");
+orgsCommand
+  .command("use <id>")
+  .description("Select the default organization")
+  .action(orgsUse);
 
 orgsCommand
   .command("list")
@@ -366,4 +463,7 @@ program
   .description("Add tools, components, or routes to your project")
   .action(add);
 
-program.parse();
+program.parseAsync().catch((error: unknown) => {
+  logger.error(error instanceof Error ? error.message : "Command failed.");
+  process.exitCode = 1;
+});

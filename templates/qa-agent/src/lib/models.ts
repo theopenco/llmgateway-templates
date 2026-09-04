@@ -11,7 +11,7 @@
  * @see https://docs.llmgateway.io/features/routing
  */
 
-export const MODELS_URL = "https://api.llmgateway.io/v1/models";
+export const MODELS_URL = `${(process.env.LLMGATEWAY_GATEWAY_URL || "https://api.llmgateway.io").replace(/\/+$/, "")}/v1/models`;
 
 /** How long a fetched catalog is cached before Next.js revalidates it. */
 export const MODELS_REVALIDATE_SECONDS = 3600;

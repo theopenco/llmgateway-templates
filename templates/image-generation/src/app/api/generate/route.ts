@@ -6,7 +6,12 @@ export async function POST(request: Request) {
     const apiKey =
       request.headers.get("x-api-key") || process.env.LLMGATEWAY_API_KEY;
 
-    const llmgateway = createLLMGateway({ apiKey });
+    const llmgateway = createLLMGateway({
+      apiKey,
+      baseURL: process.env.LLMGATEWAY_GATEWAY_URL
+        ? `${process.env.LLMGATEWAY_GATEWAY_URL.replace(/\/+$/, "")}/v1`
+        : undefined,
+    });
 
     const { prompt, model } = await request.json();
 

@@ -3,6 +3,9 @@ import { generateText, tool, stepCountIs } from "ai";
 import { z } from "zod";
 
 const llmgateway = createLLMGateway({
+  baseURL: process.env.LLMGATEWAY_GATEWAY_URL
+    ? `${process.env.LLMGATEWAY_GATEWAY_URL.replace(/\/+$/, "")}/v1`
+    : undefined,
   apiKey: process.env.LLMGATEWAY_API_KEY,
 });
 
@@ -124,7 +127,7 @@ const forecastTool = tool({
 
 async function runWeatherAgent(query: string): Promise<string> {
   const result = await generateText({
-    model: llmgateway("gpt-5.4"),
+    model: llmgateway(process.env.LLMGATEWAY_MODEL || "gpt-5.4"),
     tools: {
       getWeather: weatherTool,
       getForecast: forecastTool,
@@ -160,4 +163,7 @@ async function main() {
   }
 }
 
-main().catch(console.error);
+main().catch((error: unknown) => {
+  console.error(error instanceof Error ? error.message : error);
+  process.exitCode = 1;
+});
