@@ -2,6 +2,7 @@ import { logger, highlight, dim, bold } from "../utils/logger.js";
 import {
   listOrganizations,
   listProjects,
+  resolveOrgId,
   type Organization,
 } from "../utils/api.js";
 import { getConfig, setConfig } from "../utils/config.js";
@@ -9,6 +10,16 @@ import { formatUSD, renderTable } from "../utils/format.js";
 
 interface JsonOption {
   json?: boolean;
+}
+
+export async function orgsUse(id: string): Promise<void> {
+  const orgId = await resolveOrgId(id);
+  const config = await getConfig();
+  await setConfig({
+    defaultOrgId: orgId,
+    ...(config.defaultOrgId !== orgId ? { defaultProjectId: undefined } : {}),
+  });
+  logger.success(`Default organization set to ${orgId}.`);
 }
 
 export async function orgsList(options: JsonOption): Promise<void> {

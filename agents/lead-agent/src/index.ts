@@ -2,6 +2,9 @@ import { createLLMGateway } from "@llmgateway/ai-sdk-provider";
 import { generateText } from "ai";
 
 const llmgateway = createLLMGateway({
+  baseURL: process.env.LLMGATEWAY_GATEWAY_URL
+    ? `${process.env.LLMGATEWAY_GATEWAY_URL.replace(/\/+$/, "")}/v1`
+    : undefined,
   apiKey: process.env.LLMGATEWAY_API_KEY,
 });
 
@@ -32,7 +35,7 @@ async function sendToDiscord(message: string): Promise<void> {
 
 async function runLeadAgent(query: string): Promise<string> {
   const result = await generateText({
-    model: llmgateway("sonar-pro"),
+    model: llmgateway(process.env.LLMGATEWAY_MODEL || "sonar-pro"),
     system: `You are a lead research agent. Given a person's name or email address, research them thoroughly using your built-in web search capabilities.
 
 Produce a structured summary with the following sections:
@@ -65,4 +68,7 @@ async function main() {
   await sendToDiscord(response);
 }
 
-main().catch(console.error);
+main().catch((error: unknown) => {
+  console.error(error instanceof Error ? error.message : error);
+  process.exitCode = 1;
+});

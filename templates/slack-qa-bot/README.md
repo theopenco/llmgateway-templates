@@ -198,3 +198,7 @@ export const bot = new Chat({
 ```
 
 Then extend the `/api/webhooks/:platform` route in `src/index.ts` to dispatch to the new adapter's handler. See the [Chat SDK adapter docs](https://chat-sdk.dev/adapters) for the full list of supported platforms.
+
+## Enterprise deployments
+
+Set `LLMGATEWAY_GATEWAY_URL` to your inference gateway URL (without `/v1`) in `.env.local`. Keep API keys in server-side environment variables.

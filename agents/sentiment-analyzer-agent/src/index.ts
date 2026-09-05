@@ -4,6 +4,9 @@ import { z } from "zod";
 import { readFileSync, existsSync } from "node:fs";
 
 const llmgateway = createLLMGateway({
+  baseURL: process.env.LLMGATEWAY_GATEWAY_URL
+    ? `${process.env.LLMGATEWAY_GATEWAY_URL.replace(/\/+$/, "")}/v1`
+    : undefined,
   apiKey: process.env.LLMGATEWAY_API_KEY,
 });
 
@@ -28,7 +31,7 @@ async function runSentimentAnalyzer(
   text: string,
 ): Promise<z.infer<typeof sentimentSchema>> {
   const result = await generateText({
-    model: llmgateway("gpt-5.4-mini"),
+    model: llmgateway(process.env.LLMGATEWAY_MODEL || "gpt-5.4-mini"),
     output: Output.object({ schema: sentimentSchema }),
     system: `You are a sentiment analysis expert. Analyze the given text and determine its sentiment.
 
@@ -88,4 +91,7 @@ async function main() {
   console.log("\n" + "=".repeat(50));
 }
 
-main().catch(console.error);
+main().catch((error: unknown) => {
+  console.error(error instanceof Error ? error.message : error);
+  process.exitCode = 1;
+});

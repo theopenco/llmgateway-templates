@@ -50,6 +50,9 @@ async function sendToDiscord(message: string): Promise<void> {
 }
 
 const llmgateway = createLLMGateway({
+  baseURL: process.env.LLMGATEWAY_GATEWAY_URL
+    ? `${process.env.LLMGATEWAY_GATEWAY_URL.replace(/\/+$/, "")}/v1`
+    : undefined,
   apiKey: process.env.LLMGATEWAY_API_KEY,
 });
 
@@ -137,7 +140,7 @@ async function runChangelogAgent(range?: string): Promise<string> {
     : "Generate a changelog for the most recent commits in this repository.";
 
   const result = await generateText({
-    model: llmgateway("gpt-5.4-mini"),
+    model: llmgateway(process.env.LLMGATEWAY_MODEL || "gpt-5.4-mini"),
     tools: {
       getGitLog: getGitLogTool,
       getGitDiff: getGitDiffTool,
@@ -177,4 +180,7 @@ async function main() {
   await sendToDiscord(response);
 }
 
-main().catch(console.error);
+main().catch((error: unknown) => {
+  console.error(error instanceof Error ? error.message : error);
+  process.exitCode = 1;
+});

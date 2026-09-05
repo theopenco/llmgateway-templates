@@ -26,7 +26,12 @@ const webSearchEnabled = process.env.WEB_SEARCH !== "false";
  * LLM Gateway provider. Reads `LLM_GATEWAY_API_KEY` (and optional
  * `LLM_GATEWAY_API_BASE`) from the environment automatically.
  */
-export const gateway = createLLMGateway();
+export const gateway = createLLMGateway({
+  apiKey: process.env.LLMGATEWAY_API_KEY ?? process.env.LLM_GATEWAY_API_KEY,
+  baseURL: process.env.LLMGATEWAY_GATEWAY_URL
+    ? `${process.env.LLMGATEWAY_GATEWAY_URL.replace(/\/+$/, "")}/v1`
+    : undefined,
+});
 
 export const model = process.env.AI_MODEL ?? DEFAULT_MODEL;
 

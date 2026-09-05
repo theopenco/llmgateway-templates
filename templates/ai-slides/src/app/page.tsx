@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { nanoid } from "nanoid";
 import {
   Download,
@@ -57,26 +57,16 @@ export default function SlidesPage() {
   const [presentation, setPresentation] =
     useState<Presentation>(defaultPresentation);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [textModel, setTextModel] = useState(DEFAULT_TEXT_MODEL);
-  const [imageModel, setImageModel] = useState(DEFAULT_IMAGE_MODEL);
-  const [searchModel, setSearchModel] = useState(DEFAULT_SEARCH_MODEL);
+  const [selectedTextModel, setTextModel] = useState(DEFAULT_TEXT_MODEL);
+  const [selectedImageModel, setImageModel] = useState(DEFAULT_IMAGE_MODEL);
+  const [selectedSearchModel, setSearchModel] = useState(DEFAULT_SEARCH_MODEL);
 
-  // Fall back to the first available model if the gateway stopped serving the
-  // default one.
-  useEffect(() => {
-    setTextModel((current) => pickDefaultModel(textModels, current));
-  }, [textModels]);
-  useEffect(() => {
-    setImageModel((current) => pickDefaultModel(imageModels, current));
-  }, [imageModels]);
-  useEffect(() => {
-    setSearchModel((current) =>
-      pickDefaultModel(
-        searchModels.length > 0 ? searchModels : textModels,
-        current,
-      ),
-    );
-  }, [searchModels, textModels]);
+  const textModel = pickDefaultModel(textModels, selectedTextModel);
+  const imageModel = pickDefaultModel(imageModels, selectedImageModel);
+  const searchModel = pickDefaultModel(
+    searchModels.length > 0 ? searchModels : textModels,
+    selectedSearchModel,
+  );
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [isResearching, setIsResearching] = useState(false);
@@ -253,7 +243,7 @@ export default function SlidesPage() {
         setIsGeneratingImage(false);
       }
     },
-    [headers, imageModel, currentIndex, currentSlide?.layout, updateSlide],
+    [headers, imageModel, currentIndex, currentSlide, updateSlide],
   );
 
   const handleEnhanceSlide = useCallback(

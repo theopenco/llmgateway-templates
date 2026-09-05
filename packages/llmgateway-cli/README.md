@@ -1,6 +1,8 @@
 # @llmgateway/cli
 
-CLI tool for scaffolding LLM Gateway templates and managing AI projects.
+Scaffold 16 AI projects, sign in through your browser or enterprise SSO, install organization skills, and launch coding agents with LLM Gateway.
+
+Requires Node.js 20.19+ (Node.js 22 or later recommended).
 
 ## Installation
 
@@ -30,7 +32,7 @@ npx @llmgateway/cli launch soulforge
 npx @llmgateway/cli launch codex
 
 # Pick a model — launcher flags go before the agent name
-npx @llmgateway/cli launch -m gpt-5.5 claude
+npx @llmgateway/cli launch -m gpt-5.4 claude
 
 # Everything after the agent name is passed to the agent itself
 npx @llmgateway/cli launch claude --continue
@@ -46,6 +48,9 @@ Supported agents and how they're configured:
 
 | Agent         | Launch                    | Configuration                                                                                                                |
 | ------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Aider         | `llmgateway aider`        | OpenAI-compatible provider, explicit model and gateway URL                                                                   |
+| Qwen Code     | `llmgateway qwen`         | OpenAI authentication, explicit model and gateway URL                                                                        |
+| Goose         | `llmgateway goose`        | OpenAI provider, model and host environment                                                                                  |
 | DevPass Code  | `llmgateway devpass-code` | First-party agent — key refreshed in its `auth.json` + `LLMGATEWAY_API_KEY`                                                  |
 | Claude Code   | `llmgateway claude`       | `ANTHROPIC_BASE_URL` + `ANTHROPIC_AUTH_TOKEN` env vars + gateway model discovery, so `/model` lists the gateway catalog      |
 | OpenCode      | `llmgateway opencode`     | Built-in `llmgateway` provider — key refreshed in its `auth.json`, provider-pinned model catalog synced into `opencode.json` |
@@ -54,13 +59,16 @@ Supported agents and how they're configured:
 | Codex CLI     | `llmgateway codex`        | Per-session `-c` provider overrides (no config file changes)                                                                 |
 | Autohand Code | `llmgateway autohand`     | `OPENAI_BASE_URL` + `OPENAI_API_KEY` env vars                                                                                |
 | Pi            | `llmgateway pi`           | Adds an `llmgateway` provider to `~/.pi/agent/models.json`                                                                   |
-| Kimi Code     | `llmgateway kimi`         | Adds an `llmgateway` provider to `~/.kimi-code/config.toml`                                                                  |
+| Kimi Code     | `llmgateway kimi`         | Temporary `KIMI_MODEL_*` environment; picks up rotated keys each launch                                                      |
 | MiMo Code     | `llmgateway mimo`         | Routes the provider through the gateway in `mimocode.json`                                                                   |
 | OpenClaw      | `llmgateway openclaw`     | Adds an `llmgateway` provider to `~/.openclaw/openclaw.json`                                                                 |
-| Hermes Agent  | `llmgateway hermes`       | Runs `hermes setup` with gateway values on first launch                                                                      |
+| Hermes Agent  | `llmgateway hermes`       | Selects the native `llmgateway` provider and requested model                                                                 |
 
-The API key is resolved from `--key`, the `LLMGATEWAY_API_KEY` environment variable, or the key stored by `llmgateway auth login --key` — in that order. Before launching, the key is verified against the gateway; a stale key (e.g. one you rolled or deleted) is reported with its exact source and the launcher falls back to the next valid one, prompting you for a fresh key if none works. If an agent isn't installed, the launcher prints its official install command and exits.
+The API key is resolved from `--key`, `LLMGATEWAY_API_KEY`, or the key stored by `auth login --key`, in that order. Launching makes no inference request until the agent runs. Use `--check-key` to opt into a one-token credential check, which can incur a charge. A rejected selected key stops the launch. Missing agents produce installation instructions; the launcher never installs them automatically.
 
+Use `--gateway-url https://gateway.example.com` before the agent name for a private deployment. OpenCode and DevPass receive runtime endpoint overrides, and file-based integrations refresh their gateway configuration on launch. Empryo, SoulForge, and Hermes use their native hosted provider; for a private endpoint, register a custom launcher using that agent's enterprise configuration. Hermes requires a version with the native `llmgateway` provider.
+
+`--dry-run` is offline, redacts the selected key, and does not change agent files. Child exit codes and termination signals propagate to your shell.
 See the [integration guides](https://llmgateway.io/guides) for per-agent details.
 
 ### `configure` - Generate agent configs with the gateway's models
@@ -141,32 +149,88 @@ npx @llmgateway/cli add route generate
 npx @llmgateway/cli add route chat
 ```
 
-### `auth` - Authentication
-
-Two kinds of credentials:
-
-- **Dashboard session** (email & password) — required for `keys`, `budget`, `usage`, `orgs`, `projects`, and `credits`.
-- **API key** — used by scaffolded apps to call the gateway itself.
+### `auth` - Browser and SSO authentication
 
 ```bash
-# Sign in (interactive — pick email & password or API key)
-npx @llmgateway/cli auth login
+# Open your browser, sign in, compare the code, and approve
+llmgateway auth login
 
-# Sign in with email & password directly
-npx @llmgateway/cli auth login --email you@example.com
+# Go directly to your organization's SSO sign-in
+llmgateway auth login --sso you@example.com
 
-# Store a gateway API key (opens browser)
-npx @llmgateway/cli auth login --key
+# Remote terminal: display a link and code without opening a browser
+llmgateway auth login --no-browser --timeout 600
 
-# Check authentication status / current user
-npx @llmgateway/cli auth status
-npx @llmgateway/cli auth whoami
+# Private deployment: configure all three service URLs
+llmgateway auth login --sso \
+  --api-url https://management.example.com \
+  --dashboard-url https://dashboard.example.com \
+  --gateway-url https://gateway.example.com
 
-# Logout (removes session and stored key)
-npx @llmgateway/cli auth logout
+llmgateway auth status
+llmgateway auth whoami
+llmgateway auth logout
+
+# Compatibility with deployments that do not have device authorization
+llmgateway auth login --email you@example.com
+llmgateway auth login --key
 ```
 
-> Signed up with GitHub or Google? Set a password in the dashboard settings first.
+Browser sign-in uses the dashboard's existing login methods, including SSO. Approve only the code shown in your own terminal. The CLI polls for its own session; browser URLs contain no session token. `--sso` optionally accepts a work email and uses the configured dashboard's SSO page. Login expires after ten minutes by default; Ctrl-C cancels without saving credentials.
+
+The management API needs Better Auth device authorization and bearer support, and the dashboard needs `/connect/device`. See [the deployment contract](./docs/enterprise.md). Older deployments get an explicit compatibility error. Email/password sign-in remains subject to organization SSO enforcement.
+
+A dashboard session manages organizations, keys, and skills. Running inference or launching a coding agent also needs a project API key: create one with `llmgateway keys create`, store one with `auth login --key`, or export `LLMGATEWAY_API_KEY`. API keys do not replace dashboard sessions for management commands. Logout revokes the CLI session when reachable and clears local credentials, while retaining deployment URLs and registered custom agents.
+
+### `skills` - Organization skills
+
+```bash
+llmgateway orgs list
+llmgateway orgs use <org-id>
+llmgateway skills list --json
+llmgateway skills show code-review
+llmgateway skills add code-review --agent claude
+llmgateway skills add --all --agent codex --dry-run
+llmgateway skills add --all --agent codex
+llmgateway skills add code-review --global --agent opencode
+llmgateway skills publish ./SKILL.md --org <org-id>
+```
+
+`--org` accepts an organization ID or an unambiguous name. The selected organization is checked against your current memberships. A single organization is selected automatically; scripts with multiple organizations must pass `--org` or set a default.
+
+Skills come from the organization's enabled catalog, including their supporting files. The default installation target is `.agents/skills/<name>/SKILL.md`. Supported targets are `agents`, `codex`, `claude`, `opencode`, `cursor`, `qwen`, and `pi`; `--global` uses the agent's home-directory location. Review a skill with `show` before installing it. Installation writes files; it does not execute skill scripts.
+
+Existing skill directories are preserved unless you pass `--force`, which replaces the entire selected skill bundle. Disabled skills, unsafe paths, symlink destinations, duplicate filenames, and bundles over 1 MiB are rejected before installation. `--all` downloads enabled skills in the selected organization only. Publishing a single `SKILL.md` requires an enterprise organization and an owner/admin role; use the dashboard to manage supporting files and existing versions.
+
+### `agents` - Custom coding agents
+
+Register an executable and its arguments from a trusted JSON file:
+
+```json
+{
+  "id": "company-agent",
+  "label": "Company coding agent",
+  "description": "Our internal OpenAI-compatible agent",
+  "command": "company-agent",
+  "args": ["--model", "${model}"],
+  "defaultModel": "gpt-5.4",
+  "env": {
+    "OPENAI_API_KEY": "${apiKey}",
+    "OPENAI_BASE_URL": "${gatewayUrl}/v1"
+  }
+}
+```
+
+```bash
+llmgateway agents add ./company-agent.json
+llmgateway agents list --json
+llmgateway launch --dry-run company-agent
+llmgateway launch -m your-model company-agent --resume
+llmgateway agents show company-agent > shared-agent.json
+llmgateway agents remove company-agent
+```
+
+Definitions support `${model}`, `${gatewayUrl}`, and `${apiKey}`. Credentials are allowed only in environment values; arguments are passed literally without a shell. `command` must be an executable name or absolute path, not a shell command line. Definitions cannot replace built-in agents. Use `agents add --force` to replace an existing custom definition. Registration is explicit and stores definitions in your CLI configuration directory; repository files are never executed automatically. The [example definition](./examples/company-agent.json) can be distributed through your enterprise's normal configuration tooling.
 
 ### `keys` - Manage API keys
 
@@ -245,6 +309,7 @@ npx @llmgateway/cli usage sources --project <projectId>
 ```bash
 # List organizations (id, plan, credits)
 npx @llmgateway/cli orgs list
+npx @llmgateway/cli orgs use <orgId>
 
 # List projects, set a default for keys/usage commands
 npx @llmgateway/cli projects list
@@ -285,10 +350,16 @@ npx @llmgateway/cli docs sdk
 
 ## Available Templates
 
-| Template           | Description                                               | Type  |
-| ------------------ | --------------------------------------------------------- | ----- |
-| `image-generation` | Full-stack AI image generation app (Next.js 16, React 19) | Web   |
-| `weather-agent`    | CLI agent that answers weather queries using tools        | Agent |
+Web templates: `ai-chatbot`, `ai-slides`, `image-generation`, `og-image-generator`, `feedback-dashboard`, `writing-assistant`, `qa-agent`, `slack-qa-bot`, `embeddable-credits`, and `showcase`.
+
+CLI agents: `weather-agent`, `lead-agent`, `changelog-generator-agent`, `email-drafter-agent`, `sentiment-analyzer-agent`, and `data-extractor-agent`.
+
+```bash
+# Reproducible scaffolding from a reviewed Git ref, without installing
+llmgateway init my-app --template ai-chatbot --ref main --no-install
+```
+
+All templates include a README and standalone dependency versions. AI templates use AI SDK 6 and accept `LLMGATEWAY_GATEWAY_URL` for private inference endpoints. CLI agent templates also accept `LLMGATEWAY_MODEL`.
 
 ## Configuration
 
@@ -304,10 +375,17 @@ The CLI stores configuration in `~/.llmgateway/config.json`:
 }
 ```
 
-Environment variables take precedence over the config file:
+Deployment environment variables override stored settings; an explicit launch `--gateway-url` overrides its environment default. URLs must use HTTPS, except local loopback development servers.
 
-- `LLMGATEWAY_API_KEY` - Your LLM Gateway API key
-- `LLMGATEWAY_API_URL` - Management API base URL (defaults to `https://internal.llmgateway.io`; use `http://localhost:4002` for local dev)
+| Variable                 | Purpose                                  | Default                          |
+| ------------------------ | ---------------------------------------- | -------------------------------- |
+| `LLMGATEWAY_API_KEY`     | Project inference key                    | Stored key                       |
+| `LLMGATEWAY_API_URL`     | Management API and authentication        | `https://internal.llmgateway.io` |
+| `LLMGATEWAY_ORIGIN_URL`  | Dashboard and SSO origin                 | `https://llmgateway.io`          |
+| `LLMGATEWAY_GATEWAY_URL` | Inference gateway root, without `/v1`    | `https://api.llmgateway.io`      |
+| `LLMGATEWAY_CONFIG_DIR`  | Configuration and custom agent directory | `~/.llmgateway`                  |
+
+Session credentials are bound to the management instance that issued them and are not forwarded after an API URL change. Logging into a different account or instance clears stored project defaults and the stored inference key. For separate simultaneous deployments, use separate `LLMGATEWAY_CONFIG_DIR` directories. Credentials are stored with owner-only file permissions on POSIX systems. For email/key compatibility login, set deployment URLs through environment variables.
 
 ## License
 

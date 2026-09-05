@@ -150,3 +150,7 @@ Set the `LLMGATEWAY_API_KEY` environment variable in your hosting platform.
 ## License
 
 MIT
+
+## Enterprise deployments
+
+Set `LLMGATEWAY_GATEWAY_URL` to your inference gateway URL (without `/v1`) in `.env.local`. Keep API keys in server-side environment variables.

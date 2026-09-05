@@ -7,8 +7,7 @@ import {
   syncOpencodeModelCatalog,
   writeClaudeGatewaySettings,
 } from "../utils/agent-configs.js";
-import { DEFAULT_GATEWAY_URL } from "../utils/agents.js";
-import { getConfig, getEnvApiKey } from "../utils/config.js";
+import { getConfig, getEnvApiKey, getGatewayUrl } from "../utils/config.js";
 import { logger, highlight, dim, bold } from "../utils/logger.js";
 
 export interface ConfigureOptions {
@@ -76,6 +75,8 @@ export async function configure(
 }
 
 async function pickAgent(): Promise<ConfigurableId> {
+  if (!process.stdin.isTTY)
+    throw new Error("Specify an agent to configure: claude or opencode.");
   const answer = await prompts({
     type: "select",
     name: "agent",
@@ -109,7 +110,9 @@ async function configureOpencode(options: ConfigureOptions): Promise<void> {
     return;
   }
 
-  const result = await syncOpencodeModelCatalog();
+  const result = await syncOpencodeModelCatalog(
+    await getGatewayUrl(options.gatewayUrl),
+  );
   logger.success(
     `Synced ${result.total} provider-pinned gateway models into ${result.file}`,
   );
@@ -134,11 +137,7 @@ async function configureOpencode(options: ConfigureOptions): Promise<void> {
 }
 
 async function configureClaude(options: ConfigureOptions): Promise<void> {
-  const gatewayUrl = (
-    options.gatewayUrl ??
-    process.env.LLMGATEWAY_GATEWAY_URL ??
-    DEFAULT_GATEWAY_URL
-  ).replace(/\/$/, "");
+  const gatewayUrl = await getGatewayUrl(options.gatewayUrl);
   const scope = options.project ? "project" : "user";
 
   const apiKey = options.key ?? getEnvApiKey() ?? (await getConfig()).apiKey;

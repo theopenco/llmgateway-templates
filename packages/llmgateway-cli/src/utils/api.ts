@@ -1,6 +1,11 @@
 import prompts from "prompts";
-import { logger, highlight, dim } from "./logger.js";
-import { getApiUrl, getConfig } from "./config.js";
+import { logger } from "./logger.js";
+import {
+  getApiUrl,
+  getConfig,
+  getDashboardUrl,
+  sessionHeaders,
+} from "./config.js";
 
 export class ApiError extends Error {
   constructor(
@@ -22,14 +27,17 @@ interface RequestOptions {
  * Node's fetch sends `Origin: null` on POST, which Better Auth's CSRF
  * check rejects — so we send the matching dashboard origin instead.
  */
-function getTrustedOrigin(apiUrl: string): string {
+async function getTrustedOrigin(apiUrl: string): Promise<string> {
   if (process.env.LLMGATEWAY_ORIGIN_URL) {
-    return process.env.LLMGATEWAY_ORIGIN_URL;
+    return new URL(await getDashboardUrl()).origin;
   }
-  if (apiUrl.includes("localhost") || apiUrl.includes("127.0.0.1")) {
+  if (
+    ["localhost", "127.0.0.1", "[::1]"].includes(new URL(apiUrl).hostname) &&
+    !(await getConfig()).dashboardUrl
+  ) {
     return "http://localhost:3002";
   }
-  return "https://llmgateway.io";
+  return new URL(await getDashboardUrl()).origin;
 }
 
 async function extractErrorMessage(response: Response): Promise<string> {
@@ -51,21 +59,13 @@ export async function apiRequest<T>(
   path: string,
   options: RequestOptions = {},
 ): Promise<T> {
-  const config = await getConfig();
+  const headers = await sessionHeaders();
 
-  if (!config.sessionCookie) {
-    logger.error("Not signed in to LLM Gateway.");
-    logger.log(
-      dim(
-        `Run ${highlight("llmgateway auth login")} and sign in with email & password.`,
-      ),
+  if (Object.keys(headers).length === 0) {
+    throw new ApiError(
+      401,
+      "Not signed in. Run `llmgateway auth login` to authenticate in your browser.",
     );
-    logger.log(
-      dim(
-        "Key management and usage commands need a dashboard session (an API key is not enough).",
-      ),
-    );
-    process.exit(1);
   }
 
   const apiUrl = await getApiUrl();
@@ -79,26 +79,29 @@ export async function apiRequest<T>(
   const response = await fetch(url, {
     method: options.method ?? "GET",
     headers: {
-      Cookie: config.sessionCookie,
-      Origin: getTrustedOrigin(apiUrl),
+      ...headers,
+      Origin: await getTrustedOrigin(apiUrl),
       ...(options.body ? { "Content-Type": "application/json" } : {}),
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
+    redirect: "error",
+    signal: AbortSignal.timeout(30000),
   });
 
   if (response.status === 401) {
-    logger.error("Session expired or invalid.");
-    logger.log(
-      dim(`Run ${highlight("llmgateway auth login")} to sign in again.`),
+    throw new ApiError(
+      401,
+      "Session expired or invalid. Run `llmgateway auth login` to sign in again.",
     );
-    process.exit(1);
   }
 
   if (!response.ok) {
     throw new ApiError(response.status, await extractErrorMessage(response));
   }
 
-  return (await response.json()) as T;
+  return response.status === 204
+    ? (undefined as T)
+    : ((await response.json()) as T);
 }
 
 /**
@@ -114,9 +117,11 @@ export async function signInWithEmail(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Origin: getTrustedOrigin(apiUrl),
+      Origin: await getTrustedOrigin(apiUrl),
     },
     body: JSON.stringify({ email, password }),
+    redirect: "error",
+    signal: AbortSignal.timeout(30000),
   });
 
   if (!response.ok) {
@@ -150,19 +155,21 @@ export async function getSessionUser(): Promise<{
   email: string;
   name?: string | null;
 } | null> {
-  const config = await getConfig();
-  if (!config.sessionCookie) {
+  const headers = await sessionHeaders();
+  if (Object.keys(headers).length === 0) {
     return null;
   }
 
   const apiUrl = await getApiUrl();
   const response = await fetch(`${apiUrl}/auth/get-session`, {
-    headers: { Cookie: config.sessionCookie },
+    headers,
+    redirect: "error",
+    signal: AbortSignal.timeout(30000),
   });
 
-  if (!response.ok) {
-    return null;
-  }
+  if (response.status === 401) return null;
+  if (!response.ok)
+    throw new ApiError(response.status, await extractErrorMessage(response));
 
   const data = (await response.json()) as {
     user?: { email: string; name?: string | null };
@@ -193,9 +200,34 @@ export async function listOrganizations(): Promise<Organization[]> {
 
 export async function listProjects(orgId: string): Promise<Project[]> {
   const data = await apiRequest<{ projects: Project[] }>(
-    `/orgs/${orgId}/projects`,
+    `/orgs/${encodeURIComponent(orgId)}/projects`,
   );
   return data.projects;
+}
+
+export async function resolveOrgId(explicit?: string): Promise<string> {
+  const id = explicit ?? (await getConfig()).defaultOrgId;
+  const orgs = await listOrganizations();
+  if (id) {
+    const matches = orgs.filter((org) => org.id === id || org.name === id);
+    if (matches.length !== 1)
+      throw new Error(
+        `Organization "${id}" was not found or is ambiguous. Use its ID.`,
+      );
+    return matches[0].id;
+  }
+  if (orgs.length === 1) return orgs[0].id;
+  if (!process.stdin.isTTY)
+    throw new Error("Specify --org <id> or run `llmgateway orgs use <id>`.");
+  if (!orgs.length) throw new Error("No organizations found for this account.");
+  const answer = await prompts({
+    type: "select",
+    name: "org",
+    message: "Select an organization:",
+    choices: orgs.map((org) => ({ title: org.name, value: org.id })),
+  });
+  if (!answer.org) throw new Error("Organization selection cancelled.");
+  return answer.org;
 }
 
 /**
@@ -222,28 +254,7 @@ export async function resolveProjectId(
     process.exit(1);
   }
 
-  const orgs = await listOrganizations();
-  if (orgs.length === 0) {
-    logger.error("No organizations found for this account.");
-    process.exit(1);
-  }
-
-  let orgId = orgs[0].id;
-  if (orgs.length > 1) {
-    const orgAnswer = await prompts({
-      type: "select",
-      name: "orgId",
-      message: "Select an organization:",
-      choices: orgs.map((org) => ({
-        title: `${org.name} ${org.isPersonal ? "(personal)" : ""}`.trim(),
-        value: org.id,
-      })),
-    });
-    if (!orgAnswer.orgId) {
-      process.exit(1);
-    }
-    orgId = orgAnswer.orgId;
-  }
+  const orgId = await resolveOrgId();
 
   const projects = await listProjects(orgId);
   if (projects.length === 0) {
@@ -254,6 +265,10 @@ export async function resolveProjectId(
     return projects[0].id;
   }
 
+  if (!process.stdin.isTTY)
+    throw new Error(
+      "Specify --project <id> or set a default with llmgateway projects use <id>.",
+    );
   const projectAnswer = await prompts({
     type: "select",
     name: "projectId",

@@ -161,3 +161,7 @@ If `DISCORD_WEBHOOK_URL` is not set, the agent will still output the summary to 
 ## License
 
 MIT
+
+## Enterprise deployments
+
+Set `LLMGATEWAY_GATEWAY_URL` to your inference gateway URL (without `/v1`) in `.env.local`. Set `LLMGATEWAY_MODEL` to use a model allowed by your organization. Keep API keys in server-side environment variables.

@@ -3,16 +3,35 @@ import open from "open";
 import { logger, highlight, dim, bold } from "../utils/logger.js";
 import {
   getConfig,
+  configFile,
   setConfig,
   clearConfig,
   getEnvApiKey,
+  getApiUrl,
+  getDashboardUrl,
+  normalizeUrl,
+  sessionHeaders,
+  type Config,
 } from "../utils/config.js";
-import { signInWithEmail, getSessionUser, ApiError } from "../utils/api.js";
+import {
+  signInWithEmail,
+  getSessionUser,
+  ApiError,
+  resolveOrgId,
+} from "../utils/api.js";
+import { deviceLogin, verificationUrl } from "../utils/device-auth.js";
 
 interface LoginOptions {
   key?: boolean;
   /** --email may be a bare flag (true) or carry a value */
   email?: string | boolean;
+  sso?: string | boolean;
+  browser?: boolean;
+  apiUrl?: string;
+  dashboardUrl?: string;
+  gatewayUrl?: string;
+  org?: string;
+  timeout?: string;
 }
 
 export async function authLogin(options: LoginOptions = {}): Promise<void> {
@@ -20,47 +39,140 @@ export async function authLogin(options: LoginOptions = {}): Promise<void> {
   logger.log(bold("LLM Gateway Authentication"));
   logger.blank();
 
-  let method: "email" | "key" | undefined = options.key
-    ? "key"
-    : options.email !== undefined
-      ? "email"
-      : undefined;
-
-  if (!method) {
-    const answer = await prompts({
-      type: "select",
-      name: "method",
-      message: "How do you want to authenticate?",
-      choices: [
-        {
-          title: "Email & password",
-          description:
-            "Full access: manage API keys, budgets, and usage analytics",
-          value: "email",
-        },
-        {
-          title: "Paste an API key",
-          description: "Gateway requests only (chat, completions, images)",
-          value: "key",
-        },
-      ],
-    });
-    if (!answer.method) {
-      process.exit(1);
-    }
-    method = answer.method;
+  if (
+    [
+      options.key,
+      options.email !== undefined,
+      options.sso !== undefined,
+    ].filter(Boolean).length > 1
+  ) {
+    throw new Error("Choose one login method: browser/SSO, --email, or --key.");
   }
-
-  if (method === "email") {
+  if (
+    (options.key || options.email !== undefined) &&
+    (options.apiUrl || options.dashboardUrl || options.gatewayUrl)
+  ) {
+    throw new Error(
+      "For --email or --key, configure deployment URLs using LLMGATEWAY_API_URL, LLMGATEWAY_ORIGIN_URL and LLMGATEWAY_GATEWAY_URL.",
+    );
+  }
+  if (options.email !== undefined) {
     await loginWithEmail(
       typeof options.email === "string" ? options.email : undefined,
     );
-  } else {
+  } else if (options.key) {
     await loginWithApiKey();
+  } else {
+    await loginWithBrowser(options);
+  }
+  if (options.org)
+    await setConfig({
+      defaultOrgId: await resolveOrgId(options.org),
+      defaultProjectId: undefined,
+    });
+}
+
+async function saveSession(updates: Partial<Config>): Promise<void> {
+  const current = await getConfig();
+  const changedAccount =
+    current.sessionEmail !== updates.sessionEmail ||
+    current.sessionApiUrl !== updates.sessionApiUrl;
+  await setConfig({
+    ...(changedAccount
+      ? {
+          defaultOrgId: undefined,
+          defaultProjectId: undefined,
+          apiKey: undefined,
+        }
+      : {}),
+    sessionCookie: undefined,
+    sessionToken: undefined,
+    ...updates,
+  });
+}
+
+async function loginWithBrowser(options: LoginOptions): Promise<void> {
+  const apiUrl = normalizeUrl(options.apiUrl ?? (await getApiUrl()));
+  const dashboardUrl = normalizeUrl(
+    options.dashboardUrl ?? (await getDashboardUrl()),
+  );
+  if (
+    options.apiUrl &&
+    process.env.LLMGATEWAY_API_URL &&
+    normalizeUrl(process.env.LLMGATEWAY_API_URL) !== apiUrl
+  ) {
+    throw new Error(
+      "--api-url conflicts with LLMGATEWAY_API_URL. Update or unset the environment override first.",
+    );
+  }
+  const gatewayUrl = options.gatewayUrl
+    ? normalizeUrl(options.gatewayUrl)
+    : undefined;
+  const timeoutMs =
+    options.timeout === undefined ? undefined : Number(options.timeout) * 1000;
+  const controller = new AbortController();
+  const cancel = () =>
+    controller.abort(new Error("Login cancelled. No credentials were saved."));
+  process.once("SIGINT", cancel);
+  process.once("SIGTERM", cancel);
+  try {
+    const token = await deviceLogin({
+      apiUrl,
+      dashboardUrl,
+      timeoutMs,
+      signal: controller.signal,
+      onCode: async (code) => {
+        const url = verificationUrl(code, dashboardUrl, options.sso);
+        logger.log(`Open ${highlight(url)}`);
+        logger.log(
+          `Confirm this code in your browser: ${bold(code.user_code)}`,
+        );
+        if (options.browser !== false) {
+          await open(url).catch(() =>
+            logger.warn(
+              "Could not open a browser. Open the URL above on a device where you can sign in.",
+            ),
+          );
+        }
+        logger.log(dim("Waiting for browser approval…"));
+      },
+    });
+    const response = await fetch(`${apiUrl}/auth/get-session`, {
+      headers: { Authorization: `Bearer ${token}` },
+      redirect: "error",
+      signal: AbortSignal.any([controller.signal, AbortSignal.timeout(30000)]),
+    });
+    if (!response.ok)
+      throw new Error(
+        "The browser session could not be verified. No credentials were saved.",
+      );
+    const session = (await response.json()) as {
+      user?: { email?: string };
+    } | null;
+    if (!session?.user?.email)
+      throw new Error(
+        "The browser session did not include a user. No credentials were saved.",
+      );
+    await saveSession({
+      sessionToken: token,
+      sessionEmail: session.user.email,
+      sessionApiUrl: apiUrl,
+      apiUrl,
+      dashboardUrl,
+      ...(gatewayUrl ? { gatewayUrl } : {}),
+    });
+    logger.success(`Signed in as ${highlight(session.user.email)}.`);
+  } finally {
+    process.removeListener("SIGINT", cancel);
+    process.removeListener("SIGTERM", cancel);
   }
 }
 
 async function loginWithEmail(presetEmail?: string): Promise<void> {
+  if (!process.stdin.isTTY)
+    throw new Error(
+      "Email/password login needs an interactive terminal. Use `auth login --no-browser` for browser authentication from a remote terminal.",
+    );
   const answers = await prompts([
     {
       type: presetEmail ? null : "text",
@@ -83,11 +195,15 @@ async function loginWithEmail(presetEmail?: string): Promise<void> {
 
   try {
     const { cookie, user } = await signInWithEmail(email, answers.password);
-    await setConfig({ sessionCookie: cookie, sessionEmail: user.email });
+    await saveSession({
+      sessionCookie: cookie,
+      sessionEmail: user.email,
+      sessionApiUrl: await getApiUrl(),
+    });
 
     logger.blank();
     logger.success(`Signed in as ${highlight(user.email)}`);
-    logger.log(dim("Session stored in ~/.llmgateway/config.json"));
+    logger.log(dim(`Session stored in ${configFile()}`));
     logger.blank();
     logger.log(dim("You can now use:"));
     logger.log(
@@ -106,7 +222,7 @@ async function loginWithEmail(presetEmail?: string): Promise<void> {
       if (error.status === 401 || error.status === 403) {
         logger.log(
           dim(
-            "If you signed up with GitHub/Google, set a password first at https://llmgateway.io/dashboard/settings",
+            "Use `llmgateway auth login` for browser login, or `llmgateway auth login --sso` if your organization requires SSO.",
           ),
         );
       }
@@ -117,6 +233,10 @@ async function loginWithEmail(presetEmail?: string): Promise<void> {
 }
 
 async function loginWithApiKey(): Promise<void> {
+  if (!process.stdin.isTTY)
+    throw new Error(
+      "Storing an API key needs an interactive terminal. Set LLMGATEWAY_API_KEY for unattended launches.",
+    );
   // Check if already configured via env
   const envKey = getEnvApiKey();
   if (envKey) {
@@ -134,7 +254,10 @@ async function loginWithApiKey(): Promise<void> {
   logger.log("Opening LLM Gateway dashboard to get your API key...");
   logger.blank();
 
-  await open("https://llmgateway.io/dashboard/api-keys");
+  const keyUrl = `${await getDashboardUrl()}/dashboard/api-keys`;
+  await open(keyUrl).catch(() =>
+    logger.log(`Open ${keyUrl} to get your API key.`),
+  );
 
   const response = await prompts({
     type: "password",
@@ -151,7 +274,7 @@ async function loginWithApiKey(): Promise<void> {
 
   logger.blank();
   logger.success("API key saved successfully!");
-  logger.log(dim(`Stored in ~/.llmgateway/config.json`));
+  logger.log(dim(`Stored in ${configFile()}`));
   logger.blank();
 }
 
@@ -162,7 +285,7 @@ export async function authStatus(): Promise<void> {
   const config = await getConfig();
 
   // Dashboard session
-  if (config.sessionCookie) {
+  if (config.sessionCookie || config.sessionToken) {
     const user = await getSessionUser();
     if (user) {
       logger.success(
@@ -226,8 +349,35 @@ export async function authLogout(): Promise<void> {
     logger.blank();
   }
 
-  await clearConfig();
-  logger.success("Logged out successfully. Config file removed.");
+  try {
+    const headers = await sessionHeaders();
+    if (Object.keys(headers).length) {
+      const response = await fetch(`${await getApiUrl()}/auth/sign-out`, {
+        method: "POST",
+        headers: {
+          ...headers,
+          Origin: new URL(await getDashboardUrl()).origin,
+          "Content-Type": "application/json",
+        },
+        body: "{}",
+        redirect: "error",
+        signal: AbortSignal.timeout(10000),
+      });
+      if (!response.ok)
+        logger.warn(
+          "Could not revoke the remote session. Local credentials will still be removed.",
+        );
+    }
+  } catch {
+    logger.warn(
+      "Could not reach the session's server. Local credentials will still be removed.",
+    );
+  } finally {
+    await clearConfig();
+  }
+  logger.success(
+    "Logged out. Stored credentials removed; deployment settings and custom agents retained.",
+  );
   logger.blank();
 }
 

@@ -3,9 +3,18 @@ export interface Template {
   description: string;
   category: "web" | "agent" | "bot";
   path: string;
+  /** Published equivalents for dependencies that are workspace links in this repo. */
+  standaloneDependencies?: Record<string, string>;
 }
 
 export const templates: Template[] = [
+  {
+    name: "ai-slides",
+    description:
+      "AI presentation builder with research, images, charts, and PowerPoint export",
+    category: "web",
+    path: "templates/ai-slides",
+  },
   {
     name: "image-generation",
     description: "Full-stack AI image generation app (Next.js 16, React 19)",
@@ -48,6 +57,11 @@ export const templates: Template[] = [
       'Monetize your AI app in 5 minutes — end-user wallets ("Stripe for AI")',
     category: "web",
     path: "templates/embeddable-credits",
+    standaloneDependencies: {
+      "@llmgateway/client": "^1.1.1",
+      "@llmgateway/server": "^1.1.1",
+      "@llmgateway/elements": "^1.3.0",
+    },
   },
   {
     name: "showcase",

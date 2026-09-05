@@ -3,6 +3,9 @@ import { generateText, Output } from "ai";
 import { z } from "zod";
 
 const llmgateway = createLLMGateway({
+  baseURL: process.env.LLMGATEWAY_GATEWAY_URL
+    ? `${process.env.LLMGATEWAY_GATEWAY_URL.replace(/\/+$/, "")}/v1`
+    : undefined,
   apiKey: process.env.LLMGATEWAY_API_KEY,
 });
 
@@ -24,7 +27,7 @@ async function runDataExtractor(
   text: string,
 ): Promise<z.infer<typeof entitiesSchema>> {
   const result = await generateText({
-    model: llmgateway("gpt-5.4-mini"),
+    model: llmgateway(process.env.LLMGATEWAY_MODEL || "gpt-5.4-mini"),
     output: Output.object({ schema: entitiesSchema }),
     system: `You are a data extraction specialist. Extract all structured entities from the given unstructured text.
 
@@ -94,4 +97,7 @@ async function main() {
   console.log("\n" + "=".repeat(50));
 }
 
-main().catch(console.error);
+main().catch((error: unknown) => {
+  console.error(error instanceof Error ? error.message : error);
+  process.exitCode = 1;
+});

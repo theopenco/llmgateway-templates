@@ -40,7 +40,12 @@ export async function POST(request: Request) {
     return Response.json({ error: "API key required" }, { status: 401 });
   }
 
-  const llmgateway = createLLMGateway({ apiKey });
+  const llmgateway = createLLMGateway({
+    apiKey,
+    baseURL: process.env.LLMGATEWAY_GATEWAY_URL
+      ? `${process.env.LLMGATEWAY_GATEWAY_URL.replace(/\/+$/, "")}/v1`
+      : undefined,
+  });
   const { prompt, model, searchModel } = await request.json();
 
   // Step 1: Research real data using a search model

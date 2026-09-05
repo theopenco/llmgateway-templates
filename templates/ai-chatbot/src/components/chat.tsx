@@ -1,7 +1,8 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { DefaultChatTransport } from "ai";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Bot, KeyRound, Send, Trash2, User } from "lucide-react";
 import { useApiKey } from "@/components/api-key-provider";
 import { ModelPicker } from "@/components/model-picker";
@@ -21,24 +22,23 @@ export function Chat({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { apiKey, setOpen: setApiKeyOpen } = useApiKey();
 
-  const headers = useMemo(
-    () => (apiKey ? { "x-api-key": apiKey } : undefined),
-    [apiKey],
-  );
-
-  const {
-    messages,
-    input,
-    handleInputChange,
-    handleSubmit,
-    isLoading,
-    setMessages,
-  } = useChat({
-    api: "/api/chat",
-    body: { model },
-    headers,
-    streamProtocol: "text",
+  const [input, setInput] = useState("");
+  const { messages, sendMessage, status, error, setMessages } = useChat({
+    transport: new DefaultChatTransport({ api: "/api/chat" }),
   });
+  const isLoading = status === "submitted" || status === "streaming";
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!input.trim() || isLoading) return;
+    void sendMessage(
+      { text: input },
+      {
+        body: { model },
+        headers: apiKey ? { "x-api-key": apiKey } : undefined,
+      },
+    );
+    setInput("");
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -145,10 +145,18 @@ export function Chat({
       </div>
 
       <div className="border-t border-border px-4 py-4">
+        {error && (
+          <p
+            role="alert"
+            className="mx-auto mb-3 max-w-3xl text-sm text-destructive"
+          >
+            The response failed. Check your API key and model, then try again.
+          </p>
+        )}
         <form onSubmit={handleSubmit} className="mx-auto flex max-w-3xl gap-3">
           <input
             value={input}
-            onChange={handleInputChange}
+            onChange={(event) => setInput(event.target.value)}
             placeholder="Type a message..."
             className="flex-1 rounded-md border border-input bg-secondary px-4 py-2 text-sm outline-none placeholder:text-muted-foreground focus:border-ring"
             disabled={isLoading}

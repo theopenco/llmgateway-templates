@@ -164,7 +164,12 @@ export async function POST(request: Request) {
 
   const { instruction, model, targetUrl } = await request.json();
 
-  const llmgateway = createLLMGateway({ apiKey });
+  const llmgateway = createLLMGateway({
+    apiKey,
+    baseURL: process.env.LLMGATEWAY_GATEWAY_URL
+      ? `${process.env.LLMGATEWAY_GATEWAY_URL.replace(/\/+$/, "")}/v1`
+      : undefined,
+  });
   const encoder = new TextEncoder();
 
   const browser = new BrowserManager();

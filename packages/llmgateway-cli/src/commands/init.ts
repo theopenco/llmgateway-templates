@@ -5,6 +5,7 @@ import prompts from "prompts";
 import ora from "ora";
 import { exec } from "child_process";
 import { promisify } from "util";
+import { standaloneManifest } from "../utils/scaffold.js";
 import { logger, highlight, bold, dim } from "../utils/logger.js";
 import {
   templates,
@@ -23,12 +24,25 @@ const execAsync = promisify(exec);
 interface InitOptions {
   template?: string;
   name?: string;
+  install?: boolean;
+  ref?: string;
 }
 
 export async function init(
   directory: string | undefined,
   options: InitOptions,
 ): Promise<void> {
+  const ref = options.ref ?? "main";
+  if (!/^[a-zA-Z0-9][a-zA-Z0-9._/-]*$/.test(ref) || ref.includes(".."))
+    throw new Error("Invalid Git ref.");
+  if (
+    !process.stdin.isTTY &&
+    (!options.template || (!directory && !options.name))
+  ) {
+    throw new Error(
+      "Non-interactive scaffolding requires --template and a directory or --name.",
+    );
+  }
   let templateName = options.template;
   let projectName = options.name;
   let targetDir = directory;
@@ -92,6 +106,10 @@ export async function init(
   if (await fs.pathExists(fullPath)) {
     const files = await fs.readdir(fullPath);
     if (files.length > 0) {
+      if (!process.stdin.isTTY)
+        throw new Error(
+          `Directory ${targetDir} is not empty. Choose an empty directory.`,
+        );
       const response = await prompts({
         type: "confirm",
         name: "overwrite",
@@ -112,7 +130,7 @@ export async function init(
   ).start();
 
   try {
-    const emitter = degit(`${REPO}/${template.path}`, {
+    const emitter = degit(`${REPO}/${template.path}#${ref}`, {
       cache: false,
       force: true,
     });
@@ -130,13 +148,12 @@ export async function init(
   // Update package.json with project name
   const packageJsonPath = path.join(fullPath, "package.json");
   if (await fs.pathExists(packageJsonPath)) {
-    try {
-      const packageJson = await fs.readJson(packageJsonPath);
-      packageJson.name = projectName || path.basename(fullPath);
-      await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
-    } catch {
-      // Ignore errors updating package.json
-    }
+    const packageJson = standaloneManifest(
+      await fs.readJson(packageJsonPath),
+      template,
+      projectName || path.basename(fullPath),
+    );
+    await fs.writeJson(packageJsonPath, packageJson, { spaces: 2 });
   }
 
   // Copy .env.example to .env.local if it exists
@@ -147,20 +164,23 @@ export async function init(
     !(await fs.pathExists(envLocalPath))
   ) {
     await fs.copy(envExamplePath, envLocalPath);
+    await fs.chmod(envLocalPath, 0o600);
     logger.success("Created .env.local from .env.example");
   }
 
   // Detect package manager and install dependencies
   const pm = detectPackageManager(process.cwd());
-  const installSpinner = ora(`Installing dependencies with ${pm}...`).start();
-
-  try {
-    await execAsync(getInstallCommand(pm), { cwd: fullPath });
-    installSpinner.succeed("Dependencies installed");
-  } catch {
-    installSpinner.warn(
-      "Failed to install dependencies. Run install manually.",
-    );
+  if (options.install !== false) {
+    const installSpinner = ora(`Installing dependencies with ${pm}...`).start();
+    try {
+      await execAsync(getInstallCommand(pm), { cwd: fullPath });
+      installSpinner.succeed("Dependencies installed");
+    } catch {
+      installSpinner.warn(
+        "Failed to install dependencies. Run install manually.",
+      );
+      process.exitCode = 1;
+    }
   }
 
   // Print success message
@@ -175,6 +195,8 @@ export async function init(
   if (cdCommand) {
     logger.log(`  ${dim("$")} ${highlight(cdCommand)}`);
   }
+  if (options.install === false)
+    logger.log(`  ${dim("$")} ${highlight(getInstallCommand(pm))}`);
 
   logger.log(
     `  ${dim("$")} ${highlight("# Add your LLM Gateway API key to .env.local")}`,
