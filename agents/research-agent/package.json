@@ -1,0 +1,28 @@
+{
+  "name": "@llmgateway-templates/research-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=.env.local src/index.ts",
+    "build": "tsc",
+    "start": "node --env-file-if-exists=.env.local dist/index.js",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@llmgateway/ai-sdk-provider": "^4.0.0",
+    "ai": "^7.0.139",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.19.2",
+    "eslint": "^10.12.0",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.2"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "T-1001",
+    "from": "maria@example.com",
+    "subject": "Charged twice this month",
+    "body": "Hi, I see two charges of $49 on my card for October. Please refund one of them, this is the second time it happens."
+  },
+  {
+    "id": "T-1002",
+    "from": "dev@example.org",
+    "subject": "API returns 500 on /v1/chat/completions",
+    "body": "Since 9am UTC every request with stream=true fails with a 500. Our production app is down. Request id req_8f2a."
+  },
+  {
+    "id": "T-1003",
+    "from": "lukas@example.de",
+    "subject": "Frage zur Rechnung",
+    "body": "Hallo, können Sie unsere Firmenadresse auf der Rechnung ändern? Die neue Adresse ist Hauptstraße 5, Berlin."
+  },
+  {
+    "id": "T-1004",
+    "from": "sam@example.com",
+    "subject": "Feature idea",
+    "body": "Love the product! It would be great to export usage reports as CSV."
+  }
+]
