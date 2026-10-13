@@ -21,8 +21,8 @@ importers:
   agents/changelog-generator-agent:
     dependencies:
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       ai:
         specifier: ^7.0.139
         version: 7.0.139(zod@4.6.7)
@@ -52,8 +52,8 @@ importers:
   agents/code-review-agent:
     dependencies:
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       ai:
         specifier: ^7.0.139
         version: 7.0.139(zod@4.6.7)
@@ -83,8 +83,8 @@ importers:
   agents/data-extractor-agent:
     dependencies:
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       ai:
         specifier: ^7.0.139
         version: 7.0.139(zod@4.6.7)
@@ -114,8 +114,8 @@ importers:
   agents/email-drafter-agent:
     dependencies:
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       ai:
         specifier: ^7.0.139
         version: 7.0.139(zod@4.6.7)
@@ -145,8 +145,8 @@ importers:
   agents/lead-agent:
     dependencies:
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       ai:
         specifier: ^7.0.139
         version: 7.0.139(zod@4.6.7)
@@ -176,8 +176,8 @@ importers:
   agents/meeting-notes-agent:
     dependencies:
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       ai:
         specifier: ^7.0.139
         version: 7.0.139(zod@4.6.7)
@@ -207,8 +207,8 @@ importers:
   agents/model-router-agent:
     dependencies:
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       ai:
         specifier: ^7.0.139
         version: 7.0.139(zod@4.6.7)
@@ -238,8 +238,8 @@ importers:
   agents/research-agent:
     dependencies:
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       ai:
         specifier: ^7.0.139
         version: 7.0.139(zod@4.6.7)
@@ -269,8 +269,8 @@ importers:
   agents/sentiment-analyzer-agent:
     dependencies:
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       ai:
         specifier: ^7.0.139
         version: 7.0.139(zod@4.6.7)
@@ -300,8 +300,8 @@ importers:
   agents/support-triage-agent:
     dependencies:
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       ai:
         specifier: ^7.0.139
         version: 7.0.139(zod@4.6.7)
@@ -331,8 +331,8 @@ importers:
   agents/weather-agent:
     dependencies:
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       ai:
         specifier: ^7.0.139
         version: 7.0.139(zod@4.6.7)
@@ -556,8 +556,8 @@ importers:
         specifier: ^4.0.142
         version: 4.0.142(react@19.3.0)(zod@4.6.7)
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       '@radix-ui/react-dialog':
         specifier: ^1.3.1
         version: 1.3.1(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -638,8 +638,8 @@ importers:
         specifier: ^0.21.0
         version: 0.21.0(react@19.3.0)(zod@4.6.7)
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       '@radix-ui/react-dialog':
         specifier: ^1.3.1
         version: 1.3.1(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -793,8 +793,8 @@ importers:
   templates/feedback-dashboard:
     dependencies:
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       '@radix-ui/react-dialog':
         specifier: ^1.3.1
         version: 1.3.1(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -869,8 +869,8 @@ importers:
   templates/image-generation:
     dependencies:
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       '@radix-ui/react-dialog':
         specifier: ^1.3.1
         version: 1.3.1(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -984,8 +984,8 @@ importers:
         specifier: ^4.0.142
         version: 4.0.142(react@19.3.0)(zod@4.6.7)
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       '@radix-ui/react-dialog':
         specifier: ^1.3.1
         version: 1.3.1(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -1072,8 +1072,8 @@ importers:
   templates/og-image-generator:
     dependencies:
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       '@radix-ui/react-dialog':
         specifier: ^1.3.1
         version: 1.3.1(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -1145,8 +1145,8 @@ importers:
   templates/qa-agent:
     dependencies:
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       '@radix-ui/react-dialog':
         specifier: ^1.3.1
         version: 1.3.1(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -1276,8 +1276,8 @@ importers:
         specifier: ^4.41.1
         version: 4.41.1(@opentelemetry/api@1.9.1)(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       ai:
         specifier: ^7.0.139
         version: 7.0.139(zod@4.6.7)
@@ -1319,8 +1319,8 @@ importers:
   templates/writing-assistant:
     dependencies:
       '@llmgateway/ai-sdk-provider':
-        specifier: ^4.0.0
-        version: 4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
       '@radix-ui/react-dialog':
         specifier: ^1.3.1
         version: 1.3.1(@types/react-dom@19.2.7(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -1418,21 +1418,11 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/provider-utils@5.0.36':
-    resolution: {integrity: sha512-MFXBn6XDyf37PNQAge/HTatPJE8Vmg/g/w4WPtjSV53jq8FKAzoaN5+43hsdQa9bqgN+/13jxug9ChvsG+godQ==}
-    engines: {node: '>=22'}
-    peerDependencies:
-      zod: ^3.25.76 || ^4.1.8
-
   '@ai-sdk/provider-utils@5.0.59':
     resolution: {integrity: sha512-eaXBTkguxBFzS+KvxGRsbdkX9A7+R1g/C4jWx9mup0oSs3Cx5Mb427/byGpD2XL8SnMYT9O8LmXBmrgo+N3TJw==}
     engines: {node: '>=22'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
-
-  '@ai-sdk/provider@4.0.10':
-    resolution: {integrity: sha512-fX2ENAc7iDpZ+Wp4+Rk06Usn/Ys7dI9uAkGv0jlF6XVrW13NkRWx5Ou+U6lIM2E1fTLkCs16GGrUAaVvroag7A==}
-    engines: {node: '>=22'}
 
   '@ai-sdk/provider@4.0.27':
     resolution: {integrity: sha512-TtWwm6SxFiPomlMIbTQa+yhJte+w4/oCsW+wJrJzMC3MqHpAY9e5dJF1Y4HxyKt3W2Csac0KiI76Ckio11TFYw==}
@@ -2019,15 +2009,18 @@ packages:
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
 
-  '@llmgateway/ai-sdk-provider@4.0.0':
-    resolution: {integrity: sha512-+APEwx++NlVSEQUXSk9uk7Zob5ApAImaombj3dptYyGRpSMorIxAeRhbsNjsfdM2gPeQKLaHSv+ZoeUOD3+FWA==}
+  '@llmgateway/ai-sdk-provider@4.1.0':
+    resolution: {integrity: sha512-M0aguEDbwWJR/zF6y5F+6JmPOESYcOoP3JRwU/A+xSByiZvsiBZggIJOIEfnrGoSq2bi6+54eq9z54lpkIorvQ==}
     engines: {node: '>=22'}
     peerDependencies:
-      ai: ^7.0.93
+      ai: ^7.0.138
       zod: ^3.25.76 || ^4.1.8
 
   '@llmgateway/models@1.291.0':
     resolution: {integrity: sha512-b92Te6AjdKY7oom2X+4iexSjslXa+eitN3Ra/oqAFCVCyXhRba493XaZlN/vRlEoAShsGFNiJdC/2YtL8KJlqg==}
+
+  '@llmgateway/models@1.359.0':
+    resolution: {integrity: sha512-/VsvebBedo0RHFCnvKsFIWXoDKgY72qNIoG9r4BTbrNtipWEF2AEW4D6bVkv439pHf3b6PniRqxaPPKMupjOng==}
 
   '@mermaid-js/parser@1.2.1':
     resolution: {integrity: sha512-n12NohV3mrUyUL2o93IgG/ifeW9FTyeJn3zDxkhwa8MJ9Fxg3HQMlA3RiGmD/3UnJvheztkjjQAjA2T4LmUcpw==}
@@ -7382,15 +7375,6 @@ snapshots:
       pkce-challenge: 5.0.1
       zod: 4.6.7
 
-  '@ai-sdk/provider-utils@5.0.36(zod@4.6.7)':
-    dependencies:
-      '@ai-sdk/provider': 4.0.10
-      '@standard-schema/spec': 1.1.0
-      '@workflow/serde': 4.1.0
-      eventsource-parser: 3.1.1
-      undici: 7.29.1
-      zod: 4.6.7
-
   '@ai-sdk/provider-utils@5.0.59(zod@4.6.7)':
     dependencies:
       '@ai-sdk/provider': 4.0.27
@@ -7399,10 +7383,6 @@ snapshots:
       eventsource-parser: 3.1.1
       undici: 7.29.1
       zod: 4.6.7
-
-  '@ai-sdk/provider@4.0.10':
-    dependencies:
-      json-schema: 0.4.0
 
   '@ai-sdk/provider@4.0.27':
     dependencies:
@@ -7956,16 +7936,18 @@ snapshots:
 
   '@keyv/serialize@1.1.1': {}
 
-  '@llmgateway/ai-sdk-provider@4.0.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)':
+  '@llmgateway/ai-sdk-provider@4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)':
     dependencies:
-      '@ai-sdk/provider': 4.0.10
-      '@ai-sdk/provider-utils': 5.0.36(zod@4.6.7)
-      '@llmgateway/models': 1.291.0
+      '@ai-sdk/provider': 4.0.27
+      '@ai-sdk/provider-utils': 5.0.59(zod@4.6.7)
+      '@llmgateway/models': 1.359.0
       '@types/json-schema': 7.0.15
       ai: 7.0.139(zod@4.6.7)
       zod: 4.6.7
 
   '@llmgateway/models@1.291.0': {}
+
+  '@llmgateway/models@1.359.0': {}
 
   '@mermaid-js/parser@1.2.1':
     dependencies:
