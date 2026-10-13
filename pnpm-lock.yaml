@@ -297,6 +297,37 @@ importers:
         specifier: ^8.71.2
         version: 8.71.2(eslint@10.12.0(jiti@2.7.0))(typescript@6.0.3)
 
+  agents/sql-agent:
+    dependencies:
+      '@llmgateway/ai-sdk-provider':
+        specifier: ^4.1.0
+        version: 4.1.0(ai@7.0.139(zod@4.6.7))(zod@4.6.7)
+      ai:
+        specifier: ^7.0.139
+        version: 7.0.139(zod@4.6.7)
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@eslint/js':
+        specifier: ^10.0.1
+        version: 10.0.1(eslint@10.12.0(jiti@2.7.0))
+      '@types/node':
+        specifier: ^24.19.2
+        version: 24.19.2
+      eslint:
+        specifier: ^10.12.0
+        version: 10.12.0(jiti@2.7.0)
+      tsx:
+        specifier: ^4.23.15
+        version: 4.23.15
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+      typescript-eslint:
+        specifier: ^8.71.2
+        version: 8.71.2(eslint@10.12.0(jiti@2.7.0))(typescript@6.0.3)
+
   agents/support-triage-agent:
     dependencies:
       '@llmgateway/ai-sdk-provider':
