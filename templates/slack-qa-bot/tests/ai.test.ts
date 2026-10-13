@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const fullStream = { fullStream: true };
+const stream = { stream: true };
 const modelInstance = { id: "model-instance" };
 const provider = vi.fn(() => modelInstance);
 const createLLMGateway = vi.fn(() => provider);
@@ -25,7 +25,7 @@ describe("ai", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.resetModules();
-    streamFn.mockResolvedValue({ fullStream });
+    streamFn.mockResolvedValue({ stream });
     delete process.env.AI_MODEL;
     delete process.env.WEB_SEARCH;
   });
@@ -34,24 +34,24 @@ describe("ai", () => {
     const mod = await import("../src/lib/ai.js");
 
     expect(createLLMGateway).toHaveBeenCalledTimes(1);
-    expect(provider).toHaveBeenCalledWith("claude-sonnet-5", {
+    expect(provider).toHaveBeenCalledWith("claude-sonnet-5-5", {
       extraBody: { web_search: true },
     });
-    expect(mod.model).toBe("claude-sonnet-5");
+    expect(mod.model).toBe("claude-sonnet-5-5");
     expect(agentConstructor).toHaveBeenCalledWith(
       expect.objectContaining({ model: modelInstance }),
     );
   });
 
   it("honors the AI_MODEL override", async () => {
-    process.env.AI_MODEL = "gpt-5.5";
+    process.env.AI_MODEL = "gpt-6.1-sol";
 
     const mod = await import("../src/lib/ai.js");
 
-    expect(provider).toHaveBeenCalledWith("gpt-5.5", {
+    expect(provider).toHaveBeenCalledWith("gpt-6.1-sol", {
       extraBody: { web_search: true },
     });
-    expect(mod.model).toBe("gpt-5.5");
+    expect(mod.model).toBe("gpt-6.1-sol");
   });
 
   it("disables web search when WEB_SEARCH=false", async () => {
@@ -59,7 +59,7 @@ describe("ai", () => {
 
     await import("../src/lib/ai.js");
 
-    expect(provider).toHaveBeenCalledWith("claude-sonnet-5", {});
+    expect(provider).toHaveBeenCalledWith("claude-sonnet-5-5", {});
   });
 
   it("streams an answer and returns the full stream", async () => {
@@ -68,7 +68,7 @@ describe("ai", () => {
     const result = await answer("What is Chat SDK?");
 
     expect(streamFn).toHaveBeenCalledWith({ prompt: "What is Chat SDK?" });
-    expect(result).toBe(fullStream);
+    expect(result).toBe(stream);
   });
 
   it("accepts a conversation history as the prompt", async () => {

@@ -44,7 +44,7 @@ test("every template and agent is registered, documented, and has a standalone i
       template.name,
     );
     if (manifest.dependencies?.ai)
-      assert.match(manifest.dependencies.ai, /^\^6\./);
+      assert.match(manifest.dependencies.ai, /^\^7\./);
   }
 });
 

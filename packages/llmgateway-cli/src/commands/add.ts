@@ -117,7 +117,7 @@ const llmgateway = createLLMGateway({
 });
 
 export async function POST(request: Request) {
-  const { prompt, model = "gpt-5.4-mini" } = await request.json();
+  const { prompt, model = "gpt-6-luna" } = await request.json();
 
   const result = await generateText({
     model: llmgateway(model),
@@ -138,7 +138,13 @@ export async function POST(request: Request) {
       {
         path: "src/app/api/chat/route.ts",
         content: `import { createLLMGateway } from "@llmgateway/ai-sdk-provider";
-import { streamText, convertToModelMessages, validateUIMessages } from "ai";
+import {
+  convertToModelMessages,
+  createUIMessageStreamResponse,
+  streamText,
+  toUIMessageStream,
+  validateUIMessages,
+} from "ai";
 
 const llmgateway = createLLMGateway({
   apiKey: process.env.LLMGATEWAY_API_KEY,
@@ -148,15 +154,19 @@ const llmgateway = createLLMGateway({
 });
 
 export async function POST(request: Request) {
-  const { messages, model = "gpt-5.4-mini" } = await request.json();
+  const body = await request.json();
+  const model: string = body.model ?? "gpt-6-luna";
+  const messages = await validateUIMessages({ messages: body.messages });
 
   const result = streamText({
     model: llmgateway(model),
-    messages: await convertToModelMessages(await validateUIMessages({ messages })),
+    messages: await convertToModelMessages(messages),
     abortSignal: request.signal,
   });
 
-  return result.toUIMessageStreamResponse();
+  return createUIMessageStreamResponse({
+    stream: toUIMessageStream({ stream: result.stream, originalMessages: messages }),
+  });
 }
 `,
       },

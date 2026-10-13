@@ -20,9 +20,9 @@ import { pickDefaultModel } from "@/lib/models";
 import type { Presentation, Slide, SlideLayout, SlideTheme } from "@/lib/types";
 import { addToast } from "@/hooks/use-toast";
 
-const DEFAULT_TEXT_MODEL = "gpt-5.4-mini";
-const DEFAULT_IMAGE_MODEL = "gemini-3.1-flash-image-preview";
-const DEFAULT_SEARCH_MODEL = "sonar-pro";
+const DEFAULT_TEXT_MODEL = "gpt-6-luna";
+const DEFAULT_IMAGE_MODEL = "gemini-3.1-flash-image";
+const DEFAULT_SEARCH_MODEL = "sonar";
 
 function createSlide(overrides?: Partial<Slide>): Slide {
   return {

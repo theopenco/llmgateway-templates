@@ -1,11 +1,17 @@
 import { createLLMGateway } from "@llmgateway/ai-sdk-provider";
-import { generateText, stepCountIs, tool } from "ai";
-import { BrowserManager } from "agent-browser/dist/browser.js";
+import { generateText, isStepCount, tool } from "ai";
+import { chromium, type Page } from "playwright";
 import { z } from "zod";
 
 export const maxDuration = 120;
 
-function createBrowserTools(browser: BrowserManager) {
+const MAX_SNAPSHOT_CHARS = 30_000;
+
+function locate(page: Page, ref: string) {
+  return page.locator(`aria-ref=${ref.replace(/^@/, "")}`);
+}
+
+function createBrowserTools(page: Page) {
   return {
     browser_navigate: tool({
       description: "Navigate the browser to a URL",
@@ -13,7 +19,6 @@ function createBrowserTools(browser: BrowserManager) {
         url: z.string().describe("The URL to navigate to"),
       }),
       execute: async ({ url }) => {
-        const page = browser.getPage();
         await page.goto(url, { waitUntil: "domcontentloaded" });
         return { url, title: await page.title() };
       },
@@ -23,27 +28,23 @@ function createBrowserTools(browser: BrowserManager) {
         "Get an accessibility snapshot of the current page. Returns a text tree with element refs (e.g. [ref=e1]) that you can use with browser_click and browser_type.",
       inputSchema: z.object({}),
       execute: async () => {
-        const snapshot = await browser.getSnapshot({ interactive: true });
-        const tree =
-          typeof snapshot.tree === "string"
-            ? snapshot.tree
-            : JSON.stringify(snapshot.tree);
-        // Truncate to avoid blowing up context — 30K chars ≈ ~8K tokens
-        const maxChars = 30_000;
-        if (tree.length > maxChars) {
-          return { snapshot: tree.slice(0, maxChars) + "\n... (truncated)" };
+        const tree = await page.ariaSnapshot({ mode: "ai" });
+        if (tree.length > MAX_SNAPSHOT_CHARS) {
+          return {
+            snapshot: tree.slice(0, MAX_SNAPSHOT_CHARS) + "\n... (truncated)",
+          };
         }
         return { snapshot: tree };
       },
     }),
     browser_click: tool({
       description:
-        "Click an element on the page using its ref from a snapshot (e.g. @e1)",
+        "Click an element on the page using its ref from a snapshot (e.g. e1)",
       inputSchema: z.object({
-        ref: z.string().describe("The ref of the element to click, e.g. @e1"),
+        ref: z.string().describe("The ref of the element to click, e.g. e1"),
       }),
       execute: async ({ ref }) => {
-        const locator = browser.getLocator(ref);
+        const locator = locate(page, ref);
         await locator.click();
         return { clicked: ref };
       },
@@ -52,7 +53,7 @@ function createBrowserTools(browser: BrowserManager) {
       description:
         "Type text into an input field using its ref from a snapshot",
       inputSchema: z.object({
-        ref: z.string().describe("The ref of the input element, e.g. @e3"),
+        ref: z.string().describe("The ref of the input element, e.g. e3"),
         text: z.string().describe("The text to type"),
         clear: z
           .boolean()
@@ -60,7 +61,7 @@ function createBrowserTools(browser: BrowserManager) {
           .describe("Clear the field before typing (default: true)"),
       }),
       execute: async ({ ref, text, clear = true }) => {
-        const locator = browser.getLocator(ref);
+        const locator = locate(page, ref);
         if (clear) {
           await locator.fill(text);
         } else {
@@ -75,7 +76,7 @@ function createBrowserTools(browser: BrowserManager) {
         ref: z.string().describe("The ref of the element to hover"),
       }),
       execute: async ({ ref }) => {
-        const locator = browser.getLocator(ref);
+        const locator = locate(page, ref);
         await locator.hover();
         return { hovered: ref };
       },
@@ -87,7 +88,7 @@ function createBrowserTools(browser: BrowserManager) {
         value: z.string().describe("The value to select"),
       }),
       execute: async ({ ref, value }) => {
-        const locator = browser.getLocator(ref);
+        const locator = locate(page, ref);
         await locator.selectOption(value);
         return { selected: value, from: ref };
       },
@@ -98,7 +99,6 @@ function createBrowserTools(browser: BrowserManager) {
         key: z.string().describe("The key to press"),
       }),
       execute: async ({ key }) => {
-        const page = browser.getPage();
         await page.keyboard.press(key);
         return { pressed: key };
       },
@@ -115,7 +115,6 @@ function createBrowserTools(browser: BrowserManager) {
           .describe("Scroll amount in pixels (default: 500)"),
       }),
       execute: async ({ direction, amount = 500 }) => {
-        const page = browser.getPage();
         const deltaX =
           direction === "left" ? -amount : direction === "right" ? amount : 0;
         const deltaY =
@@ -128,7 +127,6 @@ function createBrowserTools(browser: BrowserManager) {
       description: "Go back to the previous page",
       inputSchema: z.object({}),
       execute: async () => {
-        const page = browser.getPage();
         await page.goBack();
         return { url: page.url() };
       },
@@ -137,7 +135,6 @@ function createBrowserTools(browser: BrowserManager) {
       description: "Go forward to the next page",
       inputSchema: z.object({}),
       execute: async () => {
-        const page = browser.getPage();
         await page.goForward();
         return { url: page.url() };
       },
@@ -172,7 +169,10 @@ export async function POST(request: Request) {
   });
   const encoder = new TextEncoder();
 
-  const browser = new BrowserManager();
+  const browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage({
+    viewport: { width: 1280, height: 720 },
+  });
   let stepCount = 0;
 
   const stream = new ReadableStream({
@@ -183,44 +183,37 @@ export async function POST(request: Request) {
       try {
         emit({ type: "status", message: "Launching headless browser..." });
 
-        await browser.launch({ id: "qa", action: "launch", headless: true });
-
-        // Start screencast to stream frames via NDJSON
-        await browser.startScreencast(
-          (frame) => {
-            emit({ type: "screenshot", imageData: frame.data });
+        await page.screencast.start({
+          onFrame: ({ data }) => {
+            emit({ type: "screenshot", imageData: data.toString("base64") });
           },
-          {
-            format: "jpeg",
-            quality: 50,
-            maxWidth: 1280,
-            maxHeight: 720,
-            everyNthFrame: 2,
-          },
-        );
+          size: { width: 1280, height: 720 },
+          quality: 50,
+          fps: 10,
+        });
 
         emit({ type: "status", message: "Browser ready. Running test..." });
 
-        const tools = createBrowserTools(browser);
+        const tools = createBrowserTools(page);
 
         const result = await generateText({
-          model: llmgateway(model || "claude-sonnet-5"),
+          model: llmgateway(model || "claude-sonnet-5-5"),
           tools,
-          stopWhen: stepCountIs(25),
-          system: `You are a QA testing agent. Your task is to test a web application by interacting with it through a browser.
+          stopWhen: isStepCount(25),
+          instructions: `You are a QA testing agent. Your task is to test a web application by interacting with it through a browser.
 
 INSTRUCTIONS:
 1. First, navigate to: ${targetUrl}
 2. Use browser_snapshot to read the current page state before interacting
 3. Execute the test described by the user step by step
-4. Use browser_click to click elements (use the ref attribute from snapshots, e.g. @e1)
+4. Use browser_click to click elements (use the ref attribute from snapshots, e.g. e1)
 5. Use browser_type to type text into input fields
 6. Use browser_take_screenshot for visual verification when needed
 7. After completing the test, provide a clear summary of results — what passed, what failed, and why
 
 Be methodical: always snapshot the page before acting so you know what elements are available.`,
           prompt: instruction,
-          onStepFinish({ toolCalls, text }) {
+          onStepEnd({ toolCalls, text }) {
             if (toolCalls && toolCalls.length > 0) {
               for (const call of toolCalls) {
                 stepCount++;
@@ -268,7 +261,7 @@ Be methodical: always snapshot the page before acting so you know what elements 
           message,
         });
       } finally {
-        await browser.stopScreencast();
+        await page.screencast.stop().catch(() => {});
         await browser.close();
         controller.close();
       }

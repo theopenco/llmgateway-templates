@@ -1,6 +1,6 @@
 # QA Agent Template
 
-An AI-powered QA testing agent that uses Agent Browser to interact with your running web app. Give it natural language test instructions and watch it execute step-by-step with a real-time action timeline and live browser preview.
+An AI-powered QA testing agent that drives a real headless Chromium through [Playwright](https://playwright.dev) to test your running web app. Give it natural language test instructions and watch it execute step-by-step with a real-time action timeline and live browser preview.
 
 ## Demo
 
@@ -9,7 +9,7 @@ An AI-powered QA testing agent that uses Agent Browser to interact with your run
 ## Features
 
 - Natural language test instructions — describe what to test in plain English
-- Agent Browser — the agent controls a headless browser to navigate, click, type, and screenshot
+- Playwright browser tools — the agent reads AI-optimized accessibility snapshots (`ariaSnapshot({ mode: "ai" })`) and clicks, types and scrolls by element ref
 - Real-time action timeline — see each step as the agent executes it
 - Live iframe preview of the target application
 - Searchable model picker ([AI Elements model selector](https://elements.ai-sdk.dev/components/model-selector)) filled live from the LLM Gateway catalog
@@ -20,14 +20,14 @@ An AI-powered QA testing agent that uses Agent Browser to interact with your run
 - **Framework**: Next.js 16 (App Router)
 - **UI**: React 19, Tailwind CSS 4, shadcn/ui
 - **AI**: Vercel AI SDK (`generateText` + MCP tools), LLM Gateway Provider
-- **Browser Automation**: Agent browser (headless)
+- **Browser Automation**: Playwright (headless Chromium, live screencast)
 - **Icons**: Lucide React
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 22+ (24 LTS recommended)
 - pnpm
 - [LLM Gateway API Key](https://llmgateway.io)
 
@@ -75,6 +75,14 @@ Open [http://localhost:3001](http://localhost:3001) in your browser.
 4. Watch the agent actions appear step-by-step in the timeline
 5. Review the test summary when complete
 
+### Browser install
+
+The agent launches Chromium. Install it once:
+
+```bash
+pnpm exec playwright install chromium
+```
+
 ### Production Build
 
 ```bash
@@ -93,7 +101,7 @@ Run an AI-powered QA test.
 ```json
 {
   "instruction": "Test the signup flow",
-  "model": "claude-sonnet-5",
+  "model": "claude-sonnet-5-5",
   "targetUrl": "http://localhost:3000"
 }
 ```
@@ -105,14 +113,14 @@ Run an AI-powered QA test.
 {"type":"status","message":"Browser ready. Running test..."}
 {"type":"action","step":1,"tool":"browser_navigate","args":{"url":"http://localhost:3000"},"status":"done"}
 {"type":"action","step":2,"tool":"browser_snapshot","args":{},"status":"done"}
-{"type":"action","step":3,"tool":"browser_click","args":{"ref":"signup-link"},"status":"done"}
+{"type":"action","step":3,"tool":"browser_click","args":{"ref":"e12"},"status":"done"}
 {"type":"text","content":"I can see the signup form with email and password fields."}
 {"type":"result","summary":"Test passed: signup flow works correctly."}
 ```
 
 ## Model catalog
 
-The picker is filled at request time from the gateway's public [`/v1/models`](https://api.llmgateway.io/v1/models) catalog (`src/lib/models.ts`, revalidated hourly), so models added to LLM Gateway show up without a code change. Model ids are sent unprefixed (`claude-sonnet-5`) so the gateway [smart-routes](https://docs.llmgateway.io/features/routing) each request to the best available provider — prefix one with a provider id (`anthropic/claude-sonnet-5`) to pin it instead.
+The picker is filled at request time from the gateway's public [`/v1/models`](https://api.llmgateway.io/v1/models) catalog (`src/lib/models.ts`, revalidated hourly), so models added to LLM Gateway show up without a code change. Model ids are sent unprefixed (`claude-sonnet-5-5`) so the gateway [smart-routes](https://docs.llmgateway.io/features/routing) each request to the best available provider — prefix one with a provider id (`anthropic/claude-sonnet-5-5`) to pin it instead.
 
 ## License
 

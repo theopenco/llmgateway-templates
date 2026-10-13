@@ -13,7 +13,7 @@ Built with [Chat SDK](https://github.com/vercel/chat), the [AI SDK](https://ai-s
 3. It streams the answer from a `ToolLoopAgent` backed by [LLM Gateway](https://llmgateway.io) straight into Slack using native streaming.
 4. Follow-up messages in the same thread are answered automatically — no need to re-mention. Reply `stop` (or `unsubscribe`) and the bot leaves the thread.
 
-The model defaults to `claude-sonnet-5` and is configurable via the `AI_MODEL` environment variable. Because everything routes through LLM Gateway, you can point `AI_MODEL` at any of 300+ models from OpenAI, Anthropic, Google, and others with the same API key.
+The model defaults to `claude-sonnet-5-5` and is configurable via the `AI_MODEL` environment variable. Because everything routes through LLM Gateway, you can point `AI_MODEL` at any of 300+ models from OpenAI, Anthropic, Google, and others with the same API key.
 
 ### Web search
 
@@ -67,7 +67,7 @@ REDIS_URL=redis://localhost:6379
 LLM_GATEWAY_API_KEY=llmgtwy_...
 
 # Optional: any model id from https://llmgateway.io/models
-AI_MODEL=claude-sonnet-5
+AI_MODEL=claude-sonnet-5-5
 
 # Optional: set to false to turn off LLM Gateway's web search (on by default)
 WEB_SEARCH=true
@@ -172,9 +172,9 @@ tests/
 The bot routes through [LLM Gateway](https://llmgateway.io), which exposes 300+ models behind a single API key. Set `AI_MODEL` to any model id from the [model list](https://llmgateway.io/models), for example:
 
 ```sh
-AI_MODEL=gpt-5.5
-AI_MODEL=gemini-3.1-pro-preview
-AI_MODEL=claude-opus-5
+AI_MODEL=gpt-6.1-sol
+AI_MODEL=gemini-4-argon
+AI_MODEL=claude-opus-5-5
 ```
 
 ## Adding Other Platforms

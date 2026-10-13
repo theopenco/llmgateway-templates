@@ -50,15 +50,15 @@ export async function POST(request: Request) {
 
   // Step 1: Research real data using a search model
   const research = await generateText({
-    model: llmgateway(searchModel || "sonar-pro"),
-    system: `You are a data research assistant. Find real, accurate, up-to-date statistics and numerical data that can be used in a chart. Return concrete numbers, percentages, and data points. Be specific with values. Format as a clear data summary.`,
+    model: llmgateway(searchModel || "sonar"),
+    instructions: `You are a data research assistant. Find real, accurate, up-to-date statistics and numerical data that can be used in a chart. Return concrete numbers, percentages, and data points. Be specific with values. Format as a clear data summary.`,
     prompt: `Find real data and statistics for this chart: ${prompt}`,
   });
 
   // Step 2: Generate chart spec using the researched data
   const result = await generateText({
-    model: llmgateway(model || "gpt-5.4-mini"),
-    system: CHART_SYSTEM_PROMPT,
+    model: llmgateway(model || "gpt-6-luna"),
+    instructions: CHART_SYSTEM_PROMPT,
     prompt: `Create a chart based on this request: ${prompt}
 
 Use this researched data to populate the chart with real numbers:

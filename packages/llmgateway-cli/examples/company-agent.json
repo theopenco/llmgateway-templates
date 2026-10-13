@@ -4,7 +4,7 @@
   "description": "Our internal OpenAI-compatible agent",
   "command": "company-agent",
   "args": ["--model", "${model}"],
-  "defaultModel": "gpt-5.4",
+  "defaultModel": "gpt-6.1-sol",
   "env": {
     "OPENAI_API_KEY": "${apiKey}",
     "OPENAI_BASE_URL": "${gatewayUrl}/v1"

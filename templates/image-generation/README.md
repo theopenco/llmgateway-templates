@@ -29,7 +29,7 @@ A full-stack Next.js application for generating images using AI models through L
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 22+ (24 LTS recommended)
 - pnpm
 - [LLM Gateway API Key](https://llmgateway.io)
 
@@ -99,7 +99,7 @@ Generate an image from a text prompt.
 ```json
 {
   "prompt": "A beautiful sunset over mountains",
-  "model": "gemini-3.1-flash-image-preview"
+  "model": "gemini-3.1-flash-image"
 }
 ```
 

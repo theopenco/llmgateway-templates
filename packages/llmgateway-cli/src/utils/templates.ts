@@ -52,6 +52,13 @@ export const templates: Template[] = [
     path: "templates/qa-agent",
   },
   {
+    name: "model-arena",
+    description:
+      "Compare models side by side on speed, cost, and answer quality",
+    category: "web",
+    path: "templates/model-arena",
+  },
+  {
     name: "embeddable-credits",
     description:
       'Monetize your AI app in 5 minutes — end-user wallets ("Stripe for AI")',
@@ -77,7 +84,7 @@ export const templates: Template[] = [
   },
   {
     name: "weather-agent",
-    description: "CLI agent that answers weather queries using tools",
+    description: "CLI agent that answers weather queries with live data",
     category: "agent",
     path: "agents/weather-agent",
   },
@@ -110,6 +117,36 @@ export const templates: Template[] = [
     description: "CLI agent that extracts structured entities from text",
     category: "agent",
     path: "agents/data-extractor-agent",
+  },
+  {
+    name: "research-agent",
+    description: "CLI agent that researches the web and writes cited reports",
+    category: "agent",
+    path: "agents/research-agent",
+  },
+  {
+    name: "code-review-agent",
+    description: "CLI agent that reviews git diffs and gates CI on findings",
+    category: "agent",
+    path: "agents/code-review-agent",
+  },
+  {
+    name: "model-router-agent",
+    description: "CLI agent that routes prompts to the cheapest capable model",
+    category: "agent",
+    path: "agents/model-router-agent",
+  },
+  {
+    name: "meeting-notes-agent",
+    description: "CLI agent that turns transcripts into notes and action items",
+    category: "agent",
+    path: "agents/meeting-notes-agent",
+  },
+  {
+    name: "support-triage-agent",
+    description: "CLI agent that triages support tickets and drafts replies",
+    category: "agent",
+    path: "agents/support-triage-agent",
   },
 ];
 

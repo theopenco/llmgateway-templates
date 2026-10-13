@@ -6,7 +6,7 @@ import type { AiMessage } from "chat";
  * Default model served through LLM Gateway. Override with the `AI_MODEL`
  * environment variable (any `provider/model` id from https://llmgateway.io/models).
  */
-const DEFAULT_MODEL = "claude-sonnet-5";
+const DEFAULT_MODEL = "claude-sonnet-5-5";
 
 const SYSTEM_PROMPT = `You are a helpful assistant that answers questions for a team inside Slack.
 
@@ -53,10 +53,10 @@ export const agent = new ToolLoopAgent({
  * Stream an answer for the given prompt. Accepts either a plain question
  * string or a conversation history produced by `toAiMessages()`.
  *
- * Returns the AI SDK `fullStream` so step boundaries are preserved when piped
+ * Returns the AI SDK `stream` so step boundaries are preserved when piped
  * into `thread.post()`.
  */
 export const answer = async (prompt: string | AiMessage[]) => {
   const result = await agent.stream({ prompt });
-  return result.fullStream;
+  return result.stream;
 };

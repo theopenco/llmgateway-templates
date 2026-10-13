@@ -11,7 +11,7 @@ import {
 } from "@llmgateway/elements";
 import { useEffect, useState } from "react";
 
-const MODEL = "gpt-5.4-mini";
+const MODEL = "gpt-6-luna";
 const REPO = "https://github.com/theopenco/llmgateway-templates";
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_LLMGATEWAY_API_URL;
@@ -332,7 +332,7 @@ export async function POST() {
   return Response.json(
     await lg.sessions.create({
       customer: { externalId: user.id },
-      scope: { models: ["gpt-5.4-mini"] },
+      scope: { models: ["gpt-6-luna"] },
     }),
   );
 }`,
@@ -342,7 +342,7 @@ export async function POST() {
     code: `<LLMGatewayProvider session={session} fetchSession={fetchSession}>
   <CreditBalance label="Balance" />
   <BuyCredits amount={10} />
-  <Chat model="gpt-5.4-mini" />
+  <Chat model="gpt-6-luna" />
 </LLMGatewayProvider>`,
   },
 ];

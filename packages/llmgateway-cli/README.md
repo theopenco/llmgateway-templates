@@ -32,7 +32,7 @@ npx @llmgateway/cli launch soulforge
 npx @llmgateway/cli launch codex
 
 # Pick a model — launcher flags go before the agent name
-npx @llmgateway/cli launch -m gpt-5.4 claude
+npx @llmgateway/cli launch -m gpt-6.1-sol claude
 
 # Everything after the agent name is passed to the agent itself
 npx @llmgateway/cli launch claude --continue
@@ -89,7 +89,7 @@ npx @llmgateway/cli configure claude --project
 npx @llmgateway/cli configure opencode --dry-run
 ```
 
-- **opencode** — merges `provider/model` entries (e.g. `anthropic/claude-sonnet-5`, `aws-bedrock/claude-sonnet-5`) into `provider.llmgateway.models` in `~/.config/opencode/opencode.json`, with display names, context limits, and per-provider pricing. They show up in the picker as `llmgateway/<provider>/<model>` and pin that upstream provider via the gateway's [provider-routing syntax](https://docs.llmgateway.io/features/routing#provider-specific-routing). Root model ids (auto-routed) are already built into opencode. Existing custom entries and the rest of the file are preserved, and a hand-written `opencode.jsonc` keeps working alongside it.
+- **opencode** — merges `provider/model` entries (e.g. `anthropic/claude-sonnet-5-5`, `aws-bedrock/claude-sonnet-5-5`) into `provider.llmgateway.models` in `~/.config/opencode/opencode.json`, with display names, context limits, and per-provider pricing. They show up in the picker as `llmgateway/<provider>/<model>` and pin that upstream provider via the gateway's [provider-routing syntax](https://docs.llmgateway.io/features/routing#provider-specific-routing). Root model ids (auto-routed) are already built into opencode. Existing custom entries and the rest of the file are preserved, and a hand-written `opencode.jsonc` keeps working alongside it.
 - **Claude Code** — sets `ANTHROPIC_BASE_URL`, `ANTHROPIC_AUTH_TOKEN`, and `CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1` in `~/.claude/settings.json` (requires Claude Code v2.1.129+). Claude Code then loads the gateway's `/v1/models` catalog into its `/model` picker (shown as "From gateway"). Claude Code only lists ids starting with `claude`/`anthropic`; any other gateway model still works via `claude --model <id>`.
 
 `llmgateway launch opencode` and `llmgateway launch claude` apply the same setup automatically on every launch, keeping the catalog fresh as new models ship.
@@ -213,7 +213,7 @@ Register an executable and its arguments from a trusted JSON file:
   "description": "Our internal OpenAI-compatible agent",
   "command": "company-agent",
   "args": ["--model", "${model}"],
-  "defaultModel": "gpt-5.4",
+  "defaultModel": "gpt-6.1-sol",
   "env": {
     "OPENAI_API_KEY": "${apiKey}",
     "OPENAI_BASE_URL": "${gatewayUrl}/v1"
@@ -359,7 +359,7 @@ CLI agents: `weather-agent`, `lead-agent`, `changelog-generator-agent`, `email-d
 llmgateway init my-app --template ai-chatbot --ref main --no-install
 ```
 
-All templates include a README and standalone dependency versions. AI templates use AI SDK 6 and accept `LLMGATEWAY_GATEWAY_URL` for private inference endpoints. CLI agent templates also accept `LLMGATEWAY_MODEL`.
+All templates include a README and standalone dependency versions. AI templates use AI SDK 7 and accept `LLMGATEWAY_GATEWAY_URL` for private inference endpoints. CLI agent templates also accept `LLMGATEWAY_MODEL`.
 
 ## Configuration
 

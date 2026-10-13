@@ -3,8 +3,8 @@
  *
  * The list of models is read from the gateway's public `/v1/models` endpoint
  * instead of being hardcoded, so a template picks up newly added models without
- * a code change. Model ids are used bare (`gpt-5.4-mini`, not
- * `openai/gpt-5.4-mini`) so the gateway smart-routes each request to the best
+ * a code change. Model ids are used bare (`gpt-6-luna`, not
+ * `openai/gpt-6-luna`) so the gateway smart-routes each request to the best
  * available provider; prefixing with a provider id would pin the request to
  * that one provider and disable failover.
  *
@@ -17,7 +17,7 @@ export const MODELS_URL = `${(process.env.LLMGATEWAY_GATEWAY_URL || "https://api
 export const MODELS_REVALIDATE_SECONDS = 3600;
 
 export type Model = {
-  /** Root gateway model id, e.g. `claude-sonnet-5`. */
+  /** Root gateway model id, e.g. `claude-sonnet-5-5`. */
   id: string;
   name: string;
   /** Model author, e.g. `anthropic`. Used to group the selector. */
@@ -75,34 +75,39 @@ const FAMILY_ORDER = [
 const FALLBACK: Record<"text" | "image", Model[]> = {
   text: [
     {
-      id: "gpt-5.4-mini",
-      name: "GPT-5.4 Mini",
+      id: "gpt-6-luna",
+      name: "GPT-6 Luna",
       family: "openai",
       providers: ["openai"],
     },
-    { id: "gpt-5.5", name: "GPT-5.5", family: "openai", providers: ["openai"] },
     {
-      id: "claude-sonnet-5",
-      name: "Claude Sonnet 5",
+      id: "gpt-6.1-sol",
+      name: "GPT-6.1 Sol",
+      family: "openai",
+      providers: ["openai"],
+    },
+    {
+      id: "claude-sonnet-5-5",
+      name: "Claude Sonnet 5.5",
       family: "anthropic",
       providers: ["anthropic"],
     },
     {
-      id: "claude-haiku-4-5",
-      name: "Claude Haiku 4.5",
+      id: "claude-haiku-5-5",
+      name: "Claude Haiku 5.5",
       family: "anthropic",
       providers: ["anthropic"],
     },
     {
-      id: "gemini-3.7-flash",
-      name: "Gemini 3.7 Flash",
+      id: "gemini-3.8-flash",
+      name: "Gemini 3.8 Flash",
       family: "google",
       providers: ["google-ai-studio"],
     },
-    { id: "grok-4-6", name: "Grok 4.6", family: "xai", providers: ["xai"] },
+    { id: "grok-4-7", name: "Grok 4.7", family: "xai", providers: ["xai"] },
     {
-      id: "deepseek-v4-flash",
-      name: "DeepSeek V4 Flash",
+      id: "deepseek-v4.1-flash",
+      name: "DeepSeek V4.1 Flash",
       family: "deepseek",
       providers: ["deepseek"],
     },
@@ -112,7 +117,7 @@ const FALLBACK: Record<"text" | "image", Model[]> = {
       family: "moonshot",
       providers: ["moonshot"],
     },
-    { id: "glm-5.2", name: "GLM-5.2", family: "zai", providers: ["zai"] },
+    { id: "glm-5.3", name: "GLM-5.3", family: "zai", providers: ["zai"] },
     {
       id: "minimax-m3",
       name: "MiniMax M3",
@@ -122,14 +127,14 @@ const FALLBACK: Record<"text" | "image", Model[]> = {
   ],
   image: [
     {
-      id: "gemini-3.1-flash-image-preview",
-      name: "Gemini 3.1 Flash Image (Preview)",
+      id: "gemini-3.1-flash-image",
+      name: "Gemini 3.1 Flash Image",
       family: "google",
       providers: ["google-ai-studio"],
     },
     {
-      id: "gemini-3-pro-image-preview",
-      name: "Gemini 3 Pro Image (Preview)",
+      id: "gemini-nano-banana-2.1",
+      name: "Gemini Nano Banana 2.1",
       family: "google",
       providers: ["google-ai-studio"],
     },

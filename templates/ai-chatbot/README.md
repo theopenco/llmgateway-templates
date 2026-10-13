@@ -28,7 +28,7 @@ A full-stack Next.js chatbot with streaming responses using LLM Gateway.
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 22+ (24 LTS recommended)
 - pnpm
 - [LLM Gateway API Key](https://llmgateway.io)
 
@@ -81,7 +81,7 @@ Stream a chat completion.
 ```json
 {
   "messages": [{ "role": "user", "content": "Hello!" }],
-  "model": "gpt-5.4-mini"
+  "model": "gpt-6-luna"
 }
 ```
 
@@ -89,7 +89,7 @@ Stream a chat completion.
 
 ## Model catalog
 
-The picker is filled at request time from the gateway's public [`/v1/models`](https://api.llmgateway.io/v1/models) catalog (`src/lib/models.ts`, revalidated hourly), so models added to LLM Gateway show up without a code change. Model ids are sent unprefixed (`gpt-5.4-mini`) so the gateway [smart-routes](https://docs.llmgateway.io/features/routing) each request to the best available provider — prefix one with a provider id (`openai/gpt-5.4-mini`) to pin it instead.
+The picker is filled at request time from the gateway's public [`/v1/models`](https://api.llmgateway.io/v1/models) catalog (`src/lib/models.ts`, revalidated hourly), so models added to LLM Gateway show up without a code change. Model ids are sent unprefixed (`gpt-6-luna`) so the gateway [smart-routes](https://docs.llmgateway.io/features/routing) each request to the best available provider — prefix one with a provider id (`openai/gpt-6-luna`) to pin it instead.
 
 ## License
 

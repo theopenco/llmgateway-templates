@@ -31,9 +31,9 @@ async function runSentimentAnalyzer(
   text: string,
 ): Promise<z.infer<typeof sentimentSchema>> {
   const result = await generateText({
-    model: llmgateway(process.env.LLMGATEWAY_MODEL || "gpt-5.4-mini"),
+    model: llmgateway(process.env.LLMGATEWAY_MODEL || "gpt-6-luna"),
     output: Output.object({ schema: sentimentSchema }),
-    system: `You are a sentiment analysis expert. Analyze the given text and determine its sentiment.
+    instructions: `You are a sentiment analysis expert. Analyze the given text and determine its sentiment.
 
 Guidelines:
 - Classify as positive, negative, neutral, or mixed

@@ -1,5 +1,5 @@
 import { createLLMGateway } from "@llmgateway/ai-sdk-provider";
-import { generateObject } from "ai";
+import { generateText, Output } from "ai";
 import { z } from "zod";
 
 const analysisSchema = z.object({
@@ -78,9 +78,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const result = await generateObject({
-      model: llmgateway(model || "gpt-5.4-mini"),
-      schema: analysisSchema,
+    const result = await generateText({
+      model: llmgateway(model || "gpt-6-luna"),
+      output: Output.object({ schema: analysisSchema }),
       prompt: `Analyze the following customer reviews and provide structured sentiment analysis.
 
 Reviews:
@@ -89,7 +89,7 @@ ${reviewList.map((r: string, i: number) => `${i + 1}. ${r}`).join("\n")}
 Analyze each review individually and provide an overall summary with key themes.`,
     });
 
-    return Response.json(result.object);
+    return Response.json(result.output);
   } catch (error) {
     console.error("Analysis error:", error);
     return Response.json(

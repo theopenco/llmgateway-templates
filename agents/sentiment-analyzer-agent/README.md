@@ -12,8 +12,8 @@ A command-line AI agent that analyzes the sentiment of text, returning structure
 
 ## Tech Stack
 
-- **Runtime**: Node.js 20+ (ES Modules)
-- **Language**: TypeScript 5.7
+- **Runtime**: Node.js 22+ (ES Modules)
+- **Language**: TypeScript 6
 - **AI**: Vercel AI SDK, LLM Gateway Provider
 - **Validation**: Zod
 
@@ -21,7 +21,7 @@ A command-line AI agent that analyzes the sentiment of text, returning structure
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 22+ (24 LTS recommended)
 - pnpm
 - [LLM Gateway API Key](https://llmgateway.io)
 

@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     const prompt = ACTION_PROMPTS[action](text, tone);
 
     const result = await generateText({
-      model: llmgateway(model || "gpt-5.4-mini"),
+      model: llmgateway(model || "gpt-6-luna"),
       prompt,
     });
 

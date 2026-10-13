@@ -16,6 +16,7 @@ import {
   Legend,
   ResponsiveContainer,
   Cell,
+  type PieLabelRenderProps,
 } from "recharts";
 
 const DEFAULT_COLORS = [
@@ -293,8 +294,8 @@ export function PieChartComponent({
           outerRadius={80}
           label={
             showLabel !== false
-              ? ({ label, percent }: { label: string; percent: number }) =>
-                  `${label} ${(percent * 100).toFixed(0)}%`
+              ? ({ name, percent }: PieLabelRenderProps) =>
+                  `${name} ${((percent ?? 0) * 100).toFixed(0)}%`
               : undefined
           }
           labelLine={showLabel !== false}
