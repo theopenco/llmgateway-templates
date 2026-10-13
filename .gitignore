@@ -50,3 +50,6 @@ coverage
 
 # Local agent scratch
 .soulforge
+
+# Agent output
+reports

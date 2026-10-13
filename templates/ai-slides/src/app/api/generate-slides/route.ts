@@ -1,5 +1,5 @@
 import { createLLMGateway } from "@llmgateway/ai-sdk-provider";
-import { generateObject } from "ai";
+import { generateText, Output } from "ai";
 import { z } from "zod";
 
 const presentationSchema = z.object({
@@ -51,10 +51,10 @@ export async function POST(request: Request) {
   });
   const { prompt, model, slideCount } = await request.json();
 
-  const result = await generateObject({
-    model: llmgateway(model || "gpt-5.4-mini"),
-    schema: presentationSchema,
-    system: `You are an expert presentation designer. Create professional, engaging presentations.
+  const result = await generateText({
+    model: llmgateway(model || "gpt-6-luna"),
+    output: Output.object({ schema: presentationSchema }),
+    instructions: `You are an expert presentation designer. Create professional, engaging presentations.
 
 Guidelines:
 - Start with a "title" layout slide as the first slide
@@ -69,5 +69,5 @@ Guidelines:
     prompt: `Create a presentation about: ${prompt}`,
   });
 
-  return Response.json(result.object);
+  return Response.json(result.output);
 }

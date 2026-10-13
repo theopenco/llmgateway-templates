@@ -11,8 +11,8 @@ A command-line AI agent that extracts structured entities (people, organizations
 
 ## Tech Stack
 
-- **Runtime**: Node.js 20+ (ES Modules)
-- **Language**: TypeScript 5.7
+- **Runtime**: Node.js 22+ (ES Modules)
+- **Language**: TypeScript 6
 - **AI**: Vercel AI SDK, LLM Gateway Provider
 - **Validation**: Zod
 
@@ -20,7 +20,7 @@ A command-line AI agent that extracts structured entities (people, organizations
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 22+ (24 LTS recommended)
 - pnpm
 - [LLM Gateway API Key](https://llmgateway.io)
 

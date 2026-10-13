@@ -78,8 +78,8 @@ By participating in this project, you agree to maintain a respectful and inclusi
 
 ### Prerequisites
 
-- Node.js 20+
-- pnpm 9.15+
+- Node.js 22+ (24 LTS recommended)
+- pnpm 10.28+
 - LLM Gateway API Key (get one at [llmgateway.io](https://llmgateway.io))
 
 ### Running Locally

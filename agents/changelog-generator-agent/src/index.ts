@@ -1,5 +1,5 @@
 import { createLLMGateway } from "@llmgateway/ai-sdk-provider";
-import { generateText, tool, stepCountIs } from "ai";
+import { generateText, tool, isStepCount } from "ai";
 import { z } from "zod";
 import { execSync } from "node:child_process";
 
@@ -140,13 +140,13 @@ async function runChangelogAgent(range?: string): Promise<string> {
     : "Generate a changelog for the most recent commits in this repository.";
 
   const result = await generateText({
-    model: llmgateway(process.env.LLMGATEWAY_MODEL || "gpt-5.4-mini"),
+    model: llmgateway(process.env.LLMGATEWAY_MODEL || "gpt-6-luna"),
     tools: {
       getGitLog: getGitLogTool,
       getGitDiff: getGitDiffTool,
     },
-    stopWhen: stepCountIs(5),
-    system: `You are a changelog generator. Your job is to analyze git history and produce a well-structured changelog following the Keep a Changelog format (https://keepachangelog.com).
+    stopWhen: isStepCount(5),
+    instructions: `You are a changelog generator. Your job is to analyze git history and produce a well-structured changelog following the Keep a Changelog format (https://keepachangelog.com).
 
 Use the available tools to inspect the git log and diff, then organize the changes into these categories:
 - **Added** — new features

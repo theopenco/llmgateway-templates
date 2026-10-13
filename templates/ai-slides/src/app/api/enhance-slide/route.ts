@@ -1,5 +1,5 @@
 import { createLLMGateway } from "@llmgateway/ai-sdk-provider";
-import { generateObject } from "ai";
+import { generateText, Output } from "ai";
 import { z } from "zod";
 
 const enhancedSlideSchema = z.object({
@@ -33,10 +33,10 @@ export async function POST(request: Request) {
     ? `\n\nResearch context to incorporate:\n${researchContext}`
     : "";
 
-  const result = await generateObject({
-    model: llmgateway(model || "gpt-5.4-mini"),
-    schema: enhancedSlideSchema,
-    system: `You are a presentation content expert. Enhance slide content to be more engaging, clear, and professional.
+  const result = await generateText({
+    model: llmgateway(model || "gpt-6-luna"),
+    output: Output.object({ schema: enhancedSlideSchema }),
+    instructions: `You are a presentation content expert. Enhance slide content to be more engaging, clear, and professional.
 
 Guidelines:
 - Make titles concise and impactful
@@ -54,5 +54,5 @@ ${slide.speakerNotes ? `Speaker Notes: ${slide.speakerNotes}` : ""}
 Instruction: ${instruction || "Make this slide more engaging and professional"}${contextSection}`,
   });
 
-  return Response.json(result.object);
+  return Response.json(result.output);
 }

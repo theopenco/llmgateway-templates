@@ -6,24 +6,24 @@ A command-line AI agent that researches a person by name or email and produces a
 
 - Research any person by name or email
 - Structured profile summaries (bio, role, background, social links)
-- Built-in web search via Perplexity's sonar-pro model
+- Built-in web search via Perplexity's sonar model
 - Optional Discord webhook integration
 - Tool-based agentic architecture
 - Type-safe with Zod validation
 
 ## Tech Stack
 
-- **Runtime**: Node.js 20+ (ES Modules)
-- **Language**: TypeScript 5.7
+- **Runtime**: Node.js 22+ (ES Modules)
+- **Language**: TypeScript 6
 - **AI**: Vercel AI SDK, LLM Gateway Provider
-- **Model**: Perplexity sonar-pro (web-search enabled)
+- **Model**: Perplexity sonar (web-search enabled)
 - **Validation**: Zod
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 22+ (24 LTS recommended)
 - pnpm
 - [LLM Gateway API Key](https://llmgateway.io)
 
@@ -87,7 +87,7 @@ lead-agent/
 
 ## How It Works
 
-The lead agent uses Perplexity's sonar-pro model which has built-in web search capabilities:
+The lead agent uses Perplexity's sonar model which has built-in web search capabilities:
 
 1. **User Query**: The agent receives a person's name or email as input
 2. **Web Research**: Perplexity's model searches the web for information about the person

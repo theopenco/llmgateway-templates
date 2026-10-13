@@ -22,7 +22,7 @@ A full-stack Next.js app that generates Open Graph images with AI-powered copy v
 
 - **Framework**: Next.js 16 (App Router)
 - **UI**: React 19, Tailwind CSS 4, shadcn/ui
-- **AI**: Vercel AI SDK (`generateObject`), LLM Gateway Provider
+- **AI**: AI SDK 7 (`generateText` + `Output.object`), LLM Gateway Provider
 - **OG Image**: `next/og` ImageResponse (Edge Runtime)
 - **Icons**: Lucide React
 
@@ -30,7 +30,7 @@ A full-stack Next.js app that generates Open Graph images with AI-powered copy v
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 22+ (24 LTS recommended)
 - pnpm
 - [LLM Gateway API Key](https://llmgateway.io)
 
@@ -111,7 +111,7 @@ Render an OG image as PNG.
 
 ## Model catalog
 
-The picker is filled at request time from the gateway's public [`/v1/models`](https://api.llmgateway.io/v1/models) catalog (`src/lib/models.ts`, revalidated hourly), so models added to LLM Gateway show up without a code change. Model ids are sent unprefixed (`gemini-3.1-flash-image-preview`) so the gateway [smart-routes](https://docs.llmgateway.io/features/routing) each request to the best available provider — prefix one with a provider id (`google-ai-studio/gemini-3.1-flash-image-preview`) to pin it instead.
+The picker is filled at request time from the gateway's public [`/v1/models`](https://api.llmgateway.io/v1/models) catalog (`src/lib/models.ts`, revalidated hourly), so models added to LLM Gateway show up without a code change. Model ids are sent unprefixed (`gemini-3.1-flash-image`) so the gateway [smart-routes](https://docs.llmgateway.io/features/routing) each request to the best available provider — prefix one with a provider id (`google-ai-studio/gemini-3.1-flash-image`) to pin it instead.
 
 ## License
 

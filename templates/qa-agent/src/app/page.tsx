@@ -9,7 +9,7 @@ export default async function Home() {
   return (
     <QATester
       models={models}
-      defaultModel={pickDefaultModel(models, "claude-sonnet-5")}
+      defaultModel={pickDefaultModel(models, "claude-sonnet-5-5")}
     />
   );
 }

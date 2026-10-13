@@ -7,7 +7,7 @@ export default async function Home() {
   return (
     <FeedbackDashboard
       models={models}
-      defaultModel={pickDefaultModel(models, "gpt-5.4-mini")}
+      defaultModel={pickDefaultModel(models, "gpt-6-luna")}
     />
   );
 }

@@ -13,8 +13,8 @@ A command-line AI agent that answers weather-related queries using tool-based in
 
 ## Tech Stack
 
-- **Runtime**: Node.js 20+ (ES Modules)
-- **Language**: TypeScript 5.7
+- **Runtime**: Node.js 22+ (ES Modules)
+- **Language**: TypeScript 6
 - **AI**: Vercel AI SDK, LLM Gateway Provider
 - **Validation**: Zod
 
@@ -22,7 +22,7 @@ A command-line AI agent that answers weather-related queries using tool-based in
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 22+ (24 LTS recommended)
 - pnpm
 - [LLM Gateway API Key](https://llmgateway.io)
 
@@ -82,7 +82,7 @@ The weather agent uses a tool-based architecture:
 
 1. **User Query**: The agent receives a natural language question about weather
 2. **Tool Selection**: The LLM decides which tool(s) to use
-3. **Tool Execution**: Tools fetch weather data (mock data in this template)
+3. **Tool Execution**: Tools geocode the city and fetch live data from [Open-Meteo](https://open-meteo.com) (free, no API key)
 4. **Response Generation**: The LLM synthesizes the data into a natural response
 
 ### Available Tools
@@ -140,7 +140,7 @@ const myTool = {
 };
 ```
 
-2. Add it to the `tools` object in the `generateText` call.
+2. Add it to the `tools` object of the `ToolLoopAgent`.
 
 ### Changing the Model
 
@@ -150,17 +150,15 @@ Update the model in `src/index.ts`:
 model: llmgateway("your-preferred-model"),
 ```
 
-### Real Weather Data
+### Weather Data
 
-Replace the mock data functions with actual API calls:
+Weather comes from the [Open-Meteo](https://open-meteo.com) forecast and geocoding APIs. They are free for non-commercial use and need no key. For commercial traffic, use an Open-Meteo API plan or swap the `forecastApi` helper for your provider.
 
-```typescript
-execute: async ({ location, unit }) => {
-  const response = await fetch(
-    `https://api.weather.com/v1/current?location=${location}`
-  );
-  return response.json();
-},
+### Asking Your Own Question
+
+```bash
+pnpm build
+pnpm start "Will it snow in Oslo this week?"
 ```
 
 ## Architecture

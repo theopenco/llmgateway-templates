@@ -7,7 +7,7 @@ export default async function Home() {
   return (
     <ImageGenerator
       models={models}
-      defaultModel={pickDefaultModel(models, "gemini-3.1-flash-image-preview")}
+      defaultModel={pickDefaultModel(models, "gemini-3.1-flash-image")}
     />
   );
 }
