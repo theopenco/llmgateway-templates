@@ -143,6 +143,12 @@ export const templates: Template[] = [
     path: "agents/meeting-notes-agent",
   },
   {
+    name: "sql-agent",
+    description: "CLI agent that answers data questions by writing safe SQLite",
+    category: "agent",
+    path: "agents/sql-agent",
+  },
+  {
     name: "support-triage-agent",
     description: "CLI agent that triages support tickets and drafts replies",
     category: "agent",
