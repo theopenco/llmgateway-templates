@@ -19,7 +19,8 @@
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "test": "node --experimental-test-module-mocks --test test/*.test.mjs"
   },
   "keywords": [
     "llm",

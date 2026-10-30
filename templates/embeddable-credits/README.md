@@ -32,7 +32,8 @@ Browser                         Your backend                LLM Gateway
   │  <LLMGatewayProvider session=…>
   │     <CreditBalance/>  ── GET  /v1/wallet/balance (es_) ───────▶ wallet balance
   │     <BuyCredits/>     ── POST /v1/wallet/top-up   (es_) ───────▶ Stripe PaymentIntent
-  │                          confirm card in <PaymentElement>  ──▶ webhook credits wallet
+  │                          review card-specific fees, then POST /v1/wallet/confirm-top-up
+│                          complete authentication if needed ──▶ webhook credits wallet
   │     client.stream()   ── POST /v1/chat/completions (es_) ─────▶ AI; debits wallet
 ```
 
@@ -54,6 +55,27 @@ key — never your secret key.
 
 Open http://localhost:3000 — you'll get a session automatically, can stream a
 chat completion (debits the wallet), and buy credits via Stripe.
+
+## Checkout fees and upgrades
+
+Checkout collects a card, shows the 5% platform fee and separate 1.5% fee for
+non-US-issued cards, and waits for explicit payment confirmation. Fees do not
+reduce wallet credits, developer margin, or bonus credits.
+
+Upgrade both `@llmgateway/client` and `@llmgateway/elements` for this checkout
+contract. Headless integrations now call `createTopUp(amount, paymentMethodId)`,
+show `platformFee`, `internationalFee` and `totalAmount`, then call
+`confirmTopUp(paymentIntentId)`. Handle `requires_action` with Stripe.js
+`handleNextAction` and reconfirm the same intent. Older cardless top-up requests
+are rejected. Coordinate the SDK upgrade with the gateway API deployment.
+
+Build the packages before running their regression tests (Node.js 22.3+):
+
+```bash
+pnpm exec turbo build --filter=@llmgateway/elements
+pnpm --filter @llmgateway/client test
+pnpm --filter @llmgateway/elements test
+```
 
 ## Production notes
 
