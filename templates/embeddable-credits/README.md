@@ -64,6 +64,8 @@ reduce wallet credits, developer margin, or bonus credits.
 
 Upgrade both `@llmgateway/client` and `@llmgateway/elements` for this checkout
 contract. Headless integrations now call `createTopUp(amount, paymentMethodId)`,
+initialize Stripe.js with the mode-matched `getStripePublishableKey("test")` or
+`getStripePublishableKey("prod")` exported by `@llmgateway/client`,
 show `platformFee`, `internationalFee` and `totalAmount`, then call
 `confirmTopUp(paymentIntentId)`. Handle `requires_action` with Stripe.js
 `handleNextAction` and reconfirm the same intent. Older cardless top-up requests

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { LLMGatewayClient } from "../dist/index.js";
+import { LLMGatewayClient, getStripePublishableKey } from "../dist/index.js";
 
 test("quotes and confirms using authenticated card-bound requests", async () => {
   const requests = [];
@@ -45,4 +45,14 @@ test("propagates quote and confirmation errors", async () => {
   });
   await assert.rejects(client.createTopUp(100, "pm_test"), /Card unavailable/);
   await assert.rejects(client.confirmTopUp("pi_test"), /Card unavailable/);
+});
+
+test("selects bundled Stripe keys for test and live wallets", () => {
+  assert.ok(getStripePublishableKey("test").startsWith("pk_test_"));
+  assert.ok(getStripePublishableKey("internal").startsWith("pk_test_"));
+  assert.ok(getStripePublishableKey("prod").startsWith("pk_live_"));
+  assert.ok(getStripePublishableKey() === getStripePublishableKey("prod"));
+  assert.ok(
+    getStripePublishableKey("test") !== getStripePublishableKey("prod"),
+  );
 });
