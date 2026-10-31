@@ -46,6 +46,10 @@ pnpm publish --access public
 git push origin main --tags
 ```
 
+## Embeddable SDK releases
+
+Client, server and Elements packages publish automatically from `main`. Their default commit analyzer requires an explicit `BREAKING CHANGE:` footer for a major release; a `!` in the header alone does not trigger a release. Preserve the footer in the squash commit and include a changed file in every affected package.
+
 ## Required Secrets
 
 Make sure these secrets are configured in GitHub repository settings:
