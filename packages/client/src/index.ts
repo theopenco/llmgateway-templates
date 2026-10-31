@@ -132,13 +132,19 @@ export interface Balance {
 }
 
 export interface TopUp {
-  /** Stripe PaymentIntent client secret — confirm it with Stripe.js. */
   clientSecret: string;
-  /** Total charged to the card (credits + fees). */
+  paymentIntentId: string;
   totalAmount: number;
-  /** Real spend power credited to the wallet after the developer markup. */
+  platformFee: number;
+  internationalFee: number;
   netCredited: number;
+  bonusCredited: number;
   isInternational: boolean;
+}
+
+export interface TopUpConfirmation {
+  clientSecret: string;
+  status: string;
 }
 
 /** @internal Loose shape of an error response body. */
@@ -391,11 +397,8 @@ export class LLMGatewayClient {
     return data;
   }
 
-  /**
-   * Create a Stripe PaymentIntent to add `amount` of credits to the wallet.
-   * Confirm the returned `clientSecret` client-side (e.g. with `@llmgateway/elements`).
-   */
-  async createTopUp(amount: number): Promise<TopUp> {
+  /** Quote a card top-up without charging. Review fees before confirmTopUp(). */
+  async createTopUp(amount: number, paymentMethodId: string): Promise<TopUp> {
     const token = await this.validToken();
     const res = await this.fetchImpl(`${this.apiBaseUrl}/v1/wallet/top-up`, {
       method: "POST",
@@ -403,16 +406,15 @@ export class LLMGatewayClient {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ amount }),
+      body: JSON.stringify({ amount, paymentMethodId }),
     });
     const data = (await res.json()) as TopUp & ErrorBody;
-    if (!res.ok) {
+    if (!res.ok)
       throw new LLMGatewayError(
         res.status,
         data?.message ?? "Failed to create top-up",
         data,
       );
-    }
     return data;
   }
 
@@ -475,4 +477,30 @@ export class LLMGatewayClient {
     }
     return this.session.token;
   }
+
+  /** Confirm the quoted card. Handle requires_action with Stripe.js, then call again. */
+  async confirmTopUp(paymentIntentId: string): Promise<TopUpConfirmation> {
+    const token = await this.validToken();
+    const res = await this.fetchImpl(
+      `${this.apiBaseUrl}/v1/wallet/confirm-top-up`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ paymentIntentId }),
+      },
+    );
+    const data = (await res.json()) as TopUpConfirmation & ErrorBody;
+    if (!res.ok)
+      throw new LLMGatewayError(
+        res.status,
+        data?.message ?? "Failed to confirm top-up",
+        data,
+      );
+    return data;
+  }
 }
+
+export { getStripePublishableKey } from "./stripe.js";

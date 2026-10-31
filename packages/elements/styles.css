@@ -79,6 +79,30 @@
 	cursor: not-allowed;
 }
 
+.lg-buy-credits__fees {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	margin: 0;
+	font-variant-numeric: tabular-nums;
+}
+
+.lg-buy-credits__fees > div {
+	display: flex;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.lg-buy-credits__fees dd {
+	margin: 0;
+}
+
+.lg-buy-credits__fees > div:last-child {
+	border-top: 1px solid var(--lg-color-border);
+	padding-top: 0.5rem;
+	font-weight: 600;
+}
+
 .lg-buy-credits__error {
 	color: var(--lg-color-error);
 	font-size: 0.875rem;
